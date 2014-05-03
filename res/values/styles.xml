@@ -1,0 +1,103 @@
+<resources 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:appcompat="http://schemas.android.com/apk/res/android.support.v7.appcompat">
+
+    <!--
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    -->
+    <style name="AppBaseTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+        
+        <item name="android:colorForeground">@color/bright_foreground_holo_light</item>
+        <item name="android:colorForegroundInverse">@color/bright_foreground_inverse_holo_light</item>
+        <item name="android:colorBackground">@color/background_holo_light</item>
+        <item name="android:disabledAlpha">0.5</item>
+        <item name="android:backgroundDimAmount">0.6</item>
+
+		<!-- <item name="android:listSelector">@drawable/list_selector_background</item> -->
+		<item name="android:absListViewStyle">@style/AbsListView</item>
+		
+		<item name="actionBarStyle">@style/ActionBar</item>
+    </style>
+    
+    <style name="ActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/title_background</item>
+        <item name="background">@color/title_background</item>
+    </style>
+    
+    <style name="DialogTheme" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@drawable/dialog_full_holo_dark</item>
+    </style>
+    
+    <style name="AbsListView" parent="@android:style/Widget.AbsListView">
+        <item name="android:listSelector">@drawable/list_selector_background</item>
+        <item name="android:divider">@drawable/divider_horizontal_holo</item>
+    </style>
+    
+    <style name="SearchBar">
+	    <item name="android:background">@drawable/bg_search</item>
+	    <item name="android:layout_height">@dimen/searchbar_height</item>
+	</style>
+	
+    <style name="SearchBar.EditText" parent="@android:style/Widget.TextView">
+	    <item name="android:background">@android:color/transparent</item>
+	    <item name="android:textColor">@android:color/black</item>
+	    <item name="android:layout_marginLeft">5.0dip</item>
+	    <item name="android:layout_marginRight">30.0dip</item>
+	    <item name="android:singleLine">true</item>
+	    <item name="android:inputType">textFilter</item>
+	</style>
+
+    <style name="SearchBar.Button" parent="@android:style/Widget.Button">
+	    <item name="android:padding">6dp</item>
+	    <item name="android:layout_height">@dimen/action_button_height</item>
+	    <item name="android:layout_width">@dimen/action_button_width</item>
+	    <item name="android:background">@drawable/searchbar_btn</item>
+	    <item name="android:textColor">@android:color/white</item>
+	    <item name="android:gravity">center</item>
+	    <item name="android:textStyle">bold</item>
+	    <item name="android:minHeight">30dp</item>
+        <item name="android:minWidth">30dp</item>
+	</style>
+	
+    <style name="SearchBar.Button.Disable" parent="@style/SearchBar.Button">
+	    <item name="android:background">@android:color/transparent</item>
+	</style>
+	
+    <style name="SearchBar.Button.Glass" parent="@style/SearchBar.Button.Disable">
+	    <item name="android:layout_height">@dimen/search_button_width</item>
+	    <item name="android:layout_width">@dimen/search_button_height</item>
+	    <item name="android:layout_marginLeft">3.0dip</item>
+	    <item name="android:src">@drawable/ic_action_search</item>
+	</style>
+	
+    <style name="SearchBar.Button.Clear" parent="@style/SearchBar.Button">
+	    <item name="android:layout_height">@dimen/clear_button_height</item>
+	    <item name="android:layout_width">@dimen/clear_button_width</item>
+	    <item name="android:layout_marginRight">10.0dip</item>
+	    <item name="android:src">@drawable/ic_clear_search</item>
+	</style>
+	
+    <style name="ButtonBar">
+        <item name="android:background">@color/background_default</item>
+        <item name="android:divider">@drawable/divider_horizontal_holo</item>
+        <item name="android:paddingBottom">0dip</item>
+        <item name="android:paddingLeft">0dip</item>
+        <item name="android:paddingRight">0dip</item>
+        <item name="android:paddingTop">0dip</item>
+        <item name="android:layout_height">@dimen/dialog_button_bar_height</item>
+    </style>
+    
+    <style name="ButtonBar.Button">
+        <item name="android:layout_marginTop">1dp</item>
+	    <item name="android:background">@drawable/buttonbar_btn</item>
+	    <item name="android:textColor">@color/bright_foreground_holo_dark</item>
+	    <item name="android:textStyle">normal</item>
+	</style>
+    
+</resources>

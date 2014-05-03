@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="false"
+	android:divider="@drawable/divider_horizontal_holo"
+	android:orientation="horizontal"
+	android:showDividers="middle"
+	android:weightSum="5"
+    android:background="@color/background"
+    tools:context=".MainActivity" >
+
+    <fragment
+		android:id="@+id/listContainer"
+		android:name="com.s16.engmyan.fragment.SearchListFragment"
+		android:layout_width="0dp"
+		android:layout_height="match_parent"
+		android:layout_weight="2"
+		android:padding="8dp"
+		tools:layout="@layout/search_list_fragment" />
+
+	<FrameLayout
+		android:id="@+id/detailContainer"
+		android:layout_width="0dp"
+		android:layout_height="match_parent"
+		android:layout_weight="3"
+		android:padding="8dp" />
+	
+</LinearLayout>

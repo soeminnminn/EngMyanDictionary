@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_marginBottom="@dimen/dialog_vertical_margin"
+    android:layout_marginLeft="@dimen/dialog_horizontal_margin"
+    android:layout_marginRight="@dimen/dialog_horizontal_margin"
+    android:layout_marginTop="@dimen/dialog_vertical_margin"
+    tools:context=".MainActivity" >
+
+    <LinearLayout
+        android:id="@+id/layoutButtonBar"
+        style="@style/ButtonBar"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical" >
+		
+		<View 
+		    android:layout_width="match_parent" 
+		    android:layout_height="1dp" 
+		    android:background="@color/white_50_opacity" />
+		
+	    <Button
+	        android:id="@android:id/closeButton"
+	        style="@style/ButtonBar.Button"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:layout_gravity="bottom"
+	        android:contentDescription="@string/empty_string"
+	        android:text="@android:string/cancel" />
+    </LinearLayout>
+
+    <WebView
+        android:id="@+id/webViewCredit"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/layoutButtonBar" />
+
+</RelativeLayout>

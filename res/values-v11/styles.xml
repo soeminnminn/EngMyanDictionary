@@ -1,0 +1,27 @@
+<resources>
+
+    <!--
+        Base application theme for API 11+. This theme completely replaces
+        AppBaseTheme from res/values/styles.xml on API 11+ devices.
+    -->
+    <style name="AppBaseTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        <!-- API 11 theme customizations can go here. -->
+        <item name="android:actionBarStyle">@style/ActionBar</item>
+        <item name="actionBarStyle">@style/ActionBar</item>
+        <item name="android:dialogTheme">@style/DialogTheme</item>
+    </style>
+    
+    <style name="ActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/title_background</item>
+    </style>
+    
+    <style name="DialogTheme" parent="@android:style/Theme.Holo.Dialog">
+    </style>
+    
+    <style name="AbsListView" parent="@android:style/Widget.AbsListView">
+    </style>
+    
+    <style name="ButtonBar.Button" parent="@android:style/Widget.Holo.Button.Borderless">
+	</style>
+	
+</resources>
