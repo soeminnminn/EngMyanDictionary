@@ -3,6 +3,7 @@ package com.s16.engmyan.fragment;
 import com.s16.engmyan.Constants;
 import com.s16.engmyan.R;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ public class CreditFragment extends DialogFragment {
         super.onCreate(icicle);
 	}
 	
+	@SuppressLint("SetJavaScriptEnabled")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -51,6 +53,8 @@ public class CreditFragment extends DialogFragment {
 		getDialog().setTitle(R.string.prefs_credit);
 		
 		WebView webView = (WebView)view.findViewById(R.id.webViewCredit);
+		webView.getSettings().setAllowFileAccess(true);
+		webView.getSettings().setJavaScriptEnabled(true);
 		webView.loadUrl(Constants.URL_CREDIT);
 		
 		Button closeButton = (Button)view.findViewById(android.R.id.closeButton); 

@@ -9,6 +9,11 @@
 			android:defaultValue="true" />
         
         <Preference 
+            android:key="prefs_clear_recent"
+            android:summary="@string/prefs_clear_recent_summary"
+            android:title="@string/prefs_clear_recent" />
+        
+        <Preference 
             android:key="prefs_credit"
             android:summary="@string/prefs_credit_summary"
             android:title="@string/prefs_credit" />

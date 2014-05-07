@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutFavorites"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_default" >
+
+    <include layout="@layout/favorites_title_frame" />
+    <include layout="@layout/favorite_edit_frame" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:baselineAligned="false"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="@dimen/dialog_vertical_margin"
+        android:layout_marginLeft="@dimen/dialog_horizontal_margin"
+        android:layout_marginRight="@dimen/dialog_horizontal_margin"
+        android:layout_marginTop="@dimen/top_margin_actionbar"
+        android:background="@color/white" >
+
+        <ListView
+            android:id="@+id/listViewFavorites"
+            style="@style/AbsListViewHolo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" >
+
+        </ListView>
+
+    </LinearLayout>
+
+</RelativeLayout>

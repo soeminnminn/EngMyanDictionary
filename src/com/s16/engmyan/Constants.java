@@ -7,6 +7,8 @@ import android.os.Environment;
 
 public class Constants {
 	
+	public static final String EMPTY_STRING = "";
+	
 	public static final String ANDROID_DATA = "/Android/data/";
 	public static final String ANDROID_OBB = "/Android/obb/";
 	
@@ -17,6 +19,7 @@ public class Constants {
 	
 	public static final String SEARCH_TEXT_KEY = "search_text";
 	public static final String DETAIL_ID_KEY = "detail_id";
+	public static final String DETAIL_DATA_KEY = "detail_data";
 	
 	public static final String DETAIL_WORD_KEY = "detail_word";
 	public static final String DETAIL_TITLE_KEY = "detail_title";
@@ -36,13 +39,14 @@ public class Constants {
     public static final String ENCODING = "utf-8";
     
     public static final String PREFS_USED_UNICODE_FIX = "prefs_used_unicode_fix";
+    public static final String PREFS_CLEAR_RECENT = "prefs_clear_recent";
     public static final String PREFS_CREDIT = "prefs_credit";
     public static final String PREFS_ABOUT = "prefs_about";
     
     public static final int REQUEST_SETTINGS = 1;
     public static final int REQUEST_DETAIL = 2;
     
-    public static final long DATA_VERSION = 1000;
+    public static final long DATA_VERSION = 2000;
 	
 	private static String DATA_FOLDER;
 	
@@ -59,7 +63,7 @@ public class Constants {
 		return null;
 	}
 	
-	public static File getDatabase(Context context) {
+	public static File getDatabaseFile(Context context) {
 		File dataFolder = getDataFolder(context);
 		if(dataFolder != null) {
 			boolean success = true;

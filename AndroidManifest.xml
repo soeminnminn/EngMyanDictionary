@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.s16.engmyan"
     android:versionCode="1"
-    android:versionName="1.0"
+    android:versionName="2.0.0"
     android:installLocation="auto" >
 
     <uses-sdk
@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name="com.s16.engmyan.DictionaryApp"
+        android:name="com.s16.engmyan.MainApp"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -46,6 +46,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.s16.engmyan.activity.MainActivity" />
         </activity>
+        
+        <provider android:name="com.s16.engmyan.data.UserDataProvider"
+            android:authorities="com.s16.engmyan.data.userdataprovider"
+            android:enabled="true"
+            android:exported="false">
+        </provider>
     </application>
 
 </manifest>

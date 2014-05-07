@@ -1,0 +1,6 @@
+<resources>
+
+	<item name="favorites_fragment" type="layout">@layout/favorites_fragment_small</item>
+	<item name="recents_fragment" type="layout">@layout/recents_fragment_small</item>
+
+</resources>

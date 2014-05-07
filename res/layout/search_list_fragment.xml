@@ -3,39 +3,17 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@color/background" >
-    
-    <RelativeLayout 
-        style="@style/SearchBar" 
-        android:layout_width="fill_parent" 
-        android:layout_marginTop="@dimen/searchbar_margin_top" 
+
+	<com.s16.widget.SearchBarView
+	    android:id="@+id/searchBarView"
+	    android:layout_width="fill_parent"
+	    android:layout_height="@dimen/searchbar_height"
+	    android:layout_marginTop="@dimen/searchbar_margin_top" 
         android:layout_marginLeft="@dimen/content_horizontal_margin" 
         android:layout_marginRight="@dimen/content_horizontal_margin"
-        android:layout_height="@dimen/searchbar_height" >
-
-        <ImageButton
-            android:id="@+id/btnSearhNormal"
-            style="@style/SearchBar.Button.Glass"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:contentDescription="@string/empty_string" />
-
-        <EditText
-            android:id="@+id/txtSearch"
-            style="@style/SearchBar.EditText"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/btnSearhNormal" />
-        
-        <ImageButton
-            android:id="@+id/btnSearhClear"
-            style="@style/SearchBar.Button.Clear"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:contentDescription="@string/empty_string" />
-
-    </RelativeLayout>
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentTop="true" >
+	</com.s16.widget.SearchBarView>
     
 	<RelativeLayout
 	    android:layout_width="fill_parent"
@@ -46,7 +24,7 @@
 
 		<ListView
 		    android:id="@+id/listViewResult"
-		    style="@style/AbsListView"
+		    style="@style/AbsListViewHolo"
 		    android:layout_width="match_parent"
 		    android:layout_height="match_parent"
 		    android:layout_alignParentLeft="true"

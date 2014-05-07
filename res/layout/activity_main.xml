@@ -1,9 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:id="@+id/listContainer"
-	android:name="com.s16.engmyan.fragment.SearchListFragment"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	tools:context=".MainActivity"
-	tools:layout="@layout/search_list_fragment" />
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    tools:context=".MainActivity" >
+    
+	<fragment 
+		android:id="@+id/listContainer"
+		android:name="com.s16.engmyan.fragment.SearchListFragment"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		tools:layout="@layout/search_list_fragment" />
+	
+	<fragment 
+		android:id="@+id/recentsContainer"
+		android:name="com.s16.engmyan.fragment.RecentsFragment"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		tools:layout="@layout/recents_fragment" />
+	
+    <fragment 
+		android:id="@+id/favoritesContainer"
+		android:name="com.s16.engmyan.fragment.FavoritesFragment"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		tools:layout="@layout/favorites_fragment" />
+	
+</RelativeLayout>

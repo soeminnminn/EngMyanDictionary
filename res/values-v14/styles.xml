@@ -8,8 +8,9 @@
     <style name="AppBaseTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <!-- API 14 theme customizations can go here. -->
         <item name="android:actionBarStyle">@style/ActionBar</item>
-        <item name="actionBarStyle">@style/ActionBar</item>
         <item name="android:dialogTheme">@style/DialogTheme</item>
+        <item name="android:absListViewStyle">@style/AbsListViewHolo</item>
+        <item name="actionBarStyle">@style/ActionBar</item>
     </style>
     
     <style name="ActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
@@ -18,8 +19,12 @@
     
     <style name="DialogTheme" parent="@android:style/Theme.Holo.Dialog">
     </style>
+    <style name="DialogTheme.NoTitle" parent="@style/DialogTheme">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
     
-    <style name="AbsListView" parent="@android:style/Widget.AbsListView">
+    <style name="AbsListViewHolo" parent="@android:style/Widget.AbsListView">
     </style>
     
     <style name="ButtonBar.Button" parent="@android:style/Widget.Holo.Button.Borderless">

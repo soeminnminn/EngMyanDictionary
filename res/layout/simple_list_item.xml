@@ -13,20 +13,12 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/text1"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="@dimen/list_item_horizontal_margin"
-    android:layout_marginRight="@dimen/list_item_horizontal_margin"
-    android:orientation="vertical" >
-
-	<TextView
-	    android:id="@android:id/text1"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:gravity="center_vertical"
-	    android:minHeight="@dimen/list_item_min_height" />
-    
-</LinearLayout>
-
-
+    android:gravity="center_vertical"
+    android:paddingLeft="@dimen/list_item_horizontal_margin"
+    android:paddingRight="@dimen/list_item_horizontal_margin"
+    android:minHeight="@dimen/list_item_min_height"
+/>

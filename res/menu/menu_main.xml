@@ -1,10 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
+    <item android:id="@+id/action_moreoverflow"
+          android:icon="@drawable/ic_action_moreoverflow"
+          android:title="@string/action_moreoverflow" 
+          android:showAsAction="always" />
+    <!-- 
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:icon="@drawable/ic_action_settings"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="never"
         android:title="@string/action_settings"/>
-
+ 	 -->
 </menu>

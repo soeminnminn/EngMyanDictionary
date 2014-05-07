@@ -1,13 +1,11 @@
 package com.s16.engmyan.activity;
 
-import java.io.File;
-
 import com.s16.engmyan.Constants;
-import com.s16.engmyan.data.DataProvider;
+import com.s16.engmyan.data.DictionaryItem;
+import com.s16.engmyan.data.UserDataProvider;
 import com.s16.engmyan.fragment.DetailViewFragment;
 import com.s16.engmyan.R;
 
-import android.database.SQLException;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,14 +16,17 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class DetailActivity extends ActionBarActivity {
 	
 	protected static String TAG = DetailActivity.class.getSimpleName();
 	
 	private DetailViewFragment mDetailView;
+	private MenuItem mMenuItemFavorite;
 	private MenuItem mMenuItemSound;
 	private MenuItem mMenuItemPicture;
+	private long mDetailId = -1;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +42,10 @@ public class DetailActivity extends ActionBarActivity {
 			mDetailView = (DetailViewFragment)fragment;
 		}
 		
-		Bundle extras = getIntent().getExtras();
-		long id = extras.getLong(Constants.DETAIL_ID_KEY);
-		CharSequence dbFilePath = extras.getCharSequence(Constants.DATABASE_FILE_KEY);
-		if(id > -1) {
-			initialize(actionBar, dbFilePath, id);			
+		mDetailId = getIntent().getLongExtra(Constants.DETAIL_ID_KEY, -1);
+		final DictionaryItem itemData = getIntent().getParcelableExtra(Constants.DETAIL_DATA_KEY);
+		if ((mDetailId >= 0) && (itemData != null)) {
+			initialize(actionBar, itemData);
 		}
 	}
 	
@@ -57,6 +57,12 @@ public class DetailActivity extends ActionBarActivity {
 	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
+		mMenuItemFavorite = menu.findItem(R.id.action_favorite);
+		if (mMenuItemFavorite != null) {
+			MenuItemCompat.setShowAsAction(mMenuItemFavorite, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+			setIfFavorties();
+		}
+		
 		mMenuItemSound = menu.findItem(R.id.action_sound);
 		if (mMenuItemSound != null) {
 			MenuItemCompat.setShowAsAction(mMenuItemSound, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
@@ -77,6 +83,9 @@ public class DetailActivity extends ActionBarActivity {
 		switch (item.getItemId()) {
 			case android.R.id.home:
 				NavUtils.navigateUpFromSameTask(this);
+				break;
+			case R.id.action_favorite:
+				performFavorite();
 				break;
 			case R.id.action_sound:
 				doSpeak();
@@ -100,28 +109,38 @@ public class DetailActivity extends ActionBarActivity {
 		super.onBackPressed();
 	}
 	
-	private void initialize(ActionBar actionBar, CharSequence dbFilePath, long id) {
-		if ((dbFilePath == null) || (dbFilePath == "")) return;
+	private void initialize(ActionBar actionBar, DictionaryItem itemData) {
+		if ((itemData == null) || (itemData.id < 0)) return;
 		if (mDetailView == null) return;
 		
-		File dbFile = new File(dbFilePath.toString());
-		if (!dbFile.exists()) return;
-		
-		DataProvider dataProvider = new DataProvider(getBaseContext(), dbFile);
-		try {
-			if(!dataProvider.isOpen()) 
-				dataProvider.open();
-		} catch(SQLException ex) {
-			ex.printStackTrace();
-		}
-		
-		mDetailView.setData(dataProvider, id);
+		mDetailView.setData(itemData);
 		String title = mDetailView.getTitle();
 		if ((actionBar != null) && (!TextUtils.isEmpty(title))) {
 			actionBar.setTitle(title);
 		}
-		
-		dataProvider.close();
+	}
+	
+	protected void performFavorite() {
+		if ((mDetailId > -1) && (mDetailView != null)) {
+			if (!UserDataProvider.isFavorited(this, mDetailId)) {
+				UserDataProvider.createFavorite(this, mDetailView.getTitle(), mDetailId);
+				
+				if (UserDataProvider.isFavorited(this, mDetailId)) {
+					Toast.makeText(this, R.string.add_favorites_message, Toast.LENGTH_LONG).show();
+					mMenuItemFavorite.setIcon(R.drawable.ic_action_star_on);
+				}
+			}
+		}
+	}
+	
+	protected void setIfFavorties() {
+		if ((mDetailId > -1) && (mMenuItemFavorite != null)) {
+			if (UserDataProvider.isFavorited(this, mDetailId)) {
+				mMenuItemFavorite.setIcon(R.drawable.ic_action_star_on);
+			} else {
+				mMenuItemFavorite.setIcon(R.drawable.ic_action_star);
+			}
+		}
 	}
 	
 	protected void toggleImageView() {
@@ -135,14 +154,4 @@ public class DetailActivity extends ActionBarActivity {
 			mDetailView.doSpeak();
 		}
 	}
-	
-	@Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();    
-    }
 }

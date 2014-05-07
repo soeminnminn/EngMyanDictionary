@@ -3,6 +3,13 @@ package com.s16.engmyan;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.database.Cursor;
+import android.text.Html;
+import android.view.ContextThemeWrapper;
+
 public class Utility {
 	
 	private static final int NULL_CHAR = 0x00;
@@ -68,6 +75,15 @@ public class Utility {
 		return result.toString();
 	}
 	
+	public static boolean isNull(Cursor cursor, String column) {
+		if (cursor == null) return true;
+		if (cursor.getCount() < 1) return true;
+		if ((column == null) || (column == "")) return true;
+		int columnIndex = cursor.getColumnIndex(column);
+		if (columnIndex < 0) return true;
+		return cursor.isNull(columnIndex);
+	}
+	
 	public static boolean isMyChar(int code) {
 		return (code >= 0x1000 && code <= 0x109F) || (code >= 0xAA60 && code <= 0xAA7B);
 	}
@@ -116,4 +132,30 @@ public class Utility {
     	}
 		return String.valueOf(chArray);
 	}
+
+	public static int getConfigScreenSize(Context context) {
+		return context.getResources().getInteger(R.integer.config_screen);
+	}
+	
+	public static int getConfigScreenOrientation(Context context) {
+		return context.getResources().getConfiguration().orientation;
+	}
+	
+	public static void showAboutDialog(Context context) {
+    	
+		final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(context, R.style.DialogTheme));
+		dialogBuilder.setIcon(android.R.drawable.ic_dialog_info);
+		dialogBuilder.setTitle(R.string.action_about);
+		String html = context.getText(R.string.about_text).toString();
+		dialogBuilder.setMessage(Html.fromHtml(html));
+		
+		dialogBuilder.setNegativeButton(context.getText(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		dialogBuilder.setPositiveButton(null, null);
+		dialogBuilder.show();
+    }
 }

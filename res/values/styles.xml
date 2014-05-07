@@ -20,7 +20,9 @@
         <item name="android:backgroundDimAmount">0.6</item>
 
 		<!-- <item name="android:listSelector">@drawable/list_selector_background</item> -->
-		<item name="android:absListViewStyle">@style/AbsListView</item>
+		<item name="android:absListViewStyle">@style/AbsListViewHolo</item>
+		<item name="android:checkboxStyle">@style/CheckBoxHoloLight</item>
+		<item name="android:radioButtonStyle">@style/RadioButtonHoloLight</item>
 		
 		<item name="actionBarStyle">@style/ActionBar</item>
     </style>
@@ -33,26 +35,35 @@
     <style name="DialogTheme" parent="@android:style/Theme.Dialog">
         <item name="android:windowBackground">@drawable/dialog_full_holo_dark</item>
     </style>
+    <style name="DialogTheme.NoTitle" parent="@style/DialogTheme">
+        <item name="android:windowNoTitle">true</item>
+    </style>
     
-    <style name="AbsListView" parent="@android:style/Widget.AbsListView">
-        <item name="android:listSelector">@drawable/list_selector_background</item>
-        <item name="android:divider">@drawable/divider_horizontal_holo</item>
+    <style name="AbsListViewHolo" parent="@android:style/Widget.AbsListView">
+        <item name="android:listSelector">@drawable/list_selector_holo_light</item>
+        <item name="android:divider">@drawable/list_divider_holo_light</item>
+    </style>
+    
+    <style name="CheckBoxHoloLight" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/btn_check_holo_light</item>
+    </style>
+    
+    <style name="RadioButtonHoloLight" parent="@android:style/Widget.CompoundButton.RadioButton">
+        <item name="android:button">@drawable/btn_radio_holo_light</item>
     </style>
     
     <style name="SearchBar">
 	    <item name="android:background">@drawable/bg_search</item>
 	    <item name="android:layout_height">@dimen/searchbar_height</item>
 	</style>
-	
     <style name="SearchBar.EditText" parent="@android:style/Widget.TextView">
 	    <item name="android:background">@android:color/transparent</item>
 	    <item name="android:textColor">@android:color/black</item>
-	    <item name="android:layout_marginLeft">5.0dip</item>
+	    <item name="android:layout_marginLeft">30.0dip</item>
 	    <item name="android:layout_marginRight">30.0dip</item>
 	    <item name="android:singleLine">true</item>
 	    <item name="android:inputType">textFilter</item>
 	</style>
-
     <style name="SearchBar.Button" parent="@android:style/Widget.Button">
 	    <item name="android:padding">6dp</item>
 	    <item name="android:layout_height">@dimen/action_button_height</item>
@@ -64,35 +75,29 @@
 	    <item name="android:minHeight">30dp</item>
         <item name="android:minWidth">30dp</item>
 	</style>
-	
     <style name="SearchBar.Button.Disable" parent="@style/SearchBar.Button">
 	    <item name="android:background">@android:color/transparent</item>
 	</style>
-	
     <style name="SearchBar.Button.Glass" parent="@style/SearchBar.Button.Disable">
 	    <item name="android:layout_height">@dimen/search_button_width</item>
 	    <item name="android:layout_width">@dimen/search_button_height</item>
-	    <item name="android:layout_marginLeft">3.0dip</item>
 	    <item name="android:src">@drawable/ic_action_search</item>
 	</style>
-	
     <style name="SearchBar.Button.Clear" parent="@style/SearchBar.Button">
 	    <item name="android:layout_height">@dimen/clear_button_height</item>
 	    <item name="android:layout_width">@dimen/clear_button_width</item>
-	    <item name="android:layout_marginRight">10.0dip</item>
 	    <item name="android:src">@drawable/ic_clear_search</item>
 	</style>
 	
     <style name="ButtonBar">
         <item name="android:background">@color/background_default</item>
-        <item name="android:divider">@drawable/divider_horizontal_holo</item>
+        <item name="android:divider">@drawable/divider_horizontal_holo_dark</item>
         <item name="android:paddingBottom">0dip</item>
         <item name="android:paddingLeft">0dip</item>
         <item name="android:paddingRight">0dip</item>
         <item name="android:paddingTop">0dip</item>
         <item name="android:layout_height">@dimen/dialog_button_bar_height</item>
     </style>
-    
     <style name="ButtonBar.Button">
         <item name="android:layout_marginTop">1dp</item>
 	    <item name="android:background">@drawable/buttonbar_btn</item>
@@ -100,4 +105,36 @@
 	    <item name="android:textStyle">normal</item>
 	</style>
     
+    <style name="ActionMenuTheme">
+        <item name="popupMenuStyle">@style/Widget.AppCompat.PopupMenu</item>
+        <item name="android:textColorPrimaryDisableOnly">@android:color/white</item>
+    </style>
+    <style name="ActionMenuButtonTheme">
+        <item name="android:src">@drawable/ic_action_moreoverflow</item>
+    </style>
+    
+    <style name="DoneBar">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">@dimen/actionbar_height</item>
+        <item name="android:textColor">@color/bright_foreground_holo_dark</item>
+        <item name="android:background">@drawable/donebar_top_background</item>
+    </style>
+    <style name="DoneBar.Bottom">
+        <item name="android:background">@drawable/donebar_bottom_background</item>
+    </style>
+    <style name="DoneBar.Title" parent="@android:style/Widget.EditText">
+        <item name="android:background">@android:color/transparent</item>
+	    <item name="android:textColor">@color/textColorHighlight</item>
+    </style>
+    <style name="DoneBar.Button" parent="@android:style/Widget.Button">
+	    <item name="android:padding">6dp</item>
+	    <item name="android:layout_height">@dimen/action_button_height</item>
+	    <item name="android:layout_width">@dimen/action_button_width</item>
+	    <item name="android:background">@drawable/action_button</item>
+	    <item name="android:textColor">@android:color/white</item>
+	    <item name="android:gravity">center</item>
+	    <item name="android:textStyle">bold</item>
+	    <item name="android:minHeight">30dp</item>
+        <item name="android:minWidth">30dp</item>
+	</style>
 </resources>

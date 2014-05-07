@@ -35,6 +35,7 @@
         android:id="@+id/webViewCredit"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/layoutButtonBar" />
+        android:layout_above="@id/layoutButtonBar"
+        android:layout_marginBottom="1dp" />
 
 </RelativeLayout>

@@ -14,8 +14,8 @@ public class AnimatingRelativeLayout extends RelativeLayout
 		implements AnimationListener {
 	
 	private Context mContext;
-	private Animation mInAnimation;
-	private Animation mOutAnimation;
+	private Animation mShowAnimation;
+	private Animation mHideAnimation;
 	private AnimationCompleteListener mAnimationCompleteListener;
 	
 	public interface AnimationCompleteListener {
@@ -42,11 +42,12 @@ public class AnimatingRelativeLayout extends RelativeLayout
     }
 
     private void initAnimations() {
-        mInAnimation = (Animation)AnimationUtils.loadAnimation(mContext, R.anim.in_animation);
-        mInAnimation.setAnimationListener(this);
+    	if (isInEditMode()) return;
+        mShowAnimation = (Animation)AnimationUtils.loadAnimation(mContext, R.anim.expand_from_top);
+        mShowAnimation.setAnimationListener(this);
         
-        mOutAnimation = (Animation)AnimationUtils.loadAnimation(mContext, R.anim.out_animation);
-        mOutAnimation.setAnimationListener(this);
+        mHideAnimation = (Animation)AnimationUtils.loadAnimation(mContext, R.anim.collapse_to_top);
+        mHideAnimation.setAnimationListener(this);
     }
 
     public void show() {
@@ -56,7 +57,7 @@ public class AnimatingRelativeLayout extends RelativeLayout
 
     public void show(boolean withAnimation) {
     	if (isVisible()) return;
-        if (withAnimation) this.startAnimation(mInAnimation);
+        if (withAnimation) this.startAnimation(mShowAnimation);
         this.setVisibility(View.VISIBLE);
     }
 
@@ -67,7 +68,7 @@ public class AnimatingRelativeLayout extends RelativeLayout
 
     public void hide(boolean withAnimation) {
     	if (!isVisible()) return;
-        if (withAnimation) this.startAnimation(mOutAnimation);
+        if (withAnimation) this.startAnimation(mHideAnimation);
         this.setVisibility(View.GONE);
     }
 
@@ -75,14 +76,14 @@ public class AnimatingRelativeLayout extends RelativeLayout
         return (this.getVisibility() == View.VISIBLE);
     }
 
-    public void overrideDefaultInAnimation(Animation value) {
-        mInAnimation = value;
-        mInAnimation.setAnimationListener(this);
+    public void overrideDefaultShowAnimation(Animation value) {
+        mShowAnimation = value;
+        mShowAnimation.setAnimationListener(this);
     }
 
-    public void overrideDefaultOutAnimation(Animation value) {
-        mOutAnimation = value;
-        mOutAnimation.setAnimationListener(this);
+    public void overrideDefaultHideAnimation(Animation value) {
+        mHideAnimation = value;
+        mHideAnimation.setAnimationListener(this);
     }
     
     public void setAnimationCompleteListener(AnimationCompleteListener value) {

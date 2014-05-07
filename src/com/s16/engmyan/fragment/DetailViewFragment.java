@@ -6,14 +6,15 @@ import com.s16.engmyan.Constants;
 import com.s16.engmyan.ExpansionManager;
 import com.s16.engmyan.R;
 import com.s16.engmyan.Utility;
-import com.s16.engmyan.data.DataProvider;
+import com.s16.engmyan.data.DictionaryItem;
 import com.s16.widget.AnimatingRelativeLayout;
 import com.s16.widget.TouchImageView;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
@@ -22,6 +23,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -41,13 +43,7 @@ public class DetailViewFragment extends Fragment
 	private TouchImageView mImageView;
 	private ImageView mImageCaution; 
 	private WebView mWebView;
-	
-	private String mWord;
-	private String mTitle;
-	private String mDefinition;
-	private String mFileName;
-	private boolean mHasSound;
-	private boolean mHasPicture;
+	private DictionaryItem mData;
 	
 	public DetailViewFragment() {
 		super();
@@ -86,13 +82,8 @@ public class DetailViewFragment extends Fragment
 	
 	@Override
 	public void onSaveInstanceState(final Bundle outState) {
-		if (outState != null) {
-			outState.putString(Constants.DETAIL_WORD_KEY, mWord);
-			outState.putString(Constants.DETAIL_TITLE_KEY, mTitle);
-			outState.putString(Constants.DETAIL_DEFINITION_KEY, mDefinition);
-			outState.putString(Constants.DETAIL_FILENAME_KEY, mFileName);
-			outState.putBoolean(Constants.DETAIL_PICTURE_KEY, mHasPicture);
-			outState.putBoolean(Constants.DETAIL_SOUND_KEY, mHasSound);
+		if ((outState != null) && (mData != null)) {
+			outState.putParcelable(Constants.DETAIL_DATA_KEY, mData);
 		}
 		super.onSaveInstanceState(outState);
 	}
@@ -134,19 +125,14 @@ public class DetailViewFragment extends Fragment
 	
 	protected void setSaveInstanceState(Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
-			mWord = savedInstanceState.getString(Constants.DETAIL_WORD_KEY, "");
-			mTitle = savedInstanceState.getString(Constants.DETAIL_TITLE_KEY, "");
-			mDefinition = savedInstanceState.getString(Constants.DETAIL_DEFINITION_KEY, "");
-			mFileName = savedInstanceState.getString(Constants.DETAIL_FILENAME_KEY, "");
-			mHasPicture = savedInstanceState.getBoolean(Constants.DETAIL_PICTURE_KEY, false);
-			mHasSound = savedInstanceState.getBoolean(Constants.DETAIL_SOUND_KEY, false);
+			mData = savedInstanceState.getParcelable(Constants.DETAIL_DATA_KEY);
 		}
 	}
 	
 	protected void setDefinition() {
 		if (mWebView == null) return;
 		
-		if (TextUtils.isEmpty(mDefinition)) {
+		if ((mData == null) || (TextUtils.isEmpty(mData.definition))) {
 			mWebView.loadUrl(Constants.URL_NOT_FOUND);
 			return;
 		}
@@ -158,14 +144,18 @@ public class DetailViewFragment extends Fragment
 		html += "<head>";
 		html += "<meta name=\"viewport\" content=\"initial-scale=1.0, user-scalable=yes, width=device-width\" />";
 		html += "<meta content=\"" + Constants.MIME_TYPE + "; charset=" + Constants.ENCODING + "\" http-equiv=\"content-type\">";
-		html += "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">";
-		html += "<title>" + mTitle + "</title>";
+		html += "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/style.css\">";
+		if (TextUtils.isEmpty(mData.title)) {
+			html += "<title>Untitled</title>";
+		} else {
+			html += "<title>" + mData.title + "</title>";
+		}
 		html += "</head>";
 		html += "<body>";
 		if (usedUnicodeFix) {
-			html += Utility.ZawGyiDrawFix(mDefinition);
+			html += Utility.ZawGyiDrawFix(mData.definition);
 		} else {
-			html += mDefinition;
+			html += mData.definition;
 		}
 		html += "</html>";
 	
@@ -174,10 +164,11 @@ public class DetailViewFragment extends Fragment
 	}
 	
 	protected void setImageBitmap() {
+		if (mData == null) return;
 		Bitmap bitmap = null;
-		if (mHasPicture && !TextUtils.isEmpty(mFileName)) {
+		if (mData.picture && !TextUtils.isEmpty(mData.filename)) {
 				
-			String picturePath = Constants.PICTURE_FOLDER + mFileName + ".png";
+			String picturePath = Constants.PICTURE_FOLDER + mData.filename + ".png";
 			bitmap = ExpansionManager.getBitmapAssert(getContext(), picturePath);
 		}
 		
@@ -198,44 +189,24 @@ public class DetailViewFragment extends Fragment
 		}
 	}
 	
-	public void setData(DataProvider dataProvider, long id) {
-		if ((dataProvider == null) || (!dataProvider.isOpen())) return;
-		if (id < 0) return;
+	@SuppressLint("SetJavaScriptEnabled")
+	public void setData(DictionaryItem data) {
+		if ((data == null) || (data.id < 0)) return;
+		mData = data;
 		
-		Cursor cursor = dataProvider.queryDefinition(id);
-		if (!DataProvider.isNull(cursor, DataProvider.COLUMN_DEFINITION)) {
-			
-			if (!DataProvider.isNull(cursor, DataProvider.COLUMN_WORD)) {
-				int wordCol = cursor.getColumnIndex(DataProvider.COLUMN_WORD);
-				mWord = cursor.getString(wordCol);
-			}
-			
-			if (!DataProvider.isNull(cursor, DataProvider.COLUMN_TITLE)) {
-				int titleCol = cursor.getColumnIndex(DataProvider.COLUMN_TITLE);
-				mTitle = cursor.getString(titleCol);
-			}
-			
-			if (!DataProvider.isNull(cursor, DataProvider.COLUMN_DEFINITION)) {
-				int definitionCol = cursor.getColumnIndex(DataProvider.COLUMN_DEFINITION);
-				mDefinition = cursor.getString(definitionCol);
-			}
-			
-			if (!DataProvider.isNull(cursor, DataProvider.COLUMN_FILENAME)) {
-				int fileNameCol = cursor.getColumnIndex(DataProvider.COLUMN_FILENAME);
-				mFileName = cursor.getString(fileNameCol);
-			}
-			
-			int soundCol = cursor.getColumnIndex(DataProvider.COLUMN_SOUND);
-			mHasSound = cursor.getShort(soundCol) == 1;
-			
-			int pictureCol = cursor.getColumnIndex(DataProvider.COLUMN_PICTURE);
-			mHasPicture = cursor.getShort(pictureCol) == 1;
-			setImageBitmap();
-		} 
-		
+		setImageBitmap();
 		if (mWebView != null) {
-			mWebView.getSettings().setSupportZoom(true);
-			mWebView.getSettings().setBuiltInZoomControls(true);
+			WebSettings webViewSettings = mWebView.getSettings(); 
+			webViewSettings.setAllowFileAccess(true);
+			webViewSettings.setJavaScriptEnabled(true);
+			webViewSettings.setSupportZoom(true);
+			webViewSettings.setBuiltInZoomControls(true);
+			
+			if (Build.VERSION.SDK_INT >= 11) {
+				webViewSettings.setDisplayZoomControls(false);
+				webViewSettings.setAllowContentAccess(true);
+			}
+			
 			setDefinition();
 		}
 	}
@@ -248,16 +219,18 @@ public class DetailViewFragment extends Fragment
 	}
 	
 	public String getTitle() {
-		return mWord;
+		if (mData != null) return mData.word;
+		return Constants.EMPTY_STRING;
 	}
 	
 	public boolean getHasPicture() {
-		return mHasPicture;
+		if (mData != null) return mData.picture;
+		return false;
 	}
 	
 	public boolean getHasSound() {
 		if (ExpansionManager.isExpansionExists(getContext())) {
-			return mHasSound;
+			if (mData != null) return mData.sound;
 		}
 		return true;
 	}
@@ -274,22 +247,23 @@ public class DetailViewFragment extends Fragment
 	}
 	
 	public void doSpeak() {
+		if (mData == null) return;
 		if (ExpansionManager.isExpansionExists(getContext())) {
 			
-			if (mHasSound) {
-				char p = mFileName.charAt(0);
-				String soundPath = Constants.SOUND_FOLDER + p + "/" + mFileName + ".wav";
+			if ((mData.sound) && (!TextUtils.isEmpty(mData.filename))) {
+				char p = mData.filename.charAt(0);
+				String soundPath = Constants.SOUND_FOLDER + p + "/" + mData.filename + ".wav";
 				ExpansionManager.playSoundExpansion(getContext(), soundPath);
 				return;
 			}
 			
 		} else if ((mTextToSpeech != null) && mTextToSpeechEnabled) {
 			
-			if (!TextUtils.isEmpty(mWord)){
+			if (!TextUtils.isEmpty(mData.word)){
 				try {
 					mTextToSpeech.setLanguage(Locale.US);
 					
-					String text = mWord.charAt(0) == '-' ? mWord.substring(1) : mWord;
+					String text = mData.word.charAt(0) == '-' ? mData.word.substring(1) : mData.word;
 					if (mTextToSpeech.speak(text, 0, null) == TextToSpeech.SUCCESS) {
 						return;
 					}
@@ -301,7 +275,6 @@ public class DetailViewFragment extends Fragment
 		
 		Toast.makeText(getContext(), getString(R.string.no_sound_message), Toast.LENGTH_LONG).show();
 	}
-
 	
 	@Override
 	public void onAnimationComplete() {
