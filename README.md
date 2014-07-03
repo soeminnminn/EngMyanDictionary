@@ -15,6 +15,7 @@ English-Myanmar Dictionary
 - Add Nav Buttons on definition view.
 - Add loading progress on definition view.
 - Fix definition mistake.
+- Add Myanmar Language Resources (my_MM, my_ZG).
 - Bug fix.
 
 #### Version 2.0.0
