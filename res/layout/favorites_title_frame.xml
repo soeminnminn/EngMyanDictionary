@@ -31,5 +31,15 @@
         android:layout_marginBottom="2dp"
         android:layout_marginLeft="50dp"
         android:background="@color/bright_foreground_disabled_holo_light" />
+    
+    <ImageButton
+        android:id="@+id/editButton"
+        style="@style/DoneBar.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|center_vertical"
+        android:layout_marginRight="4dp"
+        android:contentDescription="@string/action_edit"
+        android:src="@drawable/ic_action_edit" />
 
 </FrameLayout>

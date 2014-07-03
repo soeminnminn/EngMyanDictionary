@@ -39,6 +39,7 @@ public class FavoritesFragment extends Fragment
 	private Animation mShowAnimation;
 	private Animation mHideAnimation;
 	private ListView mListFavorites;
+	private ImageButton mEditButton;
 	private FavoritesListAdapter mListAdapter;
 	private OnVisibilityChangeListener mOnVisibilityChangeListener;
 	private OnFavoritesListItemClickListener mOnFavoritesListItemClickListener;
@@ -124,6 +125,17 @@ public class FavoritesFragment extends Fragment
 		doneButton.setLongClickable(true);
 		doneButton.setOnLongClickListener(mViewOnLongClickListener);
 		
+		mEditButton = (ImageButton)view.findViewById(R.id.editButton);
+		mEditButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				setEditMode();
+			}
+		});
+		mEditButton.setLongClickable(true);
+		mEditButton.setOnLongClickListener(mViewOnLongClickListener);
+		
 		ImageButton selectAllButton = (ImageButton)view.findViewById(R.id.selectAllButton);
 		selectAllButton.setOnClickListener(new View.OnClickListener() {
 			
@@ -206,13 +218,19 @@ public class FavoritesFragment extends Fragment
 	}
 	
 	protected void setListData() {
+		boolean hasData = false;
 		if (mListFavorites != null) {
 			Cursor cursor = UserDataProvider.getAllFavorites(getContext());
 			if (cursor != null) {
 				mListAdapter = new FavoritesListAdapter(getContext(), cursor
 						, UserDataProvider.COLUMN_ID, UserDataProvider.COLUMN_WORD);
 				mListFavorites.setAdapter(mListAdapter);
+				hasData = mListAdapter.getCount() > 0;  
 			}
+		}
+		
+		if (mEditButton != null) {
+			mEditButton.setEnabled(hasData);
 		}
 	}
 	

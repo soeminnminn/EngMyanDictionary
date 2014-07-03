@@ -15,9 +15,13 @@ public class Utility {
 	private static final int NULL_CHAR = 0x00;
 	
 	public static CharSequence RegexReplace(CharSequence data, CharSequence find, CharSequence replacement) {
+		return RegexReplace(data, find, replacement, 0);
+	}
+	
+	public static CharSequence RegexReplace(CharSequence data, CharSequence find, CharSequence replacement, int flags) {
 		if ((data == null) || (data == "")) return data;
 		StringBuffer result = new StringBuffer();
-		Pattern pattern = Pattern.compile(find.toString());
+		Pattern pattern = (flags == 0) ? Pattern.compile(find.toString()) : Pattern.compile(find.toString(), flags);
 		Matcher m = pattern.matcher(data);
 		while(m.find()) {
 			StringBuffer replacementBuffer = new StringBuffer();
@@ -74,6 +78,34 @@ public class Utility {
 		m.appendTail(result);
 		return result.toString();
 	}
+	
+	public static String wildcardToRegex(String wildcard){
+        StringBuffer s = new StringBuffer(wildcard.length());
+        s.append('^');
+        for (int i = 0, is = wildcard.length(); i < is; i++) {
+            char c = wildcard.charAt(i);
+            switch(c) {
+                case '*':
+                    s.append(".*");
+                    break;
+                case '?':
+                    s.append(".");
+                    break;
+                    // escape special regexp-characters
+                case '(': case ')': case '[': case ']': case '$':
+                case '^': case '.': case '{': case '}': case '|':
+                case '\\':
+                    s.append("\\");
+                    s.append(c);
+                    break;
+                default:
+                    s.append(c);
+                    break;
+            }
+        }
+        s.append('$');
+        return(s.toString());
+    }
 	
 	public static boolean isNull(Cursor cursor, String column) {
 		if (cursor == null) return true;

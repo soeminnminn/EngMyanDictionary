@@ -5,13 +5,17 @@ import com.s16.engmyan.Utility;
 import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 public class DictionaryItem implements Parcelable {
 
 	public int id;
 	public String word;
+	public String stripword;
 	public String title;
 	public String definition;
+	public String keywords;
+	public String synonym;
 	public String filename;
 	public boolean picture;
 	public boolean sound;
@@ -28,6 +32,60 @@ public class DictionaryItem implements Parcelable {
 		
 	};
 	
+	public static DictionaryItem getFrom(DictionaryDataProvider dataProvider, long id) {
+		if ((dataProvider != null) && (id >= 0)) {
+			Cursor cursor = dataProvider.queryDefinition(id);
+			DictionaryItem itemData = new DictionaryItem(cursor);
+			cursor.close();
+		
+			return itemData;
+		}
+		return null;
+	}
+	
+	public static DictionaryItem getFrom(DictionaryDataProvider dataProvider, String word) {
+		DictionaryItem[] itemArr = getArrayFrom(dataProvider, word);
+		if ((itemArr != null) && (itemArr.length > 0)) {
+			return itemArr[0];
+		}
+		return null;
+	}
+	
+	public static DictionaryItem[] getArrayFrom(DictionaryDataProvider dataProvider, String word) {
+		if ((dataProvider != null) && (!TextUtils.isEmpty(word))) {
+			Cursor wordCursor = dataProvider.stripQuery(word);
+			if (wordCursor != null) {
+				int count = wordCursor.getCount();
+				if (count == 1) {
+					int id = -1;
+					if (!Utility.isNull(wordCursor, DictionaryDataProvider.COLUMN_ID)) {
+						int colIdx = wordCursor.getColumnIndex(DictionaryDataProvider.COLUMN_ID);
+						id = wordCursor.getInt(colIdx);
+					}
+					wordCursor.close();
+					DictionaryItem item = getFrom(dataProvider, id);
+					if (item != null) return new DictionaryItem[] { item };
+					
+				} else if (count > 1) {
+					DictionaryItem[] itemArr = new DictionaryItem[count];
+					int idx = 0;
+					do {
+						int id = -1;
+						if (!Utility.isNull(wordCursor, DictionaryDataProvider.COLUMN_ID)) {
+							int colIdx = wordCursor.getColumnIndex(DictionaryDataProvider.COLUMN_ID);
+							id = wordCursor.getInt(colIdx);
+						}
+						itemArr[idx++] = getFrom(dataProvider, id);
+					} while(wordCursor.moveToNext());
+					wordCursor.close();
+					return itemArr;
+				}
+				wordCursor.close();
+			}
+		}
+		return null;
+	}
+	
 	public DictionaryItem() {
 	}
 	
@@ -35,38 +93,53 @@ public class DictionaryItem implements Parcelable {
 		this();
 		if (cursor != null) {
 			if (!Utility.isNull(cursor, DictionaryDataProvider.COLUMN_ID)) {
-				int idCol = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_ID);
-				id = cursor.getInt(idCol);
+				int colIdx = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_ID);
+				id = cursor.getInt(colIdx);
 			}
 			
 			if (!Utility.isNull(cursor, DictionaryDataProvider.COLUMN_WORD)) {
-				int wordCol = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_WORD);
-				word = cursor.getString(wordCol);
+				int colIdx = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_WORD);
+				word = cursor.getString(colIdx);
+			}
+			
+			if (!Utility.isNull(cursor, DictionaryDataProvider.COLUMN_STRIPWORD)) {
+				int colIdx = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_STRIPWORD);
+				stripword = cursor.getString(colIdx);
 			}
 			
 			if (!Utility.isNull(cursor, DictionaryDataProvider.COLUMN_TITLE)) {
-				int titleCol = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_TITLE);
-				title = cursor.getString(titleCol);
+				int colIdx = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_TITLE);
+				title = cursor.getString(colIdx);
 			}
 			
 			if (!Utility.isNull(cursor, DictionaryDataProvider.COLUMN_DEFINITION)) {
-				int definitionCol = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_DEFINITION);
-				definition = cursor.getString(definitionCol);
+				int colIdx = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_DEFINITION);
+				definition = cursor.getString(colIdx);
+			}
+			
+			if (!Utility.isNull(cursor, DictionaryDataProvider.COLUMN_KEYWORDS)) {
+				int colIdx = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_KEYWORDS);
+				keywords = cursor.getString(colIdx);
+			}
+			
+			if (!Utility.isNull(cursor, DictionaryDataProvider.COLUMN_SYNONYM)) {
+				int colIdx = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_SYNONYM);
+				synonym = cursor.getString(colIdx);
 			}
 			
 			if (!Utility.isNull(cursor, DictionaryDataProvider.COLUMN_FILENAME)) {
-				int fileNameCol = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_FILENAME);
-				filename = cursor.getString(fileNameCol);
+				int colIdx = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_FILENAME);
+				filename = cursor.getString(colIdx);
 			}
 			
 			if (!Utility.isNull(cursor, DictionaryDataProvider.COLUMN_PICTURE)) {
-				int pictureCol = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_PICTURE);
-				picture = cursor.getInt(pictureCol) == 1;
+				int colIdx = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_PICTURE);
+				picture = cursor.getInt(colIdx) == 1;
 			}
 			
 			if (!Utility.isNull(cursor, DictionaryDataProvider.COLUMN_SOUND)) {
-				int soundCol = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_SOUND);
-				sound = cursor.getInt(soundCol) == 1;
+				int colIdx = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_SOUND);
+				sound = cursor.getInt(colIdx) == 1;
 			}
 		}
 	}
@@ -75,8 +148,11 @@ public class DictionaryItem implements Parcelable {
 		this();
 		id = source.readInt();
 		word = source.readString();
+		stripword = source.readString();
 		title = source.readString();
 		definition = source.readString();
+		keywords = source.readString();
+		synonym = source.readString();
 		filename = source.readString();
 		picture = source.readInt() == 1;
 		sound = source.readInt() == 1;
@@ -91,11 +167,19 @@ public class DictionaryItem implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(id);
 		dest.writeString(word);
+		dest.writeString(stripword);
 		dest.writeString(title);
 		dest.writeString(definition);
+		dest.writeString(keywords);
+		dest.writeString(synonym);
 		dest.writeString(filename);
 		dest.writeInt(picture ? 1 : 0);
 		dest.writeInt(sound ? 1 : 0);
 	}
 
+	@Override
+	public String toString() {
+		if (TextUtils.isEmpty(word)) return "";
+		return word;
+	}
 }

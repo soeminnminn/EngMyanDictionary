@@ -1,5 +1,6 @@
 package com.s16.engmyan.fragment;
 
+import com.s16.engmyan.Constants;
 import com.s16.engmyan.R;
 import com.s16.engmyan.data.DictionaryDataProvider;
 import com.s16.engmyan.data.SearchListAdapter;
@@ -164,13 +165,15 @@ public class SearchListFragment extends Fragment
 				cursor = mDataProvider.querySuggestWord();
 			}
 			
-			SearchListAdapter listAdapter = new SearchListAdapter(getContext(), cursor, DictionaryDataProvider.COLUMN_ID, DictionaryDataProvider.COLUMN_WORD);
+			SearchListAdapter listAdapter = new SearchListAdapter(getContext(), cursor, 
+					DictionaryDataProvider.COLUMN_ID, DictionaryDataProvider.COLUMN_WORD, Constants.SEARCH_LIST_ITEM_LIMIT);
 			listAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 		         public Cursor runQuery(CharSequence constraint) {
 		             return mDataProvider.query(constraint.toString());
 		         }
 			});
 			mResultList.setAdapter(listAdapter);
+			mResultList.setOnScrollListener(listAdapter);
 			mResultList.setOnItemClickListener(this);
 		}
 	}

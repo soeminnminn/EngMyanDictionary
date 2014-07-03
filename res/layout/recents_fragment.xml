@@ -4,40 +4,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/dialog_full_holo_dark" >
     
-    <FrameLayout 
-	    android:id="@+id/frameRecentTitle"
-	    style="@style/DoneBar"
-	    android:layout_alignParentLeft="true"
-	    android:layout_alignParentTop="true" >
-	    
-	    <TextView
-	        style="@style/DoneBar.Title"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="left|center_vertical"
-	        android:layout_marginLeft="58dp"
-	        android:text="@string/recents_title"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
-	
-	    <ImageButton
-	        android:id="@+id/closeButton"
-	        style="@style/DoneBar.Button"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="left|center_vertical"
-	        android:layout_marginLeft="4dp"
-	        android:contentDescription="@string/action_close"
-	        android:src="@drawable/ic_action_cancel" />
-	    
-	    <View
-	        android:layout_width="1dp"
-	        android:layout_height="match_parent"
-	        android:layout_gravity="top|left"
-	        android:layout_marginBottom="2dp"
-	        android:layout_marginLeft="50dp"
-	        android:background="@color/bright_foreground_disabled_holo_light" />
-	
-	</FrameLayout>
+    <include layout="@layout/recents_title_frame" />
 	
     <LinearLayout
         android:layout_width="match_parent"

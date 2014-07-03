@@ -10,16 +10,28 @@
         <item name="android:actionBarStyle">@style/ActionBar</item>
         <item name="android:dialogTheme">@style/DialogTheme</item>
         <item name="android:absListViewStyle">@style/AbsListViewHolo</item>
+        
         <item name="actionBarStyle">@style/ActionBar</item>
+        <item name="actionBarSplitStyle">@style/ActionBarSplit</item>
     </style>
     
     <style name="ActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@color/title_background</item>
+        <item name="android:background">@drawable/actionbar_background</item>
+        <item name="android:customNavigationLayout">@layout/actionbar_content</item>
+    </style>
+    <style name="ActionBarSplit" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@drawable/actionbar_background</item>
     </style>
     
     <style name="DialogTheme" parent="@android:style/Theme.Holo.Dialog">
     </style>
     <style name="DialogTheme.NoTitle" parent="@style/DialogTheme">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+    <style name="DialogTheme.Light" parent="@android:style/Theme.Holo.Light.Dialog">
+    </style>
+    <style name="DialogTheme.Light.NoTitle" parent="@style/DialogTheme.Light">
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
     </style>

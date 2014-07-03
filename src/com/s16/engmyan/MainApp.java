@@ -4,8 +4,6 @@ import android.app.Application;
 
 public class MainApp extends Application {
 	
-	protected static String TAG = MainApp.class.getSimpleName();
-
 	public MainApp() {
 		super();
 	}

@@ -2,6 +2,7 @@ package com.s16.engmyan.data;
 
 import java.util.Date;
 
+import com.s16.engmyan.Constants;
 import com.s16.engmyan.Utility;
 
 import android.content.ContentProvider;
@@ -30,11 +31,11 @@ public class UserDataProvider extends ContentProvider {
 	private static final String URL_HISTORIES = SCHEME + AUTHORITY + "/" + HISTORIES;
 	public static final Uri URI_HISTORIES = Uri.parse(URL_HISTORIES);
 	
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = Constants.DATA_VERSION;
 	private static final String DATABASE_NAME = "user_data";
 	
-	static String FAVORITES_TABLE = "tblFavorites";
-	static String HISTORIES_TABLE = "tblHistories";
+	static String FAVORITES_TABLE = "favorites";
+	static String HISTORIES_TABLE = "histories";
 	
 	public static String COLUMN_ID = "_id";
 	public static String COLUMN_WORD = "word";
@@ -67,6 +68,21 @@ public class UserDataProvider extends ContentProvider {
 			  COLUMN_TIMESTAMP + " INTEGER NOT NULL" + 
 			  " );";
 	
+	private static final String HISTORIES_TRIGGER_CREATE = 
+			"CREATE TRIGGER IF NOT EXISTS \"limit_" + HISTORIES_TABLE + "\" AFTER INSERT ON \"" + HISTORIES_TABLE + "\"" +
+			" FOR EACH ROW" +
+			" WHEN (SELECT COUNT(\"" + COLUMN_ID + "\") FROM \"" + HISTORIES_TABLE + "\") > 100" +
+			" BEGIN " +
+			" DELETE FROM \"" + HISTORIES_TABLE + "\"" +
+			" WHERE \"" + COLUMN_TIMESTAMP + "\" IS (SELECT MIN(\"" + COLUMN_TIMESTAMP + "\") FROM \"" + HISTORIES_TABLE + "\");" +
+			" END";
+	
+	private static final String HISTORIES_TABLE_DROP = 
+			 "DROP TABLE IF EXISTS \"" + HISTORIES_TABLE + "\";";
+	
+	private static final String HISTORIES_TRIGGER_DROP = 
+			 "DROP TRIGGER IF EXISTS \"limit_" + HISTORIES_TABLE + "\";";
+	
 	private static final String FAVORITES_TABLE_CREATE =
 			  "CREATE TABLE IF NOT EXISTS " + FAVORITES_TABLE + " (" +
 			  COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -75,13 +91,20 @@ public class UserDataProvider extends ContentProvider {
 			  COLUMN_TIMESTAMP + " INTEGER NOT NULL" + 
 			  " );";
 	 
-	private static final String HISTORIES_TABLE_DROP = 
-			 "DROP TABLE IF EXISTS " + 
-			 HISTORIES_TABLE + ";";
+	private static final String FAVORITES_TRIGGER_CREATE = 
+			"CREATE TRIGGER IF NOT EXISTS \"limit_" + FAVORITES_TABLE + "\" AFTER INSERT ON \"" + FAVORITES_TABLE + "\"" +
+			" FOR EACH ROW" +
+			" WHEN (SELECT COUNT(\"" + COLUMN_ID + "\") FROM \"" + FAVORITES_TABLE + "\") > 100" +
+			" BEGIN " +
+			" DELETE FROM \"" + FAVORITES_TABLE + "\"" +
+			" WHERE \"" + COLUMN_TIMESTAMP + "\" IS (SELECT MIN(\"" + COLUMN_TIMESTAMP + "\") FROM \"" + FAVORITES_TABLE + "\");" +
+			" END";
 	
 	private static final String FAVORITES_TABLE_DROP = 
-			 "DROP TABLE IF EXISTS " + 
-			 FAVORITES_TABLE + ";";
+			 "DROP TABLE IF EXISTS \"" + FAVORITES_TABLE + "\";";
+	
+	private static final String FAVORITES_TRIGGER_DROP = 
+			 "DROP TRIGGER IF EXISTS \"limit_" + FAVORITES_TABLE + "\";";
 	
 	private DatabaseHelper mDbHelper;
 	
@@ -136,12 +159,16 @@ public class UserDataProvider extends ContentProvider {
 		@Override
 		public void onCreate(SQLiteDatabase db) {
 			db.execSQL(HISTORIES_TABLE_CREATE);
+			db.execSQL(HISTORIES_TRIGGER_CREATE);
 			db.execSQL(FAVORITES_TABLE_CREATE);
+			db.execSQL(FAVORITES_TRIGGER_CREATE);
 		}
 		
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			db.execSQL(HISTORIES_TRIGGER_DROP);
 			db.execSQL(HISTORIES_TABLE_DROP);
+			db.execSQL(FAVORITES_TRIGGER_DROP);
 			db.execSQL(FAVORITES_TABLE_DROP);
 			onCreate(db);
 		}

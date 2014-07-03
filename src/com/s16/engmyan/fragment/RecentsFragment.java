@@ -5,11 +5,14 @@ import com.s16.engmyan.Utility;
 import com.s16.engmyan.data.RecentsListAdapter;
 import com.s16.engmyan.data.UserDataProvider;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +33,7 @@ public class RecentsFragment extends Fragment
 	private Animation mShowAnimation;
 	private Animation mHideAnimation;
 	private ListView mListRecents;
+	private ImageButton mClearButton;
 	private RecentsListAdapter mListAdapter;
 	private OnVisibilityChangeListener mOnVisibilityChangeListener;
 	private OnRecentsListItemClickListener mOnRecentsListItemClickListener;
@@ -103,6 +107,17 @@ public class RecentsFragment extends Fragment
 		closeButton.setLongClickable(true);
 		closeButton.setOnLongClickListener(mViewOnLongClickListener);
 		
+		mClearButton = (ImageButton)view.findViewById(R.id.clearButton);
+		mClearButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				performClearRecents();
+			}
+		});
+		mClearButton.setLongClickable(true);
+		mClearButton.setOnLongClickListener(mViewOnLongClickListener);
+		
 		mListRecents = (ListView)view.findViewById(R.id.listViewRecents);
 		mListRecents.setSmoothScrollbarEnabled(true);
 		mListRecents.setSaveEnabled(true);
@@ -146,18 +161,46 @@ public class RecentsFragment extends Fragment
 	}
 	
 	protected void setListData() {
+		boolean hasData = false;
 		if (mListRecents != null) {
 			Cursor cursor = UserDataProvider.getAllHistories(getContext());
 			if (cursor != null) {
 				mListAdapter = new RecentsListAdapter(getContext(), cursor
 						, UserDataProvider.COLUMN_ID, UserDataProvider.COLUMN_WORD);
 				mListRecents.setAdapter(mListAdapter);
+				hasData = mListAdapter.getCount() > 0;
 			}
+		}
+		if (mClearButton != null) {
+			mClearButton.setEnabled(hasData);
 		}
 	}
 	
 	protected void performClose() {
 		hide();
+	}
+	
+	protected void performClearRecents() {
+		final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(getContext(), R.style.DialogTheme));
+		dialogBuilder.setIcon(android.R.drawable.ic_dialog_info);
+		dialogBuilder.setTitle(R.string.clear_recent_title);
+		dialogBuilder.setMessage(R.string.clear_recent_message);
+		
+		dialogBuilder.setNegativeButton(getText(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		dialogBuilder.setPositiveButton(getText(android.R.string.ok), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				UserDataProvider.removeAllHistory(getContext());
+				setListData();
+			}
+		});
+		dialogBuilder.show();
 	}
 	
 	public void setOnVisibilityChangeListener(OnVisibilityChangeListener listener) {

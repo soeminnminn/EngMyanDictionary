@@ -1,6 +1,8 @@
 package com.s16.engmyan.fragment;
 
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.s16.engmyan.Constants;
 import com.s16.engmyan.ExpansionManager;
@@ -8,13 +10,14 @@ import com.s16.engmyan.R;
 import com.s16.engmyan.Utility;
 import com.s16.engmyan.data.DictionaryItem;
 import com.s16.widget.AnimatingRelativeLayout;
+import com.s16.widget.LocalWebView;
 import com.s16.widget.TouchImageView;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.os.Build;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
@@ -23,9 +26,8 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -33,6 +35,13 @@ public class DetailViewFragment extends Fragment
 		implements AnimatingRelativeLayout.AnimationCompleteListener {
 
 	protected static String TAG = DetailViewFragment.class.getSimpleName();
+	
+	public interface DetailDataChangeListener {
+		void onNavigationChanged(boolean navBackEnabled, boolean navForwardEnabled);
+		DictionaryItem onLoadDetailData(long id, String word);
+		void onLoadFinished();
+	}
+	
 	private Context mContext;
 	
 	private TextToSpeech mTextToSpeech;
@@ -42,8 +51,10 @@ public class DetailViewFragment extends Fragment
 	private AnimatingRelativeLayout mLayoutImageView;
 	private TouchImageView mImageView;
 	private ImageView mImageCaution; 
-	private WebView mWebView;
+	private LocalWebView mWebView;
+	private View mProgressFrame; 
 	private DictionaryItem mData;
+	private DetailDataChangeListener mDetailDataChangeListener;
 	
 	public DetailViewFragment() {
 		super();
@@ -108,8 +119,37 @@ public class DetailViewFragment extends Fragment
 		mImageView.setMaxZoom(6);
 		mImageCaution = (ImageView)view.findViewById(R.id.imageCaution);
 		
-		mWebView = (WebView)view.findViewById(R.id.webViewDetail);
-		mWebView.loadUrl(Constants.URL_NOT_FOUND);
+		mProgressFrame = view.findViewById(R.id.frameProgressIndeterminate);
+		final ProgressBar progressBar = (ProgressBar)view.findViewById(R.id.progressBar);
+		progressBar.setIndeterminate(true);
+		mProgressFrame.setVisibility(View.GONE);
+		
+		mWebView = (LocalWebView)view.findViewById(R.id.webViewDetail);
+		mWebView.setLocalWebViewClient(new LocalWebView.LocalWebViewClient() {
+			
+			@Override
+			public void onPageStarted(LocalWebView view, String url, Bitmap favicon) {
+				showProgress();
+			}
+			
+			@Override
+			public void onPageFinished(LocalWebView view, String url) {
+	    		if (mDetailDataChangeListener != null) {
+	    			mDetailDataChangeListener.onLoadFinished();
+	    			mDetailDataChangeListener.onNavigationChanged(view.canGoBack(), view.canGoForward());
+	    		}
+				hideProgress();
+			}
+			
+			@Override
+			public void onLoadResource(LocalWebView view, String url) {
+			}
+			
+			@Override
+			public boolean onAnchorClick(LocalWebView view, String url) {
+				return setDefinition(view, url);
+			}
+		});
 		
 		mTextToSpeech = new TextToSpeech(getContext(), new TextToSpeech.OnInitListener() {
 
@@ -120,7 +160,21 @@ public class DetailViewFragment extends Fragment
 		});
 		
 		setImageBitmap();
-		setDefinition();
+		if (mData != null) {
+			setDefinition(mWebView, mData);
+		}
+	}
+	
+	protected void showProgress() {
+		if (mProgressFrame != null) {
+			mProgressFrame.setVisibility(View.VISIBLE);
+		}
+	}
+	
+	protected void hideProgress() {
+		if (mProgressFrame != null) {
+			mProgressFrame.setVisibility(View.GONE);
+		}
 	}
 	
 	protected void setSaveInstanceState(Bundle savedInstanceState) {
@@ -129,38 +183,136 @@ public class DetailViewFragment extends Fragment
 		}
 	}
 	
-	protected void setDefinition() {
-		if (mWebView == null) return;
-		
-		if ((mData == null) || (TextUtils.isEmpty(mData.definition))) {
-			mWebView.loadUrl(Constants.URL_NOT_FOUND);
-			return;
-		}
-		
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-		boolean usedUnicodeFix = sharedPreferences.getBoolean(Constants.PREFS_USED_UNICODE_FIX, true);
+	protected boolean getUsedUnicodeFix() {
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		return sharedPreferences.getBoolean(Constants.PREFS_USED_UNICODE_FIX, true);
+	}
+	
+	protected boolean getUsedWordClickable() {
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		return sharedPreferences.getBoolean(Constants.PREFS_USED_WORD_CLICKABLE, true);
+	}
+	
+	protected boolean getShowSynonym() {
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		return sharedPreferences.getBoolean(Constants.PREFS_SHOW_SYNONYM, true);
+	}
+	
+	protected String getDefinitionHtml(DictionaryItem itemData) {
+		if (itemData == null) return Constants.EMPTY_STRING;
 		
 		String html = "<html>";
 		html += "<head>";
-		html += "<meta name=\"viewport\" content=\"initial-scale=1.0, user-scalable=yes, width=device-width\" />";
 		html += "<meta content=\"" + Constants.MIME_TYPE + "; charset=" + Constants.ENCODING + "\" http-equiv=\"content-type\">";
+		html += "<meta name=\"viewport\" content=\"initial-scale=1.0, user-scalable=yes, width=device-width\" />";
+		html += "<meta name=\"Keywords\" content=\"\">";
+		html += "<meta name=\"Options\" content=\"{'addfont':false, 'drawfix':false, 'applykeywords':false}\">";
 		html += "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/style.css\">";
-		if (TextUtils.isEmpty(mData.title)) {
+		html += "<script type=\"text/javascript\" src=\"js/script.js\"></script>";
+		if (TextUtils.isEmpty(itemData.title)) {
 			html += "<title>Untitled</title>";
 		} else {
-			html += "<title>" + mData.title + "</title>";
+			html += "<title>" + itemData.title + "</title>";
 		}
 		html += "</head>";
 		html += "<body>";
-		if (usedUnicodeFix) {
-			html += Utility.ZawGyiDrawFix(mData.definition);
-		} else {
-			html += mData.definition;
+		//html += "<a href=\"" + Constants.URL_DEFINITION + "?id=1\">Test</a>";
+		
+		CharSequence definition = itemData.definition;
+		if (getUsedUnicodeFix()) {
+			definition = Utility.ZawGyiDrawFix(itemData.definition);
+		} 
+		
+		if (getUsedWordClickable() && (!TextUtils.isEmpty(itemData.keywords))) {
+			if (itemData.keywords.toLowerCase().contains("word")) {
+				definition = Utility.RegexReplace(definition, "([^A-Za-z\\/\\?=])(word)([^A-Za-z\\/\\?=])", 
+						"$1<a href=\"" + Constants.URL_DEFINITION + "?word=word\">$2</a>$3", Pattern.CASE_INSENSITIVE);
+			}
+			Pattern pattern = Pattern.compile("[^,]+");
+			Matcher m = pattern.matcher(itemData.keywords);
+			while(m.find()) {
+				if (m.group().equalsIgnoreCase("word")) continue;
+				definition = Utility.RegexReplace(definition, "([^A-Za-z\\/\\?=])(" + m.group() + ")([^A-Za-z\\/\\?=])", 
+						"$1<a href=\"" + Constants.URL_DEFINITION + "?word=" + m.group() + "\">$2</a>$3", Pattern.CASE_INSENSITIVE);
+			}
 		}
+		html += definition;
+		
+		if (getShowSynonym() && (!TextUtils.isEmpty(itemData.synonym))) {
+			html += "<hr />";
+			html += "<h3>Synonym</h3>";
+			html += "<p class=\"synonym\">";
+			html += itemData.synonym;
+			html += "</p>";
+		}
+		
 		html += "</html>";
+		return html;
+	}
 	
-		mWebView.loadDataWithBaseURL(Constants.URL_NOT_FOUND, html
-				, Constants.MIME_TYPE, Constants.ENCODING, Constants.URL_DEFAULT);
+	protected DictionaryItem loadDictionaryItem(String url) {
+		if (TextUtils.isEmpty(url)) return null;
+		
+		if (url.startsWith(Constants.URL_DEFINITION)) {
+			Uri uri = Uri.parse(url);
+			
+			long id = -1;
+			String queryParam = uri.getQueryParameter("id");
+			if (!TextUtils.isEmpty(queryParam)) {
+				id = Long.valueOf(queryParam);
+			}
+			queryParam = uri.getQueryParameter("word");
+			
+			if (mDetailDataChangeListener != null) {
+				return mDetailDataChangeListener.onLoadDetailData(id, queryParam);
+			}
+		}
+		return null;
+	}
+	
+	protected boolean setDefinition(LocalWebView webView, String url) {
+		if (webView == null) return false;
+		DictionaryItem itemData = loadDictionaryItem(url);
+		if (itemData != null) {
+			mData = itemData;
+			setDefinition(webView, itemData);
+			return true;
+		} else if (mData != null) {
+			setDefinition(webView, mData);
+			return true;
+		}
+		
+		return false;
+	}
+	
+	protected void setDefinition(LocalWebView webView, DictionaryItem itemData) {
+		if (webView == null) return;
+		
+		if ((itemData == null) || (TextUtils.isEmpty(itemData.definition))) {
+			webView.loadUrl(Constants.URL_NOT_FOUND);
+			return;
+		}
+		
+		final String newUrl = Constants.URL_DEFINITION + "?id=" + itemData.id;
+		//String html = getDefinitionHtml(itemData);
+		//webView.loadDataWithBaseURL(newUrl, html, Constants.MIME_TYPE, Constants.ENCODING, newUrl);
+		
+		final LocalWebView pWebView = webView;
+		new AsyncTask<DictionaryItem, Void, String>() {
+
+			@Override
+			protected String doInBackground(DictionaryItem... params) {
+				return getDefinitionHtml(params[0]);
+			}
+			
+			@Override
+			protected void onPostExecute(String result) {
+				super.onPostExecute(result);
+				
+				pWebView.loadDataWithBaseURL(newUrl, result
+						, Constants.MIME_TYPE, Constants.ENCODING, newUrl);
+			}
+		}.execute(itemData);
 	}
 	
 	protected void setImageBitmap() {
@@ -189,26 +341,32 @@ public class DetailViewFragment extends Fragment
 		}
 	}
 	
-	@SuppressLint("SetJavaScriptEnabled")
-	public void setData(DictionaryItem data) {
-		if ((data == null) || (data.id < 0)) return;
-		mData = data;
-		
+	public void setDetailDataChangeListener(DetailDataChangeListener listener) {
+		mDetailDataChangeListener = listener;
+	}
+	
+	public void setData(DictionaryItem itemData) {
+		if ((itemData == null) || (itemData.id < 0)) return;
+		mData = itemData;
+        
+		showProgress();
 		setImageBitmap();
-		if (mWebView != null) {
-			WebSettings webViewSettings = mWebView.getSettings(); 
-			webViewSettings.setAllowFileAccess(true);
-			webViewSettings.setJavaScriptEnabled(true);
-			webViewSettings.setSupportZoom(true);
-			webViewSettings.setBuiltInZoomControls(true);
-			
-			if (Build.VERSION.SDK_INT >= 11) {
-				webViewSettings.setDisplayZoomControls(false);
-				webViewSettings.setAllowContentAccess(true);
-			}
-			
-			setDefinition();
-		}
+		setDefinition(mWebView, itemData);
+	}
+	
+	public long getDetailId() {
+		if (mData != null) return mData.id;
+		return -1;
+	}
+	
+	public boolean getCanGoBack() {
+		if (mWebView == null) return false;
+		return mWebView.canGoBack();
+	}
+	
+	public boolean getCanGoForward() {
+		if (mWebView == null) return false;
+		return mWebView.canGoForward();
 	}
 	
 	public boolean getImageVisible() {
@@ -233,6 +391,32 @@ public class DetailViewFragment extends Fragment
 			if (mData != null) return mData.sound;
 		}
 		return true;
+	}
+	
+	public boolean performNavBack() {
+		if (mWebView == null) return false;
+		if (mWebView.canGoBack()) {
+			mWebView.goBack();
+			
+			if (mDetailDataChangeListener != null) {
+    			mDetailDataChangeListener.onNavigationChanged(mWebView.canGoBack(), mWebView.canGoForward());
+    		}
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean performNavForward() {
+		if (mWebView == null) return false;
+		if (mWebView.canGoForward()) {
+			mWebView.goForward();
+			
+			if (mDetailDataChangeListener != null) {
+    			mDetailDataChangeListener.onNavigationChanged(mWebView.canGoBack(), mWebView.canGoForward());
+    		}
+			return true;
+		}
+		return false;
 	}
 	
 	public void toggleImageView() {

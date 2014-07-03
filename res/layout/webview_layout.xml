@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutWebView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:layout_marginBottom="@dimen/content_vertical_margin"
+    android:layout_marginLeft="@dimen/content_horizontal_margin"
+    android:layout_marginRight="@dimen/content_horizontal_margin"
+    android:layout_marginTop="@dimen/content_vertical_margin" >
+
+    <com.s16.widget.LocalWebView
+        android:id="@+id/webViewDetail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</RelativeLayout>

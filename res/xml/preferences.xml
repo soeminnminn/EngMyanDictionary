@@ -8,10 +8,17 @@
 			android:summary="@string/prefs_used_unicode_fix_summary" 
 			android:defaultValue="true" />
         
-        <Preference 
-            android:key="prefs_clear_recent"
-            android:summary="@string/prefs_clear_recent_summary"
-            android:title="@string/prefs_clear_recent" />
+        <CheckBoxPreference  
+			android:key="prefs_used_word_clickable"  
+			android:title="@string/prefs_used_word_clickable"  
+			android:summary="@string/prefs_used_word_clickable_summary" 
+			android:defaultValue="true" />
+        
+        <CheckBoxPreference  
+			android:key="prefs_show_synonym"  
+			android:title="@string/prefs_show_synonym"  
+			android:summary="@string/prefs_show_synonym_summary" 
+			android:defaultValue="true" />
         
         <Preference 
             android:key="prefs_credit"

@@ -15,13 +15,13 @@ import com.s16.engmyan.fragment.ProgressWheelFragment;
 import com.s16.engmyan.fragment.RecentsFragment;
 import com.s16.engmyan.fragment.SearchListFragment;
 import com.s16.engmyan.R;
+import com.s16.widget.ActionBarNavigationButtons;
 import com.s16.widget.MoreMenuActionProvider;
 
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.SQLException;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -39,7 +39,8 @@ import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity 
 		implements InstallationHandler
-		, SearchListFragment.OnSearchListItemClickListener {
+		, SearchListFragment.OnSearchListItemClickListener
+		, ActionBarNavigationButtons.ActionBarContentViewActivity {
 
 	protected static String TAG = MainActivity.class.getSimpleName();
 	
@@ -56,7 +57,8 @@ public class MainActivity extends ActionBarActivity
 	private MenuItem mMenuItemSound;
 	private MenuItem mMenuItemPicture;
 	private boolean mIsMenuEnabled = true;
-	private long mDetailId = -1;
+	
+	private ActionBarNavigationButtons mActionBarContent; 
 	
 	private final FavoritesFragment.OnVisibilityChangeListener mOnFavoritesVisibilityChangeListener = 
 			new FavoritesFragment.OnVisibilityChangeListener() {
@@ -94,6 +96,36 @@ public class MainActivity extends ActionBarActivity
 				onSearchListItemClick(refId, null);
 			}
 		
+	};
+	
+	private DetailViewFragment.DetailDataChangeListener mDataChangeListener =
+			new DetailViewFragment.DetailDataChangeListener() {
+
+				@Override
+				public void onNavigationChanged(boolean navBackEnabled,
+						boolean navForwardEnabled) {
+					if (mActionBarContent != null) {
+						mActionBarContent.setNavBackEnabled(navBackEnabled);
+						mActionBarContent.setNavForwardEnabled(navForwardEnabled);
+					}
+				}
+
+				@Override
+				public DictionaryItem onLoadDetailData(long id, String word) {
+					if (mDictDataProvider != null) {
+						if (id > -1) {
+							return DictionaryItem.getFrom(mDictDataProvider, id);
+						}
+						return DictionaryItem.getFrom(mDictDataProvider, word);
+					}
+					return null;
+				}
+
+				@Override
+				public void onLoadFinished() {
+					setDetailTitle();
+					setIfFavorties();
+				}
 	};
 	
 	@Override
@@ -135,6 +167,12 @@ public class MainActivity extends ActionBarActivity
 			mDetailView = new DetailViewFragment(this);
 			transaction.replace(R.id.detailContainer, mDetailView);
 			transaction.commit();
+			
+			if (mActionBarContent != null) {
+				mActionBarContent.setNavigationVisible(true);
+			}
+			
+			mDetailView.setDetailDataChangeListener(mDataChangeListener);
 		}
 	}
 	
@@ -227,6 +265,12 @@ public class MainActivity extends ActionBarActivity
 			case R.id.action_manage_favorites:
 				performManageFavorites();
 				break;
+			case R.id.actionbar_item_nav_back:
+				performNavBack();
+				break;
+			case R.id.actionbar_item_nav_forward:
+				performNavForward();
+				break;
 			case R.id.action_about:
 				performAbout();
 				break;
@@ -273,23 +317,22 @@ public class MainActivity extends ActionBarActivity
 	@Override
 	public void onSearchListItemClick(long id, CharSequence searchText) {
 		if (id < 0) return;
-		if ((mDictDataProvider == null) || (!mDictDataProvider.isOpen())) return;
-		mDetailId = id;
+		if (mDictDataProvider == null) return;
 		
-		Cursor cursor = mDictDataProvider.queryDefinition(id);
-		final DictionaryItem itemData = new DictionaryItem(cursor);
-		UserDataProvider.createHistory(this, itemData.word, id);
-		
-		if (mDetailView == null) {
+		final DictionaryItem itemData = DictionaryItem.getFrom(mDictDataProvider, id);
+		if (itemData != null) {
+			UserDataProvider.createHistory(this, itemData.word, id);
 			
-			Intent intent = new Intent(getBaseContext(), DetailActivity.class);
-			intent.putExtra(Constants.DETAIL_ID_KEY, id);
-			intent.putExtra(Constants.DETAIL_DATA_KEY, itemData);
-			
-			ActivityCompat.startActivity(this, intent, null);
-		
-		} else {
-			setDetailData(itemData);
+			if (mDetailView == null) {
+				
+				Intent intent = new Intent(getBaseContext(), DetailActivity.class);
+				intent.putExtra(Constants.DETAIL_ID_KEY, id);
+				//intent.putExtra(Constants.DETAIL_DATA_KEY, itemData);
+				
+				ActivityCompat.startActivity(this, intent, null);
+			} else {
+				setDetailData(itemData);
+			}
 		}
 	}
 	
@@ -308,10 +351,26 @@ public class MainActivity extends ActionBarActivity
 		if ((!enabled) && isActionBarHideOnView()) {
 			getSupportActionBar().show();
 		}
+		
+		if (mActionBarContent != null) {
+			mActionBarContent.setEnabled(enabled);
+		}
 	}
 	
 	protected boolean isActionBarHideOnView() {
 		return (Utility.getConfigScreenSize(this) == 1);
+	}
+	
+	protected void performNavBack() {
+		if (mDetailView != null) {
+			mDetailView.performNavBack();
+		}
+	}
+	
+	protected void performNavForward() {
+		if (mDetailView != null) {
+			mDetailView.performNavForward();
+		}
 	}
 
 	protected void performSettings() {
@@ -344,13 +403,16 @@ public class MainActivity extends ActionBarActivity
 	}
 	
 	protected void performFavorite() {
-		if ((mDetailId > -1) && (mDetailView != null)) {
-			if (!UserDataProvider.isFavorited(this, mDetailId)) {
-				UserDataProvider.createFavorite(this, mDetailView.getTitle(), mDetailId);
-				
-				if (UserDataProvider.isFavorited(this, mDetailId)) {
-					Toast.makeText(this, R.string.add_favorites_message, Toast.LENGTH_LONG).show();
-					mMenuItemFavorite.setIcon(R.drawable.ic_action_star_on);
+		if (mDetailView != null) {
+			long id = mDetailView.getDetailId();
+			if (id > -1) {
+				if (!UserDataProvider.isFavorited(this, id)) {
+					UserDataProvider.createFavorite(this, mDetailView.getTitle(), id);
+					
+					if (UserDataProvider.isFavorited(this, id)) {
+						Toast.makeText(this, R.string.add_favorites_message, Toast.LENGTH_LONG).show();
+						mMenuItemFavorite.setIcon(R.drawable.ic_action_star_on);
+					}
 				}
 			}
 		}
@@ -374,8 +436,9 @@ public class MainActivity extends ActionBarActivity
 	}
 	
 	protected void setIfFavorties() {
-		if ((mDetailId > -1) && (mMenuItemFavorite != null)) {
-			if (UserDataProvider.isFavorited(this, mDetailId)) {
+		if ((mDetailView != null) && (mMenuItemFavorite != null)) {
+			long id = mDetailView.getDetailId();
+			if ((id > -1) && (UserDataProvider.isFavorited(this, id))) {
 				mMenuItemFavorite.setIcon(R.drawable.ic_action_star_on);
 			} else {
 				mMenuItemFavorite.setIcon(R.drawable.ic_action_star);
@@ -415,7 +478,7 @@ public class MainActivity extends ActionBarActivity
 		}
 		
 		if((dbFile.exists()) 
-			&& (!DictionaryDataProvider.versionCheck(this, dbFile, Constants.DATA_VERSION)) 
+			&& (!DictionaryDataProvider.versionCheck(this, dbFile)) 
 			&& (!dbFile.delete())) {
 			
 			installError(getString(R.string.install_error_data_load));
@@ -433,9 +496,8 @@ public class MainActivity extends ActionBarActivity
 	
 	protected void openDatabase() {
 		
-		final File dbFile = Constants.getDatabaseFile(this);
 		if (mDictDataProvider == null) {
-			mDictDataProvider = new DictionaryDataProvider(this, dbFile);
+			mDictDataProvider = Constants.getDataProvider(this);
 		}
 		
 		try {
@@ -463,10 +525,8 @@ public class MainActivity extends ActionBarActivity
 			mSearchList.prepareSearch();
 			
 			if (id >= 0) {
-				mDetailId = id;
 				if ((mDictDataProvider != null) && (mDictDataProvider.isOpen())) {
-					Cursor cursor = mDictDataProvider.queryDefinition(id);
-					setDetailData(new DictionaryItem(cursor));
+					setDetailData(DictionaryItem.getFrom(mDictDataProvider, id));
 				}
 			}
 		}
@@ -477,12 +537,7 @@ public class MainActivity extends ActionBarActivity
 		if (itemData == null) return;
 		
 		mDetailView.setData(itemData);
-		String title = mDetailView.getTitle();
-		
-		final ActionBar actionBar = getSupportActionBar();
-		if ((actionBar != null) && (!TextUtils.isEmpty(title))) {
-			actionBar.setTitle(getString(R.string.app_name) + " [ " + title + " ]");
-		}
+		setDetailTitle();
 		
 		if (mMenuItemPicture != null) {
 			mMenuItemPicture.setVisible(mDetailView.getHasPicture());
@@ -492,7 +547,26 @@ public class MainActivity extends ActionBarActivity
 			mMenuItemSound.setVisible(mDetailView.getHasSound());
 		}
 		
+		if (mActionBarContent != null) {
+			mActionBarContent.setNavBackEnabled(mDetailView.getCanGoBack());
+			mActionBarContent.setNavForwardEnabled(mDetailView.getCanGoForward());
+		}
+		
 		setIfFavorties();
+	}
+	
+	protected void setDetailTitle() {
+		if (mDetailView == null) return;
+		
+		String detailTitle = mDetailView.getTitle();
+		final ActionBar actionBar = getSupportActionBar();
+		if ((actionBar != null) && (!TextUtils.isEmpty(detailTitle))) {
+			String title = getString(R.string.app_name) + " [ " + detailTitle + " ]";
+			actionBar.setTitle(title);
+			if (mActionBarContent != null) {
+				mActionBarContent.setTitle(title);
+			}
+		}
 	}
 	
 	protected void saveState() {
@@ -508,7 +582,12 @@ public class MainActivity extends ActionBarActivity
 			editor.putString(Constants.SEARCH_TEXT_KEY, constraint.toString());
 		}
 		
-		editor.putLong(Constants.DETAIL_ID_KEY, mDetailId);
+		if (mDetailView != null) {
+			long id = mDetailView.getDetailId();
+			editor.putLong(Constants.DETAIL_ID_KEY, id);
+		} else {
+			editor.putLong(Constants.DETAIL_ID_KEY, -1);
+		}
 		
 		editor.commit();
 	}
@@ -529,5 +608,15 @@ public class MainActivity extends ActionBarActivity
 	public void installError(String message) {
 		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 		System.exit(0);
+	}
+
+	@Override
+	public void setActionBarContentView(ActionBarNavigationButtons view) {
+		mActionBarContent = view;
+		mActionBarContent.setTitleVisible(true);
+		if (mDetailView != null) {
+			mActionBarContent.setNavBackEnabled(mDetailView.getCanGoBack());
+			mActionBarContent.setNavForwardEnabled(mDetailView.getCanGoForward());
+		}
 	}
 }

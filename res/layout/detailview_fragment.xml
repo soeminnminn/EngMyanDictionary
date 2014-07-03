@@ -5,47 +5,29 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     tools:context=".MainActivity" >
-
-    <RelativeLayout
-        android:id="@+id/layoutWebView"
+    
+    <include 
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+		android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
-        android:layout_marginBottom="@dimen/content_vertical_margin"
+    	android:layout_marginBottom="@dimen/content_vertical_margin"
+    	android:layout_marginLeft="@dimen/content_horizontal_margin"
+    	android:layout_marginRight="@dimen/content_horizontal_margin"
+    	android:layout_marginTop="@dimen/content_vertical_margin"
+        layout="@layout/webview_layout" />
+    
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
         android:layout_marginLeft="@dimen/content_horizontal_margin"
         android:layout_marginRight="@dimen/content_horizontal_margin"
-        android:layout_marginTop="@dimen/content_vertical_margin" >
-
-	    <WebView
-	        android:id="@+id/webViewDetail"
-	        android:layout_width="match_parent"
-	        android:layout_height="match_parent" />
-	    
-    </RelativeLayout>
+        layout="@layout/progress_indeterminate_frame" />
     
-    <com.s16.widget.AnimatingRelativeLayout 
-		android:id="@+id/layoutImageView"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:layout_alignParentLeft="true"
-		android:background="@drawable/imageview_background" >
-	    
-        <ImageView
-            android:id="@+id/imageCaution"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:contentDescription="@string/empty_string"
-            android:scaleType="center"
-            android:src="@drawable/caution" />
+    <include
+        android:layout_width="match_parent"
+		android:layout_height="match_parent" 
+        android:layout_alignParentLeft="true"
+        layout="@layout/imageview_layout" /> 
 
-		<com.s16.widget.TouchImageView
-		    android:id="@+id/imagePreView"
-		    android:layout_width="match_parent"
-		    android:layout_height="match_parent"
-		    android:contentDescription="@string/empty_string"
-		    android:scaleType="center"
-		    android:src="@drawable/caution" />
-		
-	</com.s16.widget.AnimatingRelativeLayout>
 </RelativeLayout>

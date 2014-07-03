@@ -24,18 +24,35 @@
 		<item name="android:checkboxStyle">@style/CheckBoxHoloLight</item>
 		<item name="android:radioButtonStyle">@style/RadioButtonHoloLight</item>
 		
+		<item name="android:progressBarStyle">@style/Widget.Holo.ProgressBar</item>
+		<item name="android:progressBarStyleHorizontal">@style/Widget.Holo.ProgressBar.Horizontal</item>
+        <item name="android:progressBarStyleSmall">@style/Widget.Holo.ProgressBar.Small</item>
+        <item name="android:progressBarStyleLarge">@style/Widget.Holo.ProgressBar.Large</item>
+		
 		<item name="actionBarStyle">@style/ActionBar</item>
+		<item name="actionBarSplitStyle">@style/ActionBarSplit</item>
     </style>
     
     <style name="ActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@color/title_background</item>
-        <item name="background">@color/title_background</item>
+        <item name="android:background">@drawable/actionbar_background</item>
+        <item name="background">@drawable/actionbar_background</item>
+        <item name="customNavigationLayout">@layout/actionbar_content</item>
+    </style>
+    <style name="ActionBarSplit" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@drawable/actionbar_background</item>
+        <item name="background">@drawable/actionbar_background</item>
     </style>
     
     <style name="DialogTheme" parent="@android:style/Theme.Dialog">
         <item name="android:windowBackground">@drawable/dialog_full_holo_dark</item>
     </style>
     <style name="DialogTheme.NoTitle" parent="@style/DialogTheme">
+        <item name="android:windowNoTitle">true</item>
+    </style>
+    <style name="DialogTheme.Light" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@drawable/dialog_full_holo_light</item>
+    </style>
+    <style name="DialogTheme.Light.NoTitle" parent="@style/DialogTheme.Light">
         <item name="android:windowNoTitle">true</item>
     </style>
     
@@ -50,6 +67,22 @@
     
     <style name="RadioButtonHoloLight" parent="@android:style/Widget.CompoundButton.RadioButton">
         <item name="android:button">@drawable/btn_radio_holo_light</item>
+    </style>
+    
+    <style name="Widget.Holo.ProgressBar" parent="@android:style/Widget.ProgressBar">
+        <item name="android:indeterminateDrawable">@drawable/progress_medium_holo</item>
+    </style>
+    <style name="Widget.Holo.ProgressBar.Horizontal" parent="@android:style/Widget.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_horizontal_holo_dark</item>
+        <item name="android:indeterminateDrawable">@drawable/progress_indeterminate_horizontal_holo</item>
+        <item name="android:minHeight">16dip</item>
+        <item name="android:maxHeight">16dip</item>
+    </style>
+    <style name="Widget.Holo.ProgressBar.Small" parent="@android:style/Widget.ProgressBar.Small">
+        <item name="android:indeterminateDrawable">@drawable/progress_small_holo</item>
+    </style>
+    <style name="Widget.Holo.ProgressBar.Large" parent="@android:style/Widget.ProgressBar.Large">
+        <item name="android:indeterminateDrawable">@drawable/progress_large_holo</item>
     </style>
     
     <style name="SearchBar">
