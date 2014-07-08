@@ -176,6 +176,7 @@ public class DictionaryDataProvider {
 		if (cursor != null) {
 			cursor.moveToFirst();
 		}
+		
 		return cursor;
 	}
 	
@@ -195,15 +196,17 @@ public class DictionaryDataProvider {
 			}
 			
 			selection = COLUMN_STRIPWORD + " LIKE '" + searchword + "'";
+			
+			Cursor cursor = database.query(DICTIONARY_TABLE, SELECT_WORD_COLUMNS, selection
+					, null, null, null, COLUMN_STRIPWORD + " ASC", getLimitStr());
+
+			if (cursor != null) {
+				cursor.moveToFirst();
+				return cursor;
+			}
 		}
 		
-		Cursor cursor = database.query(DICTIONARY_TABLE, SELECT_WORD_COLUMNS, selection
-							, null, null, null, COLUMN_STRIPWORD + " ASC", getLimitStr());
-		
-		if (cursor != null) {
-			cursor.moveToFirst();
-		}
-		return cursor;
+		return null;
 	}
 	
 	public Cursor stripQuery(String searchword) {
@@ -215,15 +218,37 @@ public class DictionaryDataProvider {
 		if (!TextUtils.isEmpty(searchword)) {
 			searchword = searchword.replace("'", "''").replace("%", "").replace("_", "").trim();
 			selection += COLUMN_STRIPWORD + " LIKE '" + searchword + "'";
+			
+			Cursor cursor = database.query(DICTIONARY_TABLE, SELECT_WORD_COLUMNS, selection
+					, null, null, null, null, null);
+
+			if (cursor != null) {
+				cursor.moveToFirst();
+				return cursor;
+			}
 		}
 		
-		Cursor cursor = database.query(DICTIONARY_TABLE, SELECT_WORD_COLUMNS, selection
-							, null, null, null, null, null);
+		return null;
+	}
+	
+	public Cursor exactQuery(String searchword) {
+		final SQLiteDatabase database = getDatabase();
+		if (database == null) return null;
 		
-		if (cursor != null) {
-			cursor.moveToFirst();
+		String selection = "";
+		if (!TextUtils.isEmpty(searchword)) {
+			searchword = searchword.replace("'", "''").replace("%", "").replace("_", "").trim().toLowerCase();
+			selection += COLUMN_STRIPWORD + " IS '" + searchword + "'";
+		
+			Cursor cursor = database.query(DICTIONARY_TABLE, SELECT_WORD_COLUMNS, selection
+								, null, null, null, null, null);
+			
+			if (cursor != null) {
+				cursor.moveToFirst();
+				return cursor;
+			}
 		}
-		return cursor;
+		return null;
 	}
 	
 	public Cursor queryDefinition(long id) {

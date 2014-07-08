@@ -42,6 +42,7 @@ public class DetailViewFragment extends Fragment
 		void onLoadFinished();
 	}
 	
+	private static boolean isDataLoading = false;
 	private Context mContext;
 	
 	private TextToSpeech mTextToSpeech;
@@ -129,6 +130,7 @@ public class DetailViewFragment extends Fragment
 			
 			@Override
 			public void onPageStarted(LocalWebView view, String url, Bitmap favicon) {
+				isDataLoading = true;
 				showProgress();
 			}
 			
@@ -139,6 +141,7 @@ public class DetailViewFragment extends Fragment
 	    			mDetailDataChangeListener.onNavigationChanged(view.canGoBack(), view.canGoForward());
 	    		}
 				hideProgress();
+				isDataLoading = false;
 			}
 			
 			@Override
@@ -346,9 +349,11 @@ public class DetailViewFragment extends Fragment
 	}
 	
 	public void setData(DictionaryItem itemData) {
+		if (isDataLoading) return;
 		if ((itemData == null) || (itemData.id < 0)) return;
+		
+		isDataLoading = true;
 		mData = itemData;
-        
 		showProgress();
 		setImageBitmap();
 		setDefinition(mWebView, itemData);
@@ -395,6 +400,7 @@ public class DetailViewFragment extends Fragment
 	
 	public boolean performNavBack() {
 		if (mWebView == null) return false;
+		if (isDataLoading) return false;
 		if (mWebView.canGoBack()) {
 			mWebView.goBack();
 			
@@ -408,6 +414,7 @@ public class DetailViewFragment extends Fragment
 	
 	public boolean performNavForward() {
 		if (mWebView == null) return false;
+		if (isDataLoading) return false;
 		if (mWebView.canGoForward()) {
 			mWebView.goForward();
 			

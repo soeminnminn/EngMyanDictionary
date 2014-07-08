@@ -38,7 +38,8 @@ public class SearchBarView extends FrameLayout {
 	
 	public static interface OnQueryTextListener {
 
-        boolean onQueryTextSubmit(String query);
+		void onQueryTextChanged(CharSequence query, int count);
+        boolean onQuerySubmit(CharSequence query);
     }
 	
 	private final TextWatcher mTextSearchTextWatcher = new TextWatcher() {
@@ -46,7 +47,7 @@ public class SearchBarView extends FrameLayout {
         @Override
         public void onTextChanged(CharSequence s, int start, int before,
                 int count) {
-            //
+        	onQueryTextChanged(s, count);
         }
 
         @Override
@@ -73,7 +74,7 @@ public class SearchBarView extends FrameLayout {
             if (event.getAction() == KeyEvent.ACTION_UP) {
                 switch (keyCode) {
 	                case KeyEvent.KEYCODE_ENTER:
-	                	return performSearch();
+	                	return onQuerySubmit();
 	                case KeyEvent.KEYCODE_ESCAPE:
 	                	clearText();
 	                    return true;
@@ -95,7 +96,7 @@ public class SearchBarView extends FrameLayout {
 				case EditorInfo.IME_ACTION_SEARCH:
 				case EditorInfo.IME_ACTION_SEND:
 				case EditorInfo.IME_ACTION_UNSPECIFIED:
-					return performSearch();
+					return onQuerySubmit();
 				default:
 					break;
 			}
@@ -295,15 +296,22 @@ public class SearchBarView extends FrameLayout {
 		}
 	}
 	
-	protected boolean performSearch() {
+	protected void onQueryTextChanged(CharSequence s, int count) {
+		if (mTextSearch == null) return;
+		if (mOnQueryTextListener != null) {
+			mOnQueryTextListener.onQueryTextChanged(s, count);
+		}
+	}
+	
+	protected boolean onQuerySubmit() {
 		if (mTextSearch == null) return false;
 		mSearchText = mTextSearch.getText();
 		
 		if (mOnQueryTextListener != null) {
-			if (mSearchText != null) {
+			if (mSearchText == null) {
 				mSearchText = EMPTY_STRING;
 			}
-			return mOnQueryTextListener.onQueryTextSubmit(mSearchText.toString());
+			return mOnQueryTextListener.onQuerySubmit(mSearchText);
 		}
 		return false;
 	}

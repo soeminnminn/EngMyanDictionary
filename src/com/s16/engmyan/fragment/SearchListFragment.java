@@ -2,6 +2,7 @@ package com.s16.engmyan.fragment;
 
 import com.s16.engmyan.Constants;
 import com.s16.engmyan.R;
+import com.s16.engmyan.Utility;
 import com.s16.engmyan.data.DictionaryDataProvider;
 import com.s16.engmyan.data.SearchListAdapter;
 import com.s16.widget.SearchBarView;
@@ -32,6 +33,7 @@ public class SearchListFragment extends Fragment
 	private DictionaryDataProvider mDataProvider;
 	private SearchBarView mTextSearch;
 	private ListView mResultList;
+	private CharSequence mSearchText;
 	private OnSearchListItemClickListener mOnSearchListItemClickListener;
 	
 	public SearchListFragment() {
@@ -57,12 +59,16 @@ public class SearchListFragment extends Fragment
 	}
 	
 	public void setSearchText(String text) {
+		mSearchText = text;
 		if (mTextSearch != null) {
 			mTextSearch.setText(text);
 		}
 	}
 	
 	public String getSearchText() {
+		if (mSearchText != null) {
+			return mSearchText.toString();
+		}
 		if (mTextSearch != null) {
 			return mTextSearch.getText().toString(); 
 		}
@@ -107,9 +113,9 @@ public class SearchListFragment extends Fragment
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
-		if (mOnSearchListItemClickListener != null) {
+		if (mTextSearch != null) {
 			CharSequence constraint = mTextSearch.getText();
-			mOnSearchListItemClickListener.onSearchListItemClick(id, constraint);
+			onItemSelected(id, constraint);
 		}
 	}
 
@@ -119,9 +125,15 @@ public class SearchListFragment extends Fragment
 		mTextSearch.setHint(R.string.search_hint);
 		mTextSearch.setSaveEnabled(true);
 		mTextSearch.setOnQueryTextListener(new SearchBarView.OnQueryTextListener() {
+			
 			@Override
-			public boolean onQueryTextSubmit(String query) {
-				return performSearch();
+			public void onQueryTextChanged(CharSequence query, int count) {
+				performSearch(query);
+			}
+			
+			@Override
+			public boolean onQuerySubmit(CharSequence query) {
+				return submitSearch(query);
 			}
 		});
 		mTextSearch.requestFocus();
@@ -178,15 +190,39 @@ public class SearchListFragment extends Fragment
 		}
 	}
 	
-	public boolean performSearch() {
+	protected void onItemSelected(long id, CharSequence query) {
+		if (mOnSearchListItemClickListener != null) {
+			mOnSearchListItemClickListener.onSearchListItemClick(id, query);
+		}
+	}
+	
+	public boolean performSearch(CharSequence query) {
 		if (mResultList == null) return false;
-		if (mTextSearch == null) return false;
 		if (mDataProvider == null) return false;
+		if (TextUtils.isEmpty(query)) return false;
 		
 		SearchListAdapter listAdapter = (SearchListAdapter)mResultList.getAdapter();
 		if (listAdapter != null) {
-			CharSequence constraint = mTextSearch.getText();
-			listAdapter.getFilter().filter(constraint);
+			listAdapter.getFilter().filter(query);
+			mSearchText = query;
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public boolean submitSearch(CharSequence query) {
+		if (mResultList == null) return false;
+		if (mDataProvider == null) return false;
+		if (TextUtils.isEmpty(query)) return false;
+		
+		Cursor cursor = mDataProvider.exactQuery(query.toString());
+		if ((cursor == null) || (cursor.getCount() != 1)) return false;
+		
+		if (!Utility.isNull(cursor, DictionaryDataProvider.COLUMN_ID)) {
+			int colIdx = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_ID);
+			long id = cursor.getInt(colIdx);
+			onItemSelected(id, query);
 			return true;
 		}
 		
