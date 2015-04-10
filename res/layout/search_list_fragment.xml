@@ -24,15 +24,13 @@
 
 		<ListView
 		    android:id="@+id/listViewResult"
-		    style="@style/AbsListViewHolo"
+		    style="@style/AbsListViewLight"
 		    android:layout_width="match_parent"
 		    android:layout_height="match_parent"
 		    android:layout_alignParentLeft="true"
 		    android:layout_alignParentTop="true"
 		    android:layout_marginBottom="5.0dip"
-		    android:background="@color/white" >
-
-		</ListView>
+		    android:background="@color/white" />
 
     </RelativeLayout>
 

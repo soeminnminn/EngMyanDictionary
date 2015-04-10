@@ -39,7 +39,7 @@ document.ready = function(callback) {
 };
 
 document.ready(function() {
-    var options = { "addfont": true, "drawfix": true, "applykeywords": false };
+    var options = { "addfont": true, "drawfix": true, "applykeywords": false};
     var metaOptions = document.getElementsByName("Options");
     if (metaOptions.length > 0) {
         strOpts = metaOptions[0].getAttribute("content").replace(/'(\w+?)'/g, "\"$1\"");

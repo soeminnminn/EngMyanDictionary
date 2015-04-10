@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="PopupMenuCompatStyle.DropDownListView.Dark" parent="android:Widget.Holo.ListView.DropDown">
+    </style>
+
+    <style name="PopupMenuCompatStyle.DropDownListView.Light" parent="android:Widget.Holo.Light.ListView.DropDown">
+    </style>
+
+    <style name="PopupMenuCompatStyle.ListPopupWindow.Dark" parent="android:Widget.Holo.ListPopupWindow">
+    </style>
+
+    <style name="PopupMenuCompatStyle.ListPopupWindow.Light" parent="android:Widget.Holo.Light.ListPopupWindow">
+    </style>
+
+</resources>

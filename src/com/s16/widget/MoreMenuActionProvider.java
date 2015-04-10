@@ -1,11 +1,12 @@
 package com.s16.widget;
 
 import com.s16.engmyan.R;
+import com.s16.widget.popupmenu.PopupMenuCompat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.support.v4.view.ActionProvider;
-import android.support.v7.widget.PopupMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
@@ -23,15 +24,21 @@ public class MoreMenuActionProvider extends ActionProvider
 	private final Menu mMenu;
 	private final MenuItem mMenuItem;
 	private ImageButton mButton;
-	private PopupMenu mPopupMenu;
+	private PopupMenuCompat mPopupMenu;
 	private boolean mEnabled = true;
+	
+	private static final int[] BUTTON_ATTRS = {
+        android.R.attr.background,
+        android.R.attr.src
+	};
 	
 	public MoreMenuActionProvider(Context context, Menu menu, MenuItem menuItem, int subMenuId) {
 		super(context);
 		mMenu = menu;
 		mMenuItem = menuItem;
 		mSubMenuId = subMenuId;
-		mIsActionBarSupport = (android.os.Build.VERSION.SDK_INT > 10);
+		//mIsActionBarSupport = (android.os.Build.VERSION.SDK_INT > 10);
+		mIsActionBarSupport = (android.os.Build.VERSION.SDK_INT > 20);
 	}
 	
 	protected Activity getActivity() {
@@ -40,10 +47,9 @@ public class MoreMenuActionProvider extends ActionProvider
 	
 	protected void showPopupMenu(View v) {
 		if(mPopupMenu == null) {
-			//final PopupMenu popupMenu = new PopupMenu(getContext(), v);
-			mPopupMenu = new PopupMenu(new ContextThemeWrapper(getContext(), R.style.ActionMenuTheme), v);
+			mPopupMenu = new PopupMenuCompat(getContext(), v);
 			mPopupMenu.inflate(mSubMenuId);
-			mPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+			mPopupMenu.setOnMenuItemClickListener(new PopupMenuCompat.OnMenuItemClickListener() {
 				
 				@Override
 				public boolean onMenuItemClick(MenuItem item) {
@@ -69,11 +75,18 @@ public class MoreMenuActionProvider extends ActionProvider
 		return getActivity().onOptionsItemSelected(item);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public View onCreateActionView() {
 		if (!mIsActionBarSupport) {
-			mButton = new ImageButton(new ContextThemeWrapper(getContext(), R.style.ActionMenuButtonTheme));
-			mButton.setBackgroundResource(R.drawable.more_menu_button);
+			final Context context = new ContextThemeWrapper(getContext(), R.style.ActionMenuButtonTheme);
+			mButton = new ImageButton(context);
+			
+			final TypedArray appearance = context.getTheme().obtainStyledAttributes(BUTTON_ATTRS);
+			mButton.setBackgroundDrawable(appearance.getDrawable(0));
+			mButton.setImageDrawable(appearance.getDrawable(1));
+			appearance.recycle();
+			
 			mButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 			mButton.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -101,8 +114,9 @@ public class MoreMenuActionProvider extends ActionProvider
 	public void onPrepareSubMenu(SubMenu subMenu) {
 		if (mIsActionBarSupport) {
 			subMenu.clear();
-			if (mEnabled) 
+			if (mEnabled) {
 				getActivity().getMenuInflater().inflate(mSubMenuId, subMenu);
+			}
 		}
     }
 

@@ -8,11 +8,21 @@
     <style name="AppBaseTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <!-- API 14 theme customizations can go here. -->
         <item name="android:actionBarStyle">@style/ActionBar</item>
-        <item name="android:dialogTheme">@style/DialogTheme</item>
-        <item name="android:absListViewStyle">@style/AbsListViewHolo</item>
-        
         <item name="actionBarStyle">@style/ActionBar</item>
         <item name="actionBarSplitStyle">@style/ActionBarSplit</item>
+        
+	    <item name="colorPrimary">@color/title_background</item>
+	    <item name="colorPrimaryDark">@color/title_background_dark</item>
+	    <item name="colorAccent">@color/title_background_accent</item>
+        
+        <item name="android:dialogTheme">@style/DialogTheme</item>
+        
+        <item name="android:absListViewStyle">@style/AbsListViewLight</item>
+        <item name="android:checkboxStyle">@style/CheckBoxLight</item>
+		<item name="android:radioButtonStyle">@style/RadioButtonLight</item>
+		
+		<item name="pmPopupWindowStyle">@style/PopupMenuCompatStyle.ListPopupWindow.Light</item>
+		<item name="pmDropDownListViewStyle">@style/PopupMenuCompatStyle.DropDownListView.Light</item>
     </style>
     
     <style name="ActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
@@ -23,7 +33,13 @@
         <item name="android:background">@drawable/actionbar_background</item>
     </style>
     
+    <style name="ActionMenuButtonTheme" parent="@android:style/Widget.Holo.Button.Borderless">
+        <item name="android:src">@drawable/ic_action_moreoverflow</item>
+    </style>
+    
     <style name="DialogTheme" parent="@android:style/Theme.Holo.Dialog">
+    </style>
+    <style name="DialogTheme.Alert" parent="@android:style/Theme.Holo.Dialog">
     </style>
     <style name="DialogTheme.NoTitle" parent="@style/DialogTheme">
         <item name="android:windowActionBar">false</item>
@@ -36,10 +52,37 @@
         <item name="android:windowNoTitle">true</item>
     </style>
     
-    <style name="AbsListViewHolo" parent="@android:style/Widget.AbsListView">
+    <style name="AbsListViewLight" parent="@android:style/Widget.AbsListView">
     </style>
     
     <style name="ButtonBar.Button" parent="@android:style/Widget.Holo.Button.Borderless">
+	</style>
+	
+    <style name="SearchBar.Button" parent="@android:style/Widget.Holo.Button.Borderless">
+	    <item name="android:padding">6dp</item>
+	    <item name="android:layout_height">@dimen/action_button_height</item>
+	    <item name="android:layout_width">@dimen/action_button_width</item>
+	    <item name="android:textColor">@android:color/white</item>
+	    <item name="android:gravity">center</item>
+	    <item name="android:textStyle">bold</item>
+	    <item name="android:minHeight">30dp</item>
+        <item name="android:minWidth">30dp</item>
+	</style>
+	
+    <style name="DoneBar.Button" parent="@android:style/Widget.Holo.Button.Borderless">
+        <item name="android:padding">6dp</item>
+	    <item name="android:layout_height">@dimen/action_button_height</item>
+	    <item name="android:layout_width">@dimen/action_button_width</item>
+	    <item name="android:textColor">@android:color/white</item>
+	    <item name="android:gravity">center</item>
+	    <item name="android:textStyle">bold</item>
+	    <item name="android:minHeight">30dp</item>
+        <item name="android:minWidth">30dp</item>
+	</style>
+	<style name="DoneBar.ActionButton" parent="@style/DoneBar.Button">
+	    <item name="android:layout_height">@dimen/action_button_height</item>
+	    <item name="android:layout_width">@dimen/action_button_width</item>
+	    <item name="android:layout_marginLeft">4dip</item>
 	</style>
 
 </resources>

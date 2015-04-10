@@ -5,6 +5,11 @@ English-Myanmar Dictionary
 
 ## Change Log
 
+#### Version 3.1.0
+- Improve UI
+- Apply Lollipop Theme
+- Bug fix
+
 #### Version 3.0.0
 - Improved search result.
 - Add wildcards search. Eg: *ist, th?n.

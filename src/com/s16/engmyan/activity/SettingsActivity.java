@@ -3,16 +3,19 @@ package com.s16.engmyan.activity;
 import com.s16.engmyan.R;
 import com.s16.engmyan.fragment.SettingsFragment;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
+import android.support.v4.app.SystemUiUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 
 public class SettingsActivity extends ActionBarActivity {
 
+	@SuppressLint("InlinedApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -24,6 +27,8 @@ public class SettingsActivity extends ActionBarActivity {
 		// Enabling Back navigation on Action Bar icon
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setTitle(R.string.action_settings);
+		
+		SystemUiUtils.setStatusBarColor(this, getResources().getColor(R.color.title_background_dark));
 		
 		FragmentManager manager = getSupportFragmentManager();
 		if (manager != null) {

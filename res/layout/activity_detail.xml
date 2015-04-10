@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:id="@+id/detailContainer"
-	android:name="com.s16.engmyan.fragment.DetailViewFragment"
-	android:layout_width="match_parent"
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/detailContent"
+    android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	tools:context=".MainActivity"
-	tools:layout="@layout/detailview_fragment" />
+	tools:context=".MainActivity" >
+	
+    <include 
+        android:id="@+id/detailActionBar"
+        layout="@layout/actionbar_content"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/abc_action_bar_default_height_material" />
+	
+    <fragment android:id="@+id/detailContainer"
+		android:name="com.s16.engmyan.fragment.DetailViewFragment"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		tools:layout="@layout/detailview_fragment" />
+    
+</RelativeLayout>

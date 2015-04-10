@@ -2,7 +2,6 @@ package com.s16.engmyan.data;
 
 import com.s16.data.CursorAdapter;
 import com.s16.engmyan.R;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.view.LayoutInflater;
@@ -68,6 +67,7 @@ public class SearchListAdapter extends CursorAdapter implements OnScrollListener
 		if (loadMore && mCurrentScrollState != SCROLL_STATE_IDLE) {
 			if ((mPageLimit > 0) && (mItemCount < super.getCount())) {
 				mItemCount += mPageLimit;
+				notifyDataSetChanged();
 				view.invalidateViews();
 			}
 		}
@@ -82,7 +82,7 @@ public class SearchListAdapter extends CursorAdapter implements OnScrollListener
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
 		LayoutInflater layoutInflater = LayoutInflater.from(context);
-		View view = layoutInflater.inflate(R.layout.simple_list_item, null);
+		View view = layoutInflater.inflate(R.layout.simple_list_item, viewGroup, false);
 		return view;
 	}
 }

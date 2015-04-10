@@ -202,6 +202,7 @@ public class ExpansionManager {
 	    return false;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static Bitmap getBitmapExpansion(Context context, String path) {
 		if (TextUtils.isEmpty(path)) return null;
 		if (!isObbMounted(context)) return null;
@@ -236,6 +237,7 @@ public class ExpansionManager {
 		return null;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static Bitmap getBitmapAssert(Context context, String path) {
 		if (TextUtils.isEmpty(path)) return null;
 		

@@ -132,6 +132,8 @@
     <!-- Application -->
     <color name="background">#FFE0DFE6</color>
     <color name="title_background">#ff60638f</color>
+    <color name="title_background_dark">#ff4f5175</color>
+    <color name="title_background_accent">#ff8286c2</color>
     <color name="title_foreground">#ffffffff</color>
     <color name="imageview_background">#a060638f</color>
     

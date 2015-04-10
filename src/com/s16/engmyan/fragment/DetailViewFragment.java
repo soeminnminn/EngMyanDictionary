@@ -101,12 +101,15 @@ public class DetailViewFragment extends Fragment
 	}
 	
 	@Override
+    public void onStop() {
+		super.onStop();
+		clear();
+    }
+	
+	@Override
 	public void onDestroy() {
-		if (mTextToSpeech != null) {
-			mTextToSpeech.stop();
-			mTextToSpeech.shutdown();
-		}
 		super.onDestroy();
+		clear();
 	}
 	
 	private void initialize(View view) {
@@ -136,10 +139,7 @@ public class DetailViewFragment extends Fragment
 			
 			@Override
 			public void onPageFinished(LocalWebView view, String url) {
-	    		if (mDetailDataChangeListener != null) {
-	    			mDetailDataChangeListener.onLoadFinished();
-	    			mDetailDataChangeListener.onNavigationChanged(view.canGoBack(), view.canGoForward());
-	    		}
+				onPageLoaded(url, view.canGoBack(), view.canGoForward());
 				hideProgress();
 				isDataLoading = false;
 			}
@@ -168,6 +168,22 @@ public class DetailViewFragment extends Fragment
 		}
 	}
 	
+	private void clear() {
+		if (mTextToSpeech != null) {
+			try {
+				mTextToSpeech.stop();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				mTextToSpeech.shutdown();
+				mTextToSpeech = null;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	protected void showProgress() {
 		if (mProgressFrame != null) {
 			mProgressFrame.setVisibility(View.VISIBLE);
@@ -180,6 +196,18 @@ public class DetailViewFragment extends Fragment
 		}
 	}
 	
+	protected void onPageLoaded(String url, boolean navBackEnabled, boolean navForwardEnabled) {
+		DictionaryItem item = loadDictionaryItem(url);
+		if (item != null && (mData == null || mData.id != item.id)) {
+			mData = item;
+		}
+		
+		if (mDetailDataChangeListener != null) {
+			mDetailDataChangeListener.onLoadFinished();
+			mDetailDataChangeListener.onNavigationChanged(navBackEnabled, navForwardEnabled);
+		}
+	}
+	
 	protected void setSaveInstanceState(Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
 			mData = savedInstanceState.getParcelable(Constants.DETAIL_DATA_KEY);
@@ -188,7 +216,7 @@ public class DetailViewFragment extends Fragment
 	
 	protected boolean getUsedUnicodeFix() {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		return sharedPreferences.getBoolean(Constants.PREFS_USED_UNICODE_FIX, true);
+		return sharedPreferences.getBoolean(Constants.PREFS_USED_UNICODE_FIX, false);
 	}
 	
 	protected boolean getUsedWordClickable() {
@@ -227,17 +255,28 @@ public class DetailViewFragment extends Fragment
 		} 
 		
 		if (getUsedWordClickable() && (!TextUtils.isEmpty(itemData.keywords))) {
+			/*
 			if (itemData.keywords.toLowerCase().contains("word")) {
 				definition = Utility.RegexReplace(definition, "([^A-Za-z\\/\\?=])(word)([^A-Za-z\\/\\?=])", 
-						"$1<a href=\"" + Constants.URL_DEFINITION + "?word=word\">$2</a>$3", Pattern.CASE_INSENSITIVE);
+						"$1<a href=\"" + Constants.URL_DEFINITION + "?w=word\">$2</a>$3", Pattern.CASE_INSENSITIVE);
 			}
 			Pattern pattern = Pattern.compile("[^,]+");
 			Matcher m = pattern.matcher(itemData.keywords);
 			while(m.find()) {
 				if (m.group().equalsIgnoreCase("word")) continue;
 				definition = Utility.RegexReplace(definition, "([^A-Za-z\\/\\?=])(" + m.group() + ")([^A-Za-z\\/\\?=])", 
-						"$1<a href=\"" + Constants.URL_DEFINITION + "?word=" + m.group() + "\">$2</a>$3", Pattern.CASE_INSENSITIVE);
+						"$1<a href=\"" + Constants.URL_DEFINITION + "?w=" + m.group() + "\">$2</a>$3", Pattern.CASE_INSENSITIVE);
 			}
+			*/
+			Pattern pattern = Pattern.compile("[^,]+");
+			Matcher m = pattern.matcher(itemData.keywords);
+			while(m.find()) {
+				definition = Utility.RegexReplace(definition, "([^A-Za-z\\/\\?=])(" + m.group() + ")([^A-Za-z\\/\\?=])", 
+						"$1<a href=\"#?w=" + m.group() + "\">$2</a>$3", Pattern.CASE_INSENSITIVE);
+			}
+			
+			definition = definition.toString().replaceAll("\\#\\?", Constants.URL_DEFINITION + "?");
+			//Log.i(TAG, definition.toString());
 		}
 		html += definition;
 		
@@ -264,7 +303,7 @@ public class DetailViewFragment extends Fragment
 			if (!TextUtils.isEmpty(queryParam)) {
 				id = Long.valueOf(queryParam);
 			}
-			queryParam = uri.getQueryParameter("word");
+			queryParam = uri.getQueryParameter("w");
 			
 			if (mDetailDataChangeListener != null) {
 				return mDetailDataChangeListener.onLoadDetailData(id, queryParam);
@@ -437,6 +476,7 @@ public class DetailViewFragment extends Fragment
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void doSpeak() {
 		if (mData == null) return;
 		if (ExpansionManager.isExpansionExists(getContext())) {

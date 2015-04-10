@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainContent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:baselineAligned="false"
@@ -10,9 +11,9 @@
 	android:weightSum="5"
     android:background="@color/background"
     tools:context=".MainActivity" >
-    
+     
     <RelativeLayout
-        android:id="@+id/layoutWebView"
+        android:id="@+id/layoutMainContent"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="2" >
@@ -47,5 +48,12 @@
 		android:layout_height="match_parent"
 		android:layout_weight="3"
 		android:padding="8dp" />
+	
+	<include 
+        android:id="@+id/detailActionBar"
+        layout="@layout/actionbar_content"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/abc_action_bar_default_height_material"
+        android:visibility="gone" />
 	
 </LinearLayout>

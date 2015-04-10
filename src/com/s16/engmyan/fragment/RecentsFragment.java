@@ -181,7 +181,7 @@ public class RecentsFragment extends Fragment
 	}
 	
 	protected void performClearRecents() {
-		final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(getContext(), R.style.DialogTheme));
+		final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(getContext(), R.style.DialogTheme_Alert));
 		dialogBuilder.setIcon(android.R.drawable.ic_dialog_info);
 		dialogBuilder.setTitle(R.string.clear_recent_title);
 		dialogBuilder.setMessage(R.string.clear_recent_message);
@@ -237,6 +237,9 @@ public class RecentsFragment extends Fragment
 			view.setVisibility(View.VISIBLE);
 			mVisibility = View.VISIBLE;
 			setListData();
+			if (mOnVisibilityChangeListener != null) {
+				mOnVisibilityChangeListener.onVisibilityChanged(mVisibility);
+			}
 		}
 	}
 	
@@ -246,6 +249,9 @@ public class RecentsFragment extends Fragment
 			view.startAnimation(mHideAnimation);
 			view.setVisibility(View.GONE);
 			mVisibility = View.GONE;
+			if (mOnVisibilityChangeListener != null) {
+				mOnVisibilityChangeListener.onVisibilityChanged(mVisibility);
+			}
 		}
 	}
 }

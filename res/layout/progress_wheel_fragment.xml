@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ProgressWheel="http://schemas.android.com/apk/res/com.s16.engmyan"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginBottom="@dimen/dialog_vertical_margin"
@@ -9,23 +8,13 @@
     android:layout_marginTop="@dimen/dialog_vertical_margin"
     android:background="@color/background"
     android:orientation="vertical" >
-
-    <com.s16.widget.ProgressWheelView
+    
+    <ImageView 
         android:id="@+id/progressBar"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_centerHorizontal="true"
-        android:layout_centerInParent="true"
-        android:layout_centerVertical="true"
-        ProgressWheel:text="@string/install_text"
-        ProgressWheel:textColor="@color/black"
-        ProgressWheel:textSize="12sp"
-        ProgressWheel:rimColor="@color/title_background"
-        ProgressWheel:circleColor="@color/background"
-        ProgressWheel:barLength="20dp" 
-        ProgressWheel:barColor="#8000"
-        ProgressWheel:barWidth="25dp"
-        ProgressWheel:rimWidth="25dp" 
-        ProgressWheel:spinSpeed="3dp" />
+        android:layout_width="180dip"
+    	android:layout_height="180dip"
+    	android:layout_centerInParent="true"
+    	android:scaleType="fitXY"
+    	android:contentDescription="@string/empty_string" />
 
 </RelativeLayout>

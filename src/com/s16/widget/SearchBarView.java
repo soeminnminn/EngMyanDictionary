@@ -296,6 +296,10 @@ public class SearchBarView extends FrameLayout {
 		}
 	}
 	
+	public TextView getTextView() {
+		return mTextSearch;
+	}
+	
 	protected void onQueryTextChanged(CharSequence s, int count) {
 		if (mTextSearch == null) return;
 		if (mOnQueryTextListener != null) {

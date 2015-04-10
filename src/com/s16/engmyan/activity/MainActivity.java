@@ -20,6 +20,7 @@ import com.s16.widget.MoreMenuActionProvider;
 
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.SQLException;
@@ -27,6 +28,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.SystemUiUtils;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -35,6 +37,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity 
@@ -52,6 +55,7 @@ public class MainActivity extends ActionBarActivity
 	private FavoritesFragment mFavoritesView;
 	private RecentsFragment mRecentsView;
 	
+	private Menu mMenu;
 	private MoreMenuActionProvider mMoreMenu;
 	private MenuItem mMenuItemFavorite;
 	private MenuItem mMenuItemSound;
@@ -128,10 +132,13 @@ public class MainActivity extends ActionBarActivity
 				}
 	};
 	
+	@SuppressLint("InlinedApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		SystemUiUtils.setStatusBarColor(this, getResources().getColor(R.color.title_background_dark));
 		
 		initialize();
 		performInstall();
@@ -168,7 +175,16 @@ public class MainActivity extends ActionBarActivity
 			transaction.replace(R.id.detailContainer, mDetailView);
 			transaction.commit();
 			
+			ViewGroup content = (ViewGroup)findViewById(R.id.mainContent);
+			mActionBarContent = (ActionBarNavigationButtons)content.findViewById(R.id.detailActionBar);
 			if (mActionBarContent != null) {
+				content.removeView(mActionBarContent);
+				
+				final ActionBar actionBar = getSupportActionBar();
+				actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
+				actionBar.setCustomView(mActionBarContent);
+				
+				mActionBarContent.setVisibility(View.VISIBLE);
 				mActionBarContent.setNavigationVisible(true);
 			}
 			
@@ -194,6 +210,10 @@ public class MainActivity extends ActionBarActivity
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		if (mMenu == null) {
+			mMenu = menu;
+		}
+		
 		if (mDetailView == null) {
 			getMenuInflater().inflate(R.menu.menu_main, menu);
 		} else {
@@ -232,13 +252,15 @@ public class MainActivity extends ActionBarActivity
 				mMenuItemPicture.setVisible(false);
 		}
 		
-		final MenuItem actionMoreoverflow = menu.findItem(R.id.action_moreoverflow);
-		if (actionMoreoverflow != null) {
-			MenuItemCompat.setShowAsAction(actionMoreoverflow, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-			mMoreMenu = new MoreMenuActionProvider(this, menu, actionMoreoverflow, R.menu.menu_overflow);
-			mMoreMenu.setEnabled(mIsMenuEnabled);
-			MenuItemCompat.setActionProvider(actionMoreoverflow, mMoreMenu);
-			actionMoreoverflow.setEnabled(mIsMenuEnabled);
+		if (android.os.Build.VERSION.SDK_INT < 21) {
+			final MenuItem actionMoreoverflow = menu.findItem(R.id.action_moreoverflow);
+			if (actionMoreoverflow != null) {
+				MenuItemCompat.setShowAsAction(actionMoreoverflow, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+				mMoreMenu = new MoreMenuActionProvider(this, menu, actionMoreoverflow, R.menu.menu_overflow_light);
+				mMoreMenu.setEnabled(mIsMenuEnabled);
+				MenuItemCompat.setActionProvider(actionMoreoverflow, mMoreMenu);
+				actionMoreoverflow.setEnabled(mIsMenuEnabled);
+			}
 		}
 		
 		return true;
@@ -246,6 +268,10 @@ public class MainActivity extends ActionBarActivity
 	
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item) {
+		if (!mIsMenuEnabled) {
+			return super.onOptionsItemSelected(item);
+		}
+		
 		switch (item.getItemId()) {
 			case R.id.action_favorite:
 				performFavorite();
@@ -308,8 +334,14 @@ public class MainActivity extends ActionBarActivity
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_MENU) {
-			mMoreMenu.performClick();
-			return true;
+			if (!mIsMenuEnabled) {
+				return true;
+			}
+			
+			if (mMoreMenu != null) {
+				mMoreMenu.performClick();
+				return true;
+			}
 		}
 		return super.onKeyUp(keyCode, event);
 	}
@@ -339,22 +371,35 @@ public class MainActivity extends ActionBarActivity
 	protected void setViewEnabled(boolean enabled) {
 		mIsMenuEnabled = enabled;
 		if (mSearchList != null) {
+			if (mSearchList.getSearchView() != null) {
+				if (!enabled) {
+					SystemUiUtils.hideSoftKeyboard(this, mSearchList.getSearchView());
+				}
+				mSearchList.getSearchView().setEnabled(enabled);
+			}
 			mSearchList.setEnabled(enabled);
 		}
-		if (mMenuItemFavorite != null) {
-			mMenuItemFavorite.setEnabled(enabled);
+		if ((!enabled) && isActionBarHideOnView()) {
+			getSupportActionBar().show();
+		}
+		/*
+		if (mMenu != null) {
+			int menuCount = mMenu.size();
+			for(int i=0; i<menuCount;i++) {
+				mMenu.getItem(i).setVisible(enabled);
+			}
+		} else {
+			if (mMenuItemFavorite != null) {
+				mMenuItemFavorite.setEnabled(enabled);
+			}
 		}
 		if (mMoreMenu != null) {
 			mMoreMenu.setEnabled(enabled);
 		}
 		
-		if ((!enabled) && isActionBarHideOnView()) {
-			getSupportActionBar().show();
-		}
-		
 		if (mActionBarContent != null) {
 			mActionBarContent.setEnabled(enabled);
-		}
+		} */
 	}
 	
 	protected boolean isActionBarHideOnView() {
@@ -468,6 +513,7 @@ public class MainActivity extends ActionBarActivity
 		if(mLoading != null) {
 			mLoading.dismiss();
 		}
+		setViewEnabled(true);
 	}
 	
 	protected synchronized void performInstall() {
@@ -477,15 +523,17 @@ public class MainActivity extends ActionBarActivity
 			return;
 		}
 		
-		if((dbFile.exists()) 
-			&& (!DictionaryDataProvider.versionCheck(this, dbFile)) 
-			&& (!dbFile.delete())) {
-			
+		boolean isSuccess = dbFile.exists();
+		//isSuccess = (isSuccess && dbFile.length() > Constants.DATABASE_FILE_MIN_LENGTH);
+		//isSuccess = (isSuccess && Checksum.checkMD5(Constants.DATABASE_FILE_MD5, dbFile));
+		isSuccess = (isSuccess && DictionaryDataProvider.versionCheck(this, dbFile));
+		
+		if(!isSuccess && dbFile.exists() && !dbFile.delete()) {
 			installError(getString(R.string.install_error_data_load));
 			return;
 		}
 		
-		if(!dbFile.exists()) {
+		if(!isSuccess || !dbFile.exists()) {
 			final File dataFolder = dbFile.getParentFile();
 			InstallationTask task = new InstallationTask(this, dataFolder, this);
 			task.execute(Constants.ASSERT_ZIP_PKG);

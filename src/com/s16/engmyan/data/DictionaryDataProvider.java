@@ -154,6 +154,7 @@ public class DictionaryDataProvider {
 		try {
 			SQLiteDatabase dataBase = helper.getReadableDatabase();
 			if (helper.version != DATABASE_VERSION) return false;
+			if (!dataBase.isDatabaseIntegrityOk()) return false;
 			
 			int dbVersion = dataBase.getVersion();
 			Log.i(TAG, "Old Version : " + dbVersion + ", New Version : " + DATABASE_VERSION);

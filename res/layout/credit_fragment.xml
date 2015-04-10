@@ -8,27 +8,18 @@
     android:layout_marginRight="@dimen/dialog_horizontal_margin"
     android:layout_marginTop="@dimen/dialog_vertical_margin"
     tools:context=".MainActivity" >
-
+    
     <LinearLayout
         android:id="@+id/layoutButtonBar"
-        style="@style/ButtonBar"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:orientation="vertical" >
-		
-		<View 
-		    android:layout_width="match_parent" 
-		    android:layout_height="1dp" 
-		    android:background="@color/white_50_opacity" />
-		
-	    <Button
-	        android:id="@android:id/closeButton"
-	        style="@style/ButtonBar.Button"
-	        android:layout_width="match_parent"
-	        android:layout_height="match_parent"
-	        android:layout_gravity="bottom"
-	        android:contentDescription="@string/empty_string"
-	        android:text="@android:string/cancel" />
+	
+        <include layout="@layout/layout_dialog_one_button"
+       		 android:layout_width="match_parent"
+			 android:layout_height="@dimen/dialog_button_bar_height" />
+    
     </LinearLayout>
 
     <WebView

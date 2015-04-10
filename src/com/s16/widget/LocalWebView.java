@@ -66,7 +66,7 @@ public class LocalWebView extends WebView {
         }
 	};
 	
-	class LocalHistoryItem implements Serializable {
+	static class LocalHistoryItem implements Serializable, Parcelable {
 		
 		private static final long serialVersionUID = 1L;
 		
@@ -77,6 +77,29 @@ public class LocalWebView extends WebView {
 		public String DocumentData;
 		public byte[] PostData;
 		public int LoadMode;
+		
+		public static final Parcelable.Creator<LocalHistoryItem> CREATOR
+		        = new Parcelable.Creator<LocalHistoryItem>() {
+		    public LocalHistoryItem createFromParcel(Parcel in) {
+		        return new LocalHistoryItem(in);
+		    }
+		
+		    public LocalHistoryItem[] newArray(int size) {
+		        return new LocalHistoryItem[size];
+		    }
+		};
+		 
+		public LocalHistoryItem(Parcel in) {
+			if (in != null) {
+				Url = in.readString();
+				BaseUrl = in.readString();
+				MimeType = in.readString();
+				Encoding = in.readString();
+				DocumentData = in.readString();
+				in.readByteArray(PostData);
+				LoadMode = in.readInt();
+			}
+		}
 		
 		public LocalHistoryItem(String url) {
 			Url = url;
@@ -101,6 +124,24 @@ public class LocalWebView extends WebView {
 			MimeType = mimeType;
 			Encoding = encoding;
 			Url = historyUrl;
+		}
+
+		@Override
+		public int describeContents() {
+			return 0;
+		}
+
+		@Override
+		public void writeToParcel(Parcel dest, int flags) {
+			if (dest != null) {
+				dest.writeString(Url);
+				dest.writeString(BaseUrl);
+				dest.writeString(MimeType);
+				dest.writeString(Encoding);
+				dest.writeString(DocumentData);
+				dest.writeByteArray(PostData);
+				dest.writeInt(LoadMode);
+			}
 		}
 	}
 	

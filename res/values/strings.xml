@@ -61,7 +61,7 @@
 	
 	<string name="about_text"><Data>
       <![CDATA["
-      <p>Eng-Myan Dictionary</p>
+      <p><b>Eng-Myan Dictionary</b></p>
       <p>Word : 21984<br/>Images : 933</p>
       <p>Develop by <a href='http://www.facebook.com/soeminnminn'>Soe Minn Minn</a></p>
       <p>Copyright \u00A9 2014 The Android Open Source Project</p>

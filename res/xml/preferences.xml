@@ -6,7 +6,7 @@
 			android:key="prefs_used_unicode_fix"  
 			android:title="@string/prefs_used_unicode_fix"  
 			android:summary="@string/prefs_used_unicode_fix_summary" 
-			android:defaultValue="true" />
+			android:defaultValue="false" />
         
         <CheckBoxPreference  
 			android:key="prefs_used_word_clickable"  

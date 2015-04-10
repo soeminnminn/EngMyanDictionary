@@ -19,8 +19,7 @@ import android.widget.Filterable;
  * to switch to the framework's implementation.  See the framework SDK
  * documentation for a class overview.
  */
-public abstract class CursorAdapter extends BaseAdapter implements Filterable,
-        CursorFilter.CursorFilterClient {
+public abstract class CursorAdapter extends BaseAdapter implements Filterable {
     /**
      * This field should be made private, so it is hidden from the SDK.
      * {@hide}
@@ -295,9 +294,27 @@ public abstract class CursorAdapter extends BaseAdapter implements Filterable,
      * @param cursor The new cursor to be used
      */
     public void changeCursor(Cursor cursor) {
-        Cursor old = swapCursor(cursor);
-        if (old != null) {
-            old.close();
+    	if (cursor == mCursor) {
+            return;
+        }
+        if (mCursor != null) {
+            if (mChangeObserver != null) mCursor.unregisterContentObserver(mChangeObserver);
+            if (mDataSetObserver != null) mCursor.unregisterDataSetObserver(mDataSetObserver);
+            mCursor.close();
+        }
+        mCursor = cursor;
+        if (cursor != null) {
+            if (mChangeObserver != null) cursor.registerContentObserver(mChangeObserver);
+            if (mDataSetObserver != null) cursor.registerDataSetObserver(mDataSetObserver);
+            mRowIDColumn = cursor.getColumnIndexOrThrow("_id");
+            mDataValid = true;
+            // notify the observers about the new cursor
+            notifyDataSetChanged();
+        } else {
+            mRowIDColumn = -1;
+            mDataValid = false;
+            // notify the observers about the lack of a data set
+            notifyDataSetInvalidated();
         }
     }
 
@@ -315,7 +332,7 @@ public abstract class CursorAdapter extends BaseAdapter implements Filterable,
         if (newCursor == mCursor) {
             return null;
         }
-        Cursor oldCursor = mCursor;
+        final Cursor oldCursor = mCursor;
         if (oldCursor != null) {
             if (mChangeObserver != null) oldCursor.unregisterContentObserver(mChangeObserver);
             if (mDataSetObserver != null) oldCursor.unregisterDataSetObserver(mDataSetObserver);
@@ -385,7 +402,7 @@ public abstract class CursorAdapter extends BaseAdapter implements Filterable,
 
     public Filter getFilter() {
         if (mCursorFilter == null) {
-            mCursorFilter = new CursorFilter(this);
+            mCursorFilter = new CursorFilter();
         }
         return mCursorFilter;
     }
@@ -463,4 +480,35 @@ public abstract class CursorAdapter extends BaseAdapter implements Filterable,
         }
     }
 
+    class CursorFilter extends Filter {
+        
+        @Override
+        public CharSequence convertResultToString(Object resultValue) {
+            return convertToString((Cursor) resultValue);
+        }
+
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            Cursor cursor = runQueryOnBackgroundThread(constraint);
+
+            FilterResults results = new FilterResults();
+            if (cursor != null) {
+                results.count = cursor.getCount();
+                results.values = cursor;
+            } else {
+                results.count = 0;
+                results.values = null;
+            }
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            Cursor oldCursor = getCursor();
+            
+            if (results.values != null && results.values != oldCursor) {
+                changeCursor((Cursor)results.values);
+            }
+        }
+    }
 }

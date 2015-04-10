@@ -4,6 +4,8 @@
          Customize dimensions originally defined in res/values/dimens.xml (such as
          screen margins) for sw600dp devices (e.g. 7" tablets) here.
     -->
+    <dimen name="action_bar_default_height">64dip</dimen>
+    
     <dimen name="searchbar_height">54dip</dimen>
     <dimen name="content_margin_top">58dip</dimen>
     <dimen name="list_item_min_height">0.22in</dimen>

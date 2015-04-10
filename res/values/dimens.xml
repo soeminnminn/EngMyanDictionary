@@ -8,8 +8,10 @@
     <dimen name="content_horizontal_margin">7dp</dimen>
     <dimen name="content_vertical_margin">7dp</dimen>
     
-    <dimen name="actionbar_height">45dip</dimen>
-    <dimen name="top_margin_actionbar">48dip</dimen>
+    <dimen name="popup_title_margin_left">58dip</dimen>
+    <dimen name="popup_divider_margin_left">50dip</dimen>
+    
+    <dimen name="action_bar_default_height">48dip</dimen>
     <dimen name="action_button_height">40dip</dimen>
     <dimen name="action_button_width">40dip</dimen>
     
@@ -20,9 +22,10 @@
     <dimen name="clear_button_height">24dip</dimen>
     <dimen name="clear_button_width">24dip</dimen>
     
-    <dimen name="list_item_min_height">0.225in</dimen>
+    <dimen name="list_item_min_height">42dip</dimen>
     <dimen name="list_item_horizontal_margin">8dp</dimen>
     
+    <dimen name="dialog_buttonbar_right_margin">8dp</dimen>
     <dimen name="dialog_horizontal_margin">3dp</dimen>
     <dimen name="dialog_vertical_margin">3dp</dimen>
     <dimen name="dialog_button_bar_height">48dip</dimen>

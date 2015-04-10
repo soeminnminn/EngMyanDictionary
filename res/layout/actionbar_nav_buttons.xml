@@ -7,7 +7,7 @@
 
 	<ImageButton
 		android:id="@+id/actionbar_item_nav_back"
-		style="@style/DoneBar.Button"
+		style="@style/DoneBar.ActionButton"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_marginLeft="2dp"
@@ -17,7 +17,7 @@
 	
 	<ImageButton
 		android:id="@+id/actionbar_item_nav_forward"
-		style="@style/DoneBar.Button"
+		style="@style/DoneBar.ActionButton"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_marginLeft="2dp"

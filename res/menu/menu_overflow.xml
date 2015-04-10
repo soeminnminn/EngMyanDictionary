@@ -25,7 +25,7 @@
     
     <!-- Exit -->
     <item android:id="@+id/action_exit"
-          android:icon="@drawable/ic_action_cancel"
+          android:icon="@drawable/ic_action_exit"
           android:title="@string/action_exit"
           android:showAsAction="ifRoom|withText" />
 </menu>

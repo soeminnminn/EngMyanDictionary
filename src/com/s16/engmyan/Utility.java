@@ -3,12 +3,17 @@ package com.s16.engmyan;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.R.color;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.util.DisplayMetrics;
 import android.view.ContextThemeWrapper;
+import android.widget.TextView;
 
 public class Utility {
 	
@@ -172,16 +177,51 @@ public class Utility {
 	public static int getConfigScreenOrientation(Context context) {
 		return context.getResources().getConfiguration().orientation;
 	}
+
+	/**
+	 * This method converts dp unit to equivalent pixels, depending on device density. 
+	 * 
+	 * @param dp A value in dp (density independent pixels) unit. Which we need to convert into pixels
+	 * @param context Context to get resources and device specific display metrics
+	 * @return A float value to represent px equivalent to dp depending on device density
+	 */
+	public static float convertDpToPixel(float dp, Context context){
+	    Resources resources = context.getResources();
+	    DisplayMetrics metrics = resources.getDisplayMetrics();
+	    float px = dp * (metrics.densityDpi / 160f);
+	    return px;
+	}
+	
+	/**
+	 * This method converts device specific pixels to density independent pixels.
+	 * 
+	 * @param px A value in px (pixels) unit. Which we need to convert into db
+	 * @param context Context to get resources and device specific display metrics
+	 * @return A float value to represent dp equivalent to px value
+	 */
+	public static float convertPixelsToDp(float px, Context context){
+	    Resources resources = context.getResources();
+	    DisplayMetrics metrics = resources.getDisplayMetrics();
+	    float dp = px / (metrics.densityDpi / 160f);
+	    return dp;
+	}
 	
 	public static void showAboutDialog(Context context) {
     	
-		final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(context, R.style.DialogTheme));
+		final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(context, R.style.DialogTheme_Alert));
 		dialogBuilder.setIcon(android.R.drawable.ic_dialog_info);
 		dialogBuilder.setTitle(R.string.action_about);
-		String html = context.getText(R.string.about_text).toString();
-		dialogBuilder.setMessage(Html.fromHtml(html));
 		
-		dialogBuilder.setNegativeButton(context.getText(android.R.string.cancel), new DialogInterface.OnClickListener() {
+		String html = context.getText(R.string.about_text).toString();
+		final TextView message = new TextView(context);
+		message.setPadding((int)convertDpToPixel(10f, context), (int)convertDpToPixel(10f, context), 
+				(int)convertDpToPixel(10f, context), (int)convertDpToPixel(10f, context));
+		message.setTextColor(context.getResources().getColor(color.primary_text_dark));
+		message.setMovementMethod(LinkMovementMethod.getInstance());
+		message.setText(Html.fromHtml(html));
+		dialogBuilder.setView(message);
+		
+		dialogBuilder.setNegativeButton(context.getText(android.R.string.ok), new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();

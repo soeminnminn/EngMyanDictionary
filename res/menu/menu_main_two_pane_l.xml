@@ -1,0 +1,54 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/action_favorite"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_action_star"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/action_favorite"/>
+    
+    <item
+        android:id="@+id/action_sound"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_action_volume_on"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/action_sound"/>
+    
+    <item
+        android:id="@+id/action_picture"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_action_picture"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/action_picture"/>
+	
+	<!-- Settings -->
+    <item android:id="@+id/action_settings"
+          android:icon="@drawable/ic_action_settings"
+          android:title="@string/action_settings"
+          android:showAsAction="ifRoom|withText" />
+    
+    <!-- Favorites -->
+    <item android:id="@+id/action_manage_favorites"
+          android:icon="@drawable/ic_action_star"
+          android:title="@string/action_manage_favorites" 
+          android:showAsAction="ifRoom|withText"/>
+    
+    <!-- Recent -->
+    <item android:id="@+id/action_recent"
+          android:icon="@drawable/ic_action_recent"
+          android:title="@string/action_recent" 
+          android:showAsAction="ifRoom|withText"/>
+    
+    <!-- About -->
+    <item android:id="@+id/action_about"
+          android:icon="@drawable/ic_action_about"
+          android:title="@string/action_about" 
+          android:showAsAction="ifRoom|withText"/>
+    
+    <!-- Exit -->
+    <item android:id="@+id/action_exit"
+          android:icon="@drawable/ic_action_exit"
+          android:title="@string/action_exit"
+          android:showAsAction="ifRoom|withText" />
+
+</menu>

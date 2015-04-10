@@ -8,16 +8,19 @@ import com.s16.engmyan.data.UserDataProvider;
 import com.s16.engmyan.fragment.DetailViewFragment;
 import com.s16.engmyan.R;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
+import android.support.v4.app.SystemUiUtils;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 public class DetailActivity extends ActionBarActivity
@@ -59,18 +62,29 @@ public class DetailActivity extends ActionBarActivity
 				@Override
 				public void onLoadFinished() {
 					setDetailTitle();
+					updateMenu();
 					setIfFavorties();
 				}
 	};
 	
+	@SuppressLint("InlinedApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_detail);
 		
 		final ActionBar actionBar = getSupportActionBar();
-		actionBar.setDisplayShowTitleEnabled(false);
+		//actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setDisplayHomeAsUpEnabled(true);
+		
+		SystemUiUtils.setStatusBarColor(this, getResources().getColor(R.color.title_background_dark));
+		
+		ViewGroup content = (ViewGroup)findViewById(R.id.detailContent);
+		mActionBarContent = (ActionBarNavigationButtons)content.findViewById(R.id.detailActionBar);
+		content.removeView(mActionBarContent);
+		
+		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP);
+		actionBar.setCustomView(mActionBarContent);
 		
 		mDictDataProvider = Constants.getDataProvider(this);
 		
@@ -107,16 +121,8 @@ public class DetailActivity extends ActionBarActivity
 		}
 		
 		mMenuItemSound = menu.findItem(R.id.action_sound);
-		if (mMenuItemSound != null) {
-			MenuItemCompat.setShowAsAction(mMenuItemSound, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-			if (mDetailView != null) mMenuItemSound.setVisible(mDetailView.getHasSound());
-		}
-		
 		mMenuItemPicture = menu.findItem(R.id.action_picture);
-		if (mMenuItemPicture != null) {
-			MenuItemCompat.setShowAsAction(mMenuItemPicture, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-			if (mDetailView != null) mMenuItemPicture.setVisible(mDetailView.getHasPicture());
-		}
+		updateMenu();
 		
 		return true;
 	}
@@ -158,6 +164,18 @@ public class DetailActivity extends ActionBarActivity
 		super.onBackPressed();
 	}
 	
+	protected void updateMenu() {
+		if (mMenuItemSound != null) {
+			MenuItemCompat.setShowAsAction(mMenuItemSound, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+			if (mDetailView != null) mMenuItemSound.setVisible(mDetailView.getHasSound());
+		}
+		
+		if (mMenuItemPicture != null) {
+			MenuItemCompat.setShowAsAction(mMenuItemPicture, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+			if (mDetailView != null) mMenuItemPicture.setVisible(mDetailView.getHasPicture());
+		}
+	}
+	
 	protected void setDetailTitle() {
 		if (mDetailView == null) return;
 		
@@ -165,6 +183,9 @@ public class DetailActivity extends ActionBarActivity
 		final ActionBar actionBar = getSupportActionBar();
 		if ((actionBar != null) && (!TextUtils.isEmpty(title))) {
 			actionBar.setTitle(title);
+			if (mActionBarContent != null) {
+				mActionBarContent.setTitle(title);
+			}
 		}
 	}
 	

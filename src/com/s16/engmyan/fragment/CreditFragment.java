@@ -33,7 +33,9 @@ public class CreditFragment extends DialogFragment {
 	
 	@Override
     public void onCreate(Bundle icicle) {
-        setStyle(STYLE_NORMAL, R.style.DialogTheme);
+		if (Build.VERSION.SDK_INT < 21) {
+			setStyle(STYLE_NORMAL, R.style.DialogTheme);
+		}
         super.onCreate(icicle);
 	}
 	

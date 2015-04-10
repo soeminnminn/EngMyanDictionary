@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FilterQueryProvider;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class SearchListFragment extends Fragment
 		implements OnItemClickListener {
@@ -73,6 +74,17 @@ public class SearchListFragment extends Fragment
 			return mTextSearch.getText().toString(); 
 		}
 		return "";
+	}
+	
+	public TextView getSearchTextView() {
+		if (mTextSearch != null) {		
+			return mTextSearch.getTextView();
+		}
+		return null;
+	}
+	
+	public View getSearchView() {
+		return mTextSearch;
 	}
 	
 	public void setSelection() {
@@ -217,13 +229,20 @@ public class SearchListFragment extends Fragment
 		if (TextUtils.isEmpty(query)) return false;
 		
 		Cursor cursor = mDataProvider.exactQuery(query.toString());
-		if ((cursor == null) || (cursor.getCount() != 1)) return false;
-		
-		if (!Utility.isNull(cursor, DictionaryDataProvider.COLUMN_ID)) {
-			int colIdx = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_ID);
-			long id = cursor.getInt(colIdx);
-			onItemSelected(id, query);
-			return true;
+		if (cursor != null) {
+			if (cursor.getCount() != 1) {
+				cursor.close();
+				return false;	
+			}
+			
+			if (!Utility.isNull(cursor, DictionaryDataProvider.COLUMN_ID)) {
+				int colIdx = cursor.getColumnIndex(DictionaryDataProvider.COLUMN_ID);
+				long id = cursor.getInt(colIdx);
+				onItemSelected(id, query);
+				cursor.close();
+				return true;
+			}
+			cursor.close();
 		}
 		
 		return false;
