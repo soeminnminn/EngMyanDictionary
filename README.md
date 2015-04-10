@@ -3,6 +3,8 @@ EngMyanDictionary
 
 English-Myanmar Dictionary
 
+![EngMyanDictionary Screenshot][1]
+
 ## Change Log
 
 #### Version 3.1.0
@@ -37,7 +39,7 @@ English-Myanmar Dictionary
 License
 -------
 
-    Copyright 2013 Menny Even-Danan
+    Copyright 2014 Soe Minn Minn
     
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -50,3 +52,5 @@ License
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+    
+[1]: https://raw.github.com/soeminnminn/EngMyanDictionary/master/screenshot.png
