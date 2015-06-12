@@ -9,6 +9,11 @@ English-Myanmar Dictionary
 
 #### Version 3.1.0
 - Improve UI
+- Change to install by service
+- Bug fix
+
+#### Version 3.1.0
+- Improve UI
 - Apply Lollipop Theme
 - Bug fix
 
