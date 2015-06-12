@@ -3,9 +3,8 @@ package com.s16.engmyan.activity;
 import java.io.File;
 
 import com.s16.engmyan.Constants;
-import com.s16.engmyan.InstallationTask;
+import com.s16.engmyan.InstallationService;
 import com.s16.engmyan.Utility;
-import com.s16.engmyan.InstallationTask.InstallationHandler;
 import com.s16.engmyan.data.DictionaryDataProvider;
 import com.s16.engmyan.data.DictionaryItem;
 import com.s16.engmyan.data.UserDataProvider;
@@ -21,7 +20,10 @@ import com.s16.widget.MoreMenuActionProvider;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.SQLException;
 import android.support.v4.app.ActivityCompat;
@@ -29,6 +31,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.SystemUiUtils;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -41,8 +44,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity 
-		implements InstallationHandler
-		, SearchListFragment.OnSearchListItemClickListener
+		implements SearchListFragment.OnSearchListItemClickListener
 		, ActionBarNavigationButtons.ActionBarContentViewActivity {
 
 	protected static String TAG = MainActivity.class.getSimpleName();
@@ -63,6 +65,26 @@ public class MainActivity extends ActionBarActivity
 	private boolean mIsMenuEnabled = true;
 	
 	private ActionBarNavigationButtons mActionBarContent; 
+	
+	private class InstallBroadcastReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int dataStatus = intent.getIntExtra(InstallationService.EXTENDED_DATA_STATUS, -1);
+			if (dataStatus == InstallationService.STATE_ACTION_STARTED) {
+				showLoading();
+			} else if (dataStatus == InstallationService.STATE_ACTION_COMPLETE) {
+				hideLoading();
+				showMessage(R.string.install_complete_message);
+				openDatabase();
+			} else {
+				showMessage(R.string.install_error_message);
+				System.exit(0);
+			}
+		}
+		
+	}
+	private InstallBroadcastReceiver mInstallBroadcastReceiver;
 	
 	private final FavoritesFragment.OnVisibilityChangeListener mOnFavoritesVisibilityChangeListener = 
 			new FavoritesFragment.OnVisibilityChangeListener() {
@@ -132,6 +154,10 @@ public class MainActivity extends ActionBarActivity
 				}
 	};
 	
+	protected Context getContext() {
+		return (Context)this;
+	}
+	
 	@SuppressLint("InlinedApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -171,7 +197,7 @@ public class MainActivity extends ActionBarActivity
 		View detailView = findViewById(R.id.detailContainer);
 		if (detailView != null) {
 			FragmentTransaction transaction = manager.beginTransaction();
-			mDetailView = new DetailViewFragment(this);
+			mDetailView = new DetailViewFragment(getContext());
 			transaction.replace(R.id.detailContainer, mDetailView);
 			transaction.commit();
 			
@@ -200,6 +226,20 @@ public class MainActivity extends ActionBarActivity
 	@Override
     public void onStop() {
         super.onStop();
+    }
+	
+	@Override
+    protected void onPause() {
+        super.onPause();
+    }
+	
+	@Override
+    protected void onResume() {
+        super.onResume();
+        if (Constants.isServiceRunning(getContext(), InstallationService.class)) {
+        	registerInstallReceiver();
+        	showLoading();
+        }
     }
     
     @Override
@@ -353,7 +393,7 @@ public class MainActivity extends ActionBarActivity
 		
 		final DictionaryItem itemData = DictionaryItem.getFrom(mDictDataProvider, id);
 		if (itemData != null) {
-			UserDataProvider.createHistory(this, itemData.word, id);
+			UserDataProvider.createHistory(getContext(), itemData.word, id);
 			
 			if (mDetailView == null) {
 				
@@ -475,6 +515,11 @@ public class MainActivity extends ActionBarActivity
 	protected void performCleanAndSave() {
 		saveState();
     	
+		if (mInstallBroadcastReceiver != null) {
+			LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mInstallBroadcastReceiver);
+			mInstallBroadcastReceiver = null;
+		}
+		
     	if (mDictDataProvider != null) {
 			mDictDataProvider.close();
 		}
@@ -504,9 +549,11 @@ public class MainActivity extends ActionBarActivity
 	}
 	
 	protected void showLoading() {
-		mLoading = new ProgressWheelFragment(this);
 		FragmentManager manager = getSupportFragmentManager();
-		mLoading.show(manager, "loadingDialog");
+		if (mLoading == null) {
+			mLoading = new ProgressWheelFragment(this);
+			mLoading.show(manager, "loadingDialog");
+		}
 	}
 	
 	protected void hideLoading() {
@@ -519,7 +566,7 @@ public class MainActivity extends ActionBarActivity
 	protected synchronized void performInstall() {
 		File dbFile = Constants.getDatabaseFile(this);
 		if(dbFile == null) {
-			installError(getString(R.string.install_error_folder_create));
+			showMessage(R.string.install_error_folder_create);
 			return;
 		}
 		
@@ -529,17 +576,38 @@ public class MainActivity extends ActionBarActivity
 		isSuccess = (isSuccess && DictionaryDataProvider.versionCheck(this, dbFile));
 		
 		if(!isSuccess && dbFile.exists() && !dbFile.delete()) {
-			installError(getString(R.string.install_error_data_load));
+			showMessage(R.string.install_error_data_load);
 			return;
 		}
 		
 		if(!isSuccess || !dbFile.exists()) {
 			final File dataFolder = dbFile.getParentFile();
-			InstallationTask task = new InstallationTask(this, dataFolder, this);
-			task.execute(Constants.ASSERT_ZIP_PKG);
+			//InstallationTask task = new InstallationTask(this, dataFolder, this);
+			//task.execute(Constants.ASSERT_ZIP_PKG);
+			registerInstallReceiver();
+			
+			Bundle args = new Bundle();
+			args.putString(InstallationService.INSTALL_FOLDER, dataFolder.getAbsolutePath());
+			Intent serviceIntent = new Intent(getContext(), InstallationService.class);
+			serviceIntent.putExtras(args);
+			startService(serviceIntent);
+			
 		} else {
 			openDatabase();
 		}
+	}
+	
+	protected void registerInstallReceiver() {
+		if (mInstallBroadcastReceiver == null) {
+			mInstallBroadcastReceiver = new InstallBroadcastReceiver();
+			IntentFilter filter = new IntentFilter(InstallationService.BROADCAST_ACTION);
+			filter.addCategory(Intent.CATEGORY_DEFAULT);
+			LocalBroadcastManager.getInstance(getContext()).registerReceiver(mInstallBroadcastReceiver, filter);
+		}
+	}
+	
+	protected void showMessage(int messageId) {
+		Toast.makeText(getContext(), messageId, Toast.LENGTH_LONG).show();
 	}
 	
 	protected void openDatabase() {
@@ -638,24 +706,6 @@ public class MainActivity extends ActionBarActivity
 		}
 		
 		editor.commit();
-	}
-
-	@Override
-	public void preInstall() {
-		showLoading();
-	}
-	
-	@Override
-	public void postInstall() {
-		hideLoading();
-		Toast.makeText(this, getText(R.string.install_complete_message), Toast.LENGTH_LONG).show();
-		openDatabase();
-	}
-
-	@Override
-	public void installError(String message) {
-		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-		System.exit(0);
 	}
 
 	@Override

@@ -4,6 +4,8 @@ import java.io.File;
 
 import com.s16.engmyan.data.DictionaryDataProvider;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -104,5 +106,15 @@ public class Constants {
 			DATA_PROVIDER = new DictionaryDataProvider(context, dbFile);
 		}
 		return DATA_PROVIDER;
+	}
+	
+	public static boolean isServiceRunning(Context context, Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+             if (serviceClass.getName().equals(service.service.getClassName())) {
+                 return true;
+             }
+         }
+         return false;
 	}
 }
