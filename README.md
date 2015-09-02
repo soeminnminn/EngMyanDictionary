@@ -5,6 +5,10 @@ English-Myanmar Dictionary
 
 ![EngMyanDictionary Screenshot][1]
 
+## Download
+
+You can get it from [Google Play](https://play.google.com/store/apps/details?id=com.s16.engmyan).
+
 ## Change Log
 
 #### Version 3.1.0
