@@ -212,6 +212,12 @@ public class DetailActivity extends ActionBarActivity
 						Toast.makeText(this, R.string.add_favorites_message, Toast.LENGTH_LONG).show();
 						mMenuItemFavorite.setIcon(R.drawable.ic_action_star_on);
 					}
+				} else {
+					int result = UserDataProvider.removeFavoriteByRef(this, id);
+					if (result == 1) {
+						Toast.makeText(this, R.string.remove_favorites_message, Toast.LENGTH_LONG).show();
+						mMenuItemFavorite.setIcon(R.drawable.ic_action_star);
+					}
 				}
 			}
 		}

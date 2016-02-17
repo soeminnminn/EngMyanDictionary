@@ -1,25 +1,11 @@
 package com.s16.engmyan.fragment;
 
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import com.s16.engmyan.Constants;
-import com.s16.engmyan.ExpansionManager;
-import com.s16.engmyan.R;
-import com.s16.engmyan.Utility;
-import com.s16.engmyan.data.DictionaryItem;
-import com.s16.widget.AnimatingRelativeLayout;
-import com.s16.widget.LocalWebView;
-import com.s16.widget.TouchImageView;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -29,7 +15,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.s16.engmyan.Constants;
+import com.s16.engmyan.DefinitionViewHelper;
+import com.s16.engmyan.ExpansionManager;
+import com.s16.engmyan.R;
+import com.s16.engmyan.data.DictionaryItem;
+import com.s16.widget.AnimatingRelativeLayout;
+import com.s16.widget.TouchImageView;
 
 public class DetailViewFragment extends Fragment 
 		implements AnimatingRelativeLayout.AnimationCompleteListener {
@@ -48,11 +43,11 @@ public class DetailViewFragment extends Fragment
 	private TextToSpeech mTextToSpeech;
 	private boolean mTextToSpeechEnabled;
 	
-	private RelativeLayout mLayoutWebView;
+	private RelativeLayout mLayoutDefinitionView;
 	private AnimatingRelativeLayout mLayoutImageView;
 	private TouchImageView mImageView;
 	private ImageView mImageCaution; 
-	private LocalWebView mWebView;
+	private DefinitionViewHelper mDefinitionView;
 	private View mProgressFrame; 
 	private DictionaryItem mData;
 	private DetailDataChangeListener mDetailDataChangeListener;
@@ -113,7 +108,7 @@ public class DetailViewFragment extends Fragment
 	}
 	
 	private void initialize(View view) {
-		mLayoutWebView = (RelativeLayout)view.findViewById(R.id.layoutWebView);
+		mLayoutDefinitionView = (RelativeLayout)view.findViewById(R.id.layoutDefinitionView);
 		
 		mLayoutImageView = (AnimatingRelativeLayout)view.findViewById(R.id.layoutImageView);
 		mLayoutImageView.setAnimationCompleteListener(this);
@@ -128,29 +123,29 @@ public class DetailViewFragment extends Fragment
 		progressBar.setIndeterminate(true);
 		mProgressFrame.setVisibility(View.GONE);
 		
-		mWebView = (LocalWebView)view.findViewById(R.id.webViewDetail);
-		mWebView.setLocalWebViewClient(new LocalWebView.LocalWebViewClient() {
+		mDefinitionView = new DefinitionViewHelper((TextView)(mLayoutDefinitionView.findViewById(R.id.textViewDetails)), (ViewGroup)(mLayoutDefinitionView.findViewById(R.id.layoutSynonymView)));
+		mDefinitionView.setDefinitionViewClient(new DefinitionViewHelper.DefinitionViewClient() {
 			
 			@Override
-			public void onPageStarted(LocalWebView view, String url, Bitmap favicon) {
+			public void onPageStarted(DefinitionViewHelper helper, String url, DictionaryItem definition) {
 				isDataLoading = true;
 				showProgress();
 			}
 			
 			@Override
-			public void onPageFinished(LocalWebView view, String url) {
-				onPageLoaded(url, view.canGoBack(), view.canGoForward());
+			public void onPageFinished(DefinitionViewHelper helper, String url, DictionaryItem definition) {
+				onPageLoaded(url, helper.canGoBack(), helper.canGoForward());
 				hideProgress();
 				isDataLoading = false;
 			}
 			
 			@Override
-			public void onLoadResource(LocalWebView view, String url) {
+			public void onLoadResource(DefinitionViewHelper helper, String url, DictionaryItem definition) {
 			}
 			
 			@Override
-			public boolean onAnchorClick(LocalWebView view, String url) {
-				return setDefinition(view, url);
+			public boolean onAnchorClick(DefinitionViewHelper helper, String url, DictionaryItem definition) {
+				return setDefinition(helper, url);
 			}
 		});
 		
@@ -164,7 +159,7 @@ public class DetailViewFragment extends Fragment
 		
 		setImageBitmap();
 		if (mData != null) {
-			setDefinition(mWebView, mData);
+			mDefinitionView.setDefinition(mData);
 		}
 	}
 	
@@ -214,84 +209,6 @@ public class DetailViewFragment extends Fragment
 		}
 	}
 	
-	protected boolean getUsedUnicodeFix() {
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		return sharedPreferences.getBoolean(Constants.PREFS_USED_UNICODE_FIX, false);
-	}
-	
-	protected boolean getUsedWordClickable() {
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		return sharedPreferences.getBoolean(Constants.PREFS_USED_WORD_CLICKABLE, true);
-	}
-	
-	protected boolean getShowSynonym() {
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		return sharedPreferences.getBoolean(Constants.PREFS_SHOW_SYNONYM, true);
-	}
-	
-	protected String getDefinitionHtml(DictionaryItem itemData) {
-		if (itemData == null) return Constants.EMPTY_STRING;
-		
-		String html = "<html>";
-		html += "<head>";
-		html += "<meta content=\"" + Constants.MIME_TYPE + "; charset=" + Constants.ENCODING + "\" http-equiv=\"content-type\">";
-		html += "<meta name=\"viewport\" content=\"initial-scale=1.0, user-scalable=yes, width=device-width\" />";
-		html += "<meta name=\"Keywords\" content=\"\">";
-		html += "<meta name=\"Options\" content=\"{'addfont':false, 'drawfix':false, 'applykeywords':false}\">";
-		html += "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/style.css\">";
-		html += "<script type=\"text/javascript\" src=\"js/script.js\"></script>";
-		if (TextUtils.isEmpty(itemData.title)) {
-			html += "<title>Untitled</title>";
-		} else {
-			html += "<title>" + itemData.title + "</title>";
-		}
-		html += "</head>";
-		html += "<body>";
-		//html += "<a href=\"" + Constants.URL_DEFINITION + "?id=1\">Test</a>";
-		
-		CharSequence definition = itemData.definition;
-		if (getUsedUnicodeFix()) {
-			definition = Utility.ZawGyiDrawFix(itemData.definition);
-		} 
-		
-		if (getUsedWordClickable() && (!TextUtils.isEmpty(itemData.keywords))) {
-			/*
-			if (itemData.keywords.toLowerCase().contains("word")) {
-				definition = Utility.RegexReplace(definition, "([^A-Za-z\\/\\?=])(word)([^A-Za-z\\/\\?=])", 
-						"$1<a href=\"" + Constants.URL_DEFINITION + "?w=word\">$2</a>$3", Pattern.CASE_INSENSITIVE);
-			}
-			Pattern pattern = Pattern.compile("[^,]+");
-			Matcher m = pattern.matcher(itemData.keywords);
-			while(m.find()) {
-				if (m.group().equalsIgnoreCase("word")) continue;
-				definition = Utility.RegexReplace(definition, "([^A-Za-z\\/\\?=])(" + m.group() + ")([^A-Za-z\\/\\?=])", 
-						"$1<a href=\"" + Constants.URL_DEFINITION + "?w=" + m.group() + "\">$2</a>$3", Pattern.CASE_INSENSITIVE);
-			}
-			*/
-			Pattern pattern = Pattern.compile("[^,]+");
-			Matcher m = pattern.matcher(itemData.keywords);
-			while(m.find()) {
-				definition = Utility.RegexReplace(definition, "([^A-Za-z\\/\\?=])(" + m.group() + ")([^A-Za-z\\/\\?=])", 
-						"$1<a href=\"#?w=" + m.group() + "\">$2</a>$3", Pattern.CASE_INSENSITIVE);
-			}
-			
-			definition = definition.toString().replaceAll("\\#\\?", Constants.URL_DEFINITION + "?");
-			//Log.i(TAG, definition.toString());
-		}
-		html += definition;
-		
-		if (getShowSynonym() && (!TextUtils.isEmpty(itemData.synonym))) {
-			html += "<hr />";
-			html += "<h3>Synonym</h3>";
-			html += "<p class=\"synonym\">";
-			html += itemData.synonym;
-			html += "</p>";
-		}
-		
-		html += "</html>";
-		return html;
-	}
-	
 	protected DictionaryItem loadDictionaryItem(String url) {
 		if (TextUtils.isEmpty(url)) return null;
 		
@@ -312,49 +229,19 @@ public class DetailViewFragment extends Fragment
 		return null;
 	}
 	
-	protected boolean setDefinition(LocalWebView webView, String url) {
-		if (webView == null) return false;
+	protected boolean setDefinition(DefinitionViewHelper helper, String url) {
+		if (helper == null) return false;
 		DictionaryItem itemData = loadDictionaryItem(url);
 		if (itemData != null) {
 			mData = itemData;
-			setDefinition(webView, itemData);
+			helper.setDefinition(itemData);
 			return true;
 		} else if (mData != null) {
-			setDefinition(webView, mData);
+			helper.setDefinition(mData);
 			return true;
 		}
 		
 		return false;
-	}
-	
-	protected void setDefinition(LocalWebView webView, DictionaryItem itemData) {
-		if (webView == null) return;
-		
-		if ((itemData == null) || (TextUtils.isEmpty(itemData.definition))) {
-			webView.loadUrl(Constants.URL_NOT_FOUND);
-			return;
-		}
-		
-		final String newUrl = Constants.URL_DEFINITION + "?id=" + itemData.id;
-		//String html = getDefinitionHtml(itemData);
-		//webView.loadDataWithBaseURL(newUrl, html, Constants.MIME_TYPE, Constants.ENCODING, newUrl);
-		
-		final LocalWebView pWebView = webView;
-		new AsyncTask<DictionaryItem, Void, String>() {
-
-			@Override
-			protected String doInBackground(DictionaryItem... params) {
-				return getDefinitionHtml(params[0]);
-			}
-			
-			@Override
-			protected void onPostExecute(String result) {
-				super.onPostExecute(result);
-				
-				pWebView.loadDataWithBaseURL(newUrl, result
-						, Constants.MIME_TYPE, Constants.ENCODING, newUrl);
-			}
-		}.execute(itemData);
 	}
 	
 	protected void setImageBitmap() {
@@ -395,7 +282,7 @@ public class DetailViewFragment extends Fragment
 		mData = itemData;
 		showProgress();
 		setImageBitmap();
-		setDefinition(mWebView, itemData);
+		mDefinitionView.setDefinition(itemData);
 	}
 	
 	public long getDetailId() {
@@ -404,13 +291,13 @@ public class DetailViewFragment extends Fragment
 	}
 	
 	public boolean getCanGoBack() {
-		if (mWebView == null) return false;
-		return mWebView.canGoBack();
+		if (mDefinitionView == null) return false;
+		return mDefinitionView.canGoBack();
 	}
 	
 	public boolean getCanGoForward() {
-		if (mWebView == null) return false;
-		return mWebView.canGoForward();
+		if (mDefinitionView == null) return false;
+		return mDefinitionView.canGoForward();
 	}
 	
 	public boolean getImageVisible() {
@@ -438,13 +325,13 @@ public class DetailViewFragment extends Fragment
 	}
 	
 	public boolean performNavBack() {
-		if (mWebView == null) return false;
+		if (mDefinitionView == null) return false;
 		if (isDataLoading) return false;
-		if (mWebView.canGoBack()) {
-			mWebView.goBack();
+		if (mDefinitionView.canGoBack()) {
+			mDefinitionView.goBack();
 			
 			if (mDetailDataChangeListener != null) {
-    			mDetailDataChangeListener.onNavigationChanged(mWebView.canGoBack(), mWebView.canGoForward());
+    			mDetailDataChangeListener.onNavigationChanged(mDefinitionView.canGoBack(), mDefinitionView.canGoForward());
     		}
 			return true;
 		}
@@ -452,13 +339,13 @@ public class DetailViewFragment extends Fragment
 	}
 	
 	public boolean performNavForward() {
-		if (mWebView == null) return false;
+		if (mDefinitionView == null) return false;
 		if (isDataLoading) return false;
-		if (mWebView.canGoForward()) {
-			mWebView.goForward();
+		if (mDefinitionView.canGoForward()) {
+			mDefinitionView.goForward();
 			
 			if (mDetailDataChangeListener != null) {
-    			mDetailDataChangeListener.onNavigationChanged(mWebView.canGoBack(), mWebView.canGoForward());
+    			mDetailDataChangeListener.onNavigationChanged(mDefinitionView.canGoBack(), mDefinitionView.canGoForward());
     		}
 			return true;
 		}
@@ -466,7 +353,7 @@ public class DetailViewFragment extends Fragment
 	}
 	
 	public void toggleImageView() {
-		if (mLayoutWebView == null) return;
+		if (mLayoutDefinitionView == null) return;
 		if (mLayoutImageView == null) return;
 		
 		if (mLayoutImageView.isVisible()) {
@@ -509,13 +396,13 @@ public class DetailViewFragment extends Fragment
 	
 	@Override
 	public void onAnimationComplete() {
-		if (mLayoutWebView == null) return;
+		if (mLayoutDefinitionView == null) return;
 		if (mLayoutImageView == null) return;
 		
 		if (mLayoutImageView.isVisible()) {
-			mLayoutWebView.setVisibility(View.GONE);
+			mLayoutDefinitionView.setVisibility(View.GONE);
 		} else {
-			mLayoutWebView.setVisibility(View.VISIBLE);
+			mLayoutDefinitionView.setVisibility(View.VISIBLE);
 		}
 	}
 }

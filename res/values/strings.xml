@@ -35,6 +35,8 @@
 	<string name="install_error_data_load">Does not load data!</string>
 	<string name="install_error_message">Does not install data!</string>
 	
+	<string name="title_synonym">Synonym</string>
+	
 	<string name="no_sound_message">No sound detected.</string>
 	<string name="add_favorites_message">Favorite added.</string>
 	<string name="remove_favorites_message">Favorite removed.</string>

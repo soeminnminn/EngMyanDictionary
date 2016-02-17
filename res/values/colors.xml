@@ -137,6 +137,8 @@
     <color name="title_foreground">#ffffffff</color>
     <color name="imageview_background">#a060638f</color>
     
+    <color name="title_synonym">#ff8080C0</color>
+    
     <color name="dark_slate_gray">#2F4F4F</color>
 	<color name="gray_2">#AFAFAF</color>
 	<color name="gray_1">#C0C0C0</color>

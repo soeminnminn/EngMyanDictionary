@@ -495,8 +495,14 @@ public class MainActivity extends ActionBarActivity
 					UserDataProvider.createFavorite(this, mDetailView.getTitle(), id);
 					
 					if (UserDataProvider.isFavorited(this, id)) {
-						Toast.makeText(this, R.string.add_favorites_message, Toast.LENGTH_LONG).show();
+						showMessage(R.string.add_favorites_message);
 						mMenuItemFavorite.setIcon(R.drawable.ic_action_star_on);
+					}
+				} else {
+					int result = UserDataProvider.removeFavoriteByRef(this, id);
+					if (result == 1) {
+						showMessage(R.string.remove_favorites_message);
+						mMenuItemFavorite.setIcon(R.drawable.ic_action_star);
 					}
 				}
 			}
@@ -678,9 +684,10 @@ public class MainActivity extends ActionBarActivity
 		final ActionBar actionBar = getSupportActionBar();
 		if ((actionBar != null) && (!TextUtils.isEmpty(detailTitle))) {
 			String title = getString(R.string.app_name) + " [ " + detailTitle + " ]";
-			actionBar.setTitle(title);
 			if (mActionBarContent != null) {
 				mActionBarContent.setTitle(title);
+			} else {
+				actionBar.setTitle(title);
 			}
 		}
 	}

@@ -134,6 +134,10 @@ public class UserDataProvider extends ContentProvider {
 		return context.getContentResolver().delete(URI_FAVORITES, COLUMN_ID + " IS ?", new String[] { String.valueOf(id) });
 	}
 	
+	public static int removeFavoriteByRef(Context context, long id) {
+		return context.getContentResolver().delete(URI_FAVORITES, COLUMN_REFRENCE_ID + " IS ?", new String[] { String.valueOf(id) });
+	}
+	
 	public static Cursor getAllHistories(Context context) {
 		return context.getContentResolver().query(URI_HISTORIES, null, null, null, null);
 	}

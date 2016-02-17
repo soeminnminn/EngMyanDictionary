@@ -9,6 +9,7 @@ import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Typeface;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 
@@ -60,9 +61,18 @@ public class Constants {
     public static final int REQUEST_DETAIL = 2;
     
     public static final int DATA_VERSION = 3000;
+    
+    private static Typeface ZAWGYI_TYPEFACE;
 	
 	private static String DATA_FOLDER;
 	private static DictionaryDataProvider DATA_PROVIDER;
+	
+	public static Typeface getZawgyiTypeface(Context context) {
+		if (ZAWGYI_TYPEFACE == null) {
+			ZAWGYI_TYPEFACE = Typeface.createFromAsset(context.getAssets(), "fonts/zawgyi.ttf");
+		}
+		return ZAWGYI_TYPEFACE;
+	}
 	
 	public static File getDataFolder(Context context) {
 		if(DATA_FOLDER == null) {

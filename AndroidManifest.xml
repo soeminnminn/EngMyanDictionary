@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.s16.engmyan"
     android:versionCode="1"
-    android:versionName="3.1.1.20150824"
+    android:versionName="3.2.0.20160204"
     android:installLocation="auto" >
 
     <uses-sdk

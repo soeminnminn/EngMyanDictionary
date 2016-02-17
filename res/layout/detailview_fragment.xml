@@ -14,7 +14,7 @@
     	android:layout_marginLeft="@dimen/content_horizontal_margin"
     	android:layout_marginRight="@dimen/content_horizontal_margin"
     	android:layout_marginTop="@dimen/content_vertical_margin"
-        layout="@layout/webview_layout" />
+        layout="@layout/layout_details" />
     
     <include
         android:layout_width="match_parent"
