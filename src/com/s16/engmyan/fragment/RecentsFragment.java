@@ -1,113 +1,87 @@
 package com.s16.engmyan.fragment;
 
-import com.s16.engmyan.R;
-import com.s16.engmyan.Utility;
-import com.s16.engmyan.data.RecentsListAdapter;
-import com.s16.engmyan.data.UserDataProvider;
-
-import android.app.AlertDialog;
-import android.content.Context;
+import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.text.TextUtils;
-import android.view.ContextThemeWrapper;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.animation.AnimationUtils;
+import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Toast;
 
-public class RecentsFragment extends Fragment 
-		implements OnItemClickListener, AnimationListener{
+import com.s16.app.ActionBarUtils;
+import com.s16.engmyan.R;
+import com.s16.engmyan.adapters.RecentsListAdapter;
+import com.s16.engmyan.data.UserDataProvider;
+import com.s16.engmyan.data.UserQueryHelper;
 
-	private Context mContext;
-	private int mVisibility;
-	private Animation mShowAnimation;
-	private Animation mHideAnimation;
-	private ListView mListRecents;
-	private ImageButton mClearButton;
-	private RecentsListAdapter mListAdapter;
-	private OnVisibilityChangeListener mOnVisibilityChangeListener;
-	private OnRecentsListItemClickListener mOnRecentsListItemClickListener;
-	
-	public interface OnVisibilityChangeListener {
-		void onVisibilityChanged(int visible);
-	}
+public class RecentsFragment extends DialogFragment {
+
+	protected static String TAG = RecentsFragment.class.getSimpleName();
 	
 	public interface OnRecentsListItemClickListener {
-		public void onRecentsListItemClick(View view, long id, long refId);
+		public void onRecentsListItemClick(DialogInterface dialog, View view, long id, long refId);
 	}
 	
-	private final View.OnLongClickListener mViewOnLongClickListener = new View.OnLongClickListener() {
-		
+	private AdapterView.OnItemClickListener mItemClickListener = new AdapterView.OnItemClickListener() {
+
 		@Override
-		public boolean onLongClick(View v) {
-			if (v != null) {
-				final CharSequence description = v.getContentDescription();
-				if (!TextUtils.isEmpty(description)) {
-					Toast.makeText(getContext(), description, Toast.LENGTH_LONG).show();
-					return true;	
+		public void onItemClick(AdapterView<?> parent, View view, int position,
+				long id) {
+			if ((mListRecents != null) && (mListAdapter != null)  
+					&& (mOnRecentsListItemClickListener != null)) {
+				Cursor cursor = (Cursor)mListAdapter.getItem(position);
+				int colIdx = cursor.getColumnIndex(UserDataProvider.COLUMN_REFRENCE_ID);
+				if (colIdx != -1) {
+					long refId = cursor.getLong(colIdx);
+					mOnRecentsListItemClickListener.onRecentsListItemClick(getDialog(), view, id, refId);
 				}
 			}
-			return false;
 		}
 	};
 	
-	public RecentsFragment() {
-		super();
-		mVisibility = View.VISIBLE;
-	}
+	private View mClearButton;
+	private ListView mListRecents;
+	private RecentsListAdapter mListAdapter;
+	private OnRecentsListItemClickListener mOnRecentsListItemClickListener;
 	
-	public RecentsFragment(Context context) {
-		this();
-		mContext = context;
-	}
-	
-	protected Context getContext() {
-		return mContext;
+	@SuppressLint("InlinedApi")
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+	    super.onCreate(savedInstanceState);
+	    setStyle(DialogFragment.STYLE_NO_TITLE, R.style.AppTranslucentTheme);
 	}
 	
 	@Override
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
-        
-        View view = getView();
-		if (view != null) {
-			view.setVisibility(mVisibility);
-		}
-		
-		setListData();
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		Dialog dialog = super.onCreateDialog(savedInstanceState);
+		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+		return dialog;
 	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		View view = inflater.inflate(R.layout.recents_fragment, container, false);
-		if (mContext == null) {
-			mContext = inflater.getContext();
-		}
+		ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_recents, container, false);
 		
-		ImageButton closeButton = (ImageButton)view.findViewById(R.id.closeButton);
-		closeButton.setOnClickListener(new View.OnClickListener() {
+		View actionClose = rootView.findViewById(R.id.closeButton);
+		ActionBarUtils.getInstance(getContext()).makeActionButton(actionClose);
+		actionClose.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				performClose();
+				dismiss();
 			}
 		});
-		closeButton.setLongClickable(true);
-		closeButton.setOnLongClickListener(mViewOnLongClickListener);
 		
-		mClearButton = (ImageButton)view.findViewById(R.id.clearButton);
+		mClearButton = rootView.findViewById(R.id.clearButton);
+		ActionBarUtils.getInstance(getContext()).makeActionButton(mClearButton);
 		mClearButton.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -115,58 +89,22 @@ public class RecentsFragment extends Fragment
 				performClearRecents();
 			}
 		});
-		mClearButton.setLongClickable(true);
-		mClearButton.setOnLongClickListener(mViewOnLongClickListener);
 		
-		mListRecents = (ListView)view.findViewById(R.id.listViewRecents);
+		mListRecents = (ListView)rootView.findViewById(R.id.listViewRecents);
 		mListRecents.setSmoothScrollbarEnabled(true);
-		mListRecents.setSaveEnabled(true);
-		mListRecents.setOnItemClickListener(this);
+		mListRecents.setOnItemClickListener(mItemClickListener);
 		
-		mShowAnimation = (Animation)AnimationUtils.loadAnimation(mContext, R.anim.dialog_enter);
-        mShowAnimation.setAnimationListener(this);
-        
-        mHideAnimation = (Animation)AnimationUtils.loadAnimation(mContext, R.anim.dialog_exit);
-        mHideAnimation.setAnimationListener(this);
-        
-		return view;
-	}
-
-	@Override
-	public void onAnimationStart(Animation animation) {
-	}
-
-	@Override
-	public void onAnimationEnd(Animation animation) {
-		if (mOnVisibilityChangeListener != null) {
-			mOnVisibilityChangeListener.onVisibilityChanged(mVisibility);
-		}
-	}
-
-	@Override
-	public void onAnimationRepeat(Animation animation) {
-	}
-
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		if ((mListRecents != null) && (mListAdapter != null)  
-				&& (mOnRecentsListItemClickListener != null)) {
-			Cursor cursor = (Cursor)mListAdapter.getItem(position);
-			if (!Utility.isNull(cursor, UserDataProvider.COLUMN_REFRENCE_ID)) {
-				int refIdColumnIndex = cursor.getColumnIndex(UserDataProvider.COLUMN_REFRENCE_ID); 
-				long refId = cursor.getLong(refIdColumnIndex);
-				mOnRecentsListItemClickListener.onRecentsListItemClick(view, id, refId);
-			}
-		}
+		bindList();
+		
+		return rootView;
 	}
 	
-	protected void setListData() {
+	private void bindList() {
 		boolean hasData = false;
 		if (mListRecents != null) {
-			Cursor cursor = UserDataProvider.getAllHistories(getContext());
+			Cursor cursor = UserQueryHelper.getInstance(getContext()).getAllHistories();
 			if (cursor != null) {
-				mListAdapter = new RecentsListAdapter(getContext(), cursor
-						, UserDataProvider.COLUMN_ID, UserDataProvider.COLUMN_WORD);
+				mListAdapter = new RecentsListAdapter(getContext(), cursor, UserDataProvider.COLUMN_WORD);
 				mListRecents.setAdapter(mListAdapter);
 				hasData = mListAdapter.getCount() > 0;
 			}
@@ -176,12 +114,8 @@ public class RecentsFragment extends Fragment
 		}
 	}
 	
-	protected void performClose() {
-		hide();
-	}
-	
-	protected void performClearRecents() {
-		final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(getContext(), R.style.DialogTheme_Alert));
+	private void performClearRecents() {
+		final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
 		dialogBuilder.setIcon(android.R.drawable.ic_dialog_info);
 		dialogBuilder.setTitle(R.string.clear_recent_title);
 		dialogBuilder.setMessage(R.string.clear_recent_message);
@@ -196,62 +130,14 @@ public class RecentsFragment extends Fragment
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
-				UserDataProvider.removeAllHistory(getContext());
-				setListData();
+				UserQueryHelper.getInstance(getContext()).removeAllHistory();
+				bindList();
 			}
 		});
 		dialogBuilder.show();
 	}
 	
-	public void setOnVisibilityChangeListener(OnVisibilityChangeListener listener) {
-		mOnVisibilityChangeListener = listener;
-	}
-	
 	public void setOnRecentsListItemClickListener(OnRecentsListItemClickListener listener) {
 		mOnRecentsListItemClickListener = listener;
-	}
-	
-	public int getVisibility() {
-		View view = getView();
-		if (view != null) {
-			mVisibility = view.getVisibility();
-		}
-		return mVisibility;
-	}
-	
-	public void setVisibility(int visible) {
-		mVisibility = visible;
-		View view = getView();
-		if ((view != null) && (view.getVisibility() != mVisibility)) {
-			view.setVisibility(mVisibility);
-			if (mOnVisibilityChangeListener != null) {
-				mOnVisibilityChangeListener.onVisibilityChanged(mVisibility);
-			}
-		}
-	}
-	
-	public void show() {
-		View view = getView();
-		if ((view != null) && (view.getVisibility() != View.VISIBLE)) {
-			view.startAnimation(mShowAnimation);
-			view.setVisibility(View.VISIBLE);
-			mVisibility = View.VISIBLE;
-			setListData();
-			if (mOnVisibilityChangeListener != null) {
-				mOnVisibilityChangeListener.onVisibilityChanged(mVisibility);
-			}
-		}
-	}
-	
-	public void hide() {
-		View view = getView();
-		if ((view != null) && (view.getVisibility() != View.GONE)) {
-			view.startAnimation(mHideAnimation);
-			view.setVisibility(View.GONE);
-			mVisibility = View.GONE;
-			if (mOnVisibilityChangeListener != null) {
-				mOnVisibilityChangeListener.onVisibilityChanged(mVisibility);
-			}
-		}
 	}
 }

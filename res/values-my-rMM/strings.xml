@@ -29,8 +29,8 @@
 	<string name="loading_text">ဆွဲတင်နေသည် …</string>
 	
 	<string name="install_text">ခေတ္တစောင့်ပါ …</string>
-	<string name="install_message">Installing\ndata …</string>
-	<string name="install_complete_message">Install လုပ်ပြီးပါပြီ။</string>
+	<string name="install_message">ဒေတာ သွင်းနေသည် …</string>
+	<string name="install_complete_message">ဒေတာ သွင်းပြီးပါပြီ။</string>
 	<string name="install_error_folder_create">Does not create data folder!</string>
 	<string name="install_error_data_load">Does not load data!</string>
 	
@@ -46,11 +46,14 @@
 	<string name="clear_recent_title">ယခင်အသုံးများ ရှင်းပါ။</string>
 	<string name="clear_recent_message">ယခင်အသုံးများ ရှင်းပါမည်လား။</string>
 	
-	<string name="prefs_group_general">ယေဘုယျ</string>
+	<string name="prefs_category_general">ယေဘုယျ</string>
+	
 	<string name="prefs_used_unicode_fix">ယူနီကုတ် ပုံစံအမှန်သုံးမည်</string>
-	<string name="prefs_used_unicode_fix_summary">ယူနီကုတ် ပုံစံအမှန်သုံးထားလျှင် စာကူးမရပါ။</string>
+	<string name="prefs_used_unicode_fix_summary">စာလုံးအလွဲများကို ယူနီကုတ် ပုံစံအမှန်သုံးမည်။</string>
+	
 	<string name="prefs_used_word_clickable">နှိပ်စရာ စာလုံး</string>
 	<string name="prefs_used_word_clickable_summary">စာလုံးကိုနှိပ်လျှင် ရှင်းလင်းချက်ပြမည်။</string>
+	
 	<string name="prefs_show_synonym">Synonym ပြပါ</string>
 	<string name="prefs_show_synonym_summary">Synonym ကို ရှင်းလင်းချက်နှင့်အတူပြမည်။</string>
 	
@@ -59,12 +62,4 @@
 	<string name="prefs_credit">ဖန်တီးသူ</string>
 	<string name="prefs_credit_summary">ဖန်တီးသူများ အကြောင်း</string>
 	
-	<string name="about_text"><Data>
-      <![CDATA["
-      <p>Eng-Myan Dictionary</p>
-      <p>Word : 21984<br/>Images : 933</p>
-      <p>Develop by <a href='http://www.facebook.com/soeminnminn'>Soe Minn Minn</a></p>
-      <p>Copyright \u00A9 2014 The Android Open Source Project</p>
-      "]]>
-    </Data></string>
 </resources>

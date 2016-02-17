@@ -3,50 +3,57 @@ package com.s16.engmyan.activity;
 import com.s16.engmyan.R;
 import com.s16.engmyan.fragment.SettingsFragment;
 
-import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NavUtils;
 import android.support.v4.app.SystemUiUtils;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-public class SettingsActivity extends ActionBarActivity {
-
-	@SuppressLint("InlinedApi")
+public class SettingsActivity extends AppCompatActivity {
+	
+	protected Context getContext() {
+		return this;
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_settings);
+		setTitle(R.string.action_settings);
 		
-		// get the action bar
-		final ActionBar actionBar = getSupportActionBar();
-
-		// Enabling Back navigation on Action Bar icon
-		actionBar.setDisplayHomeAsUpEnabled(true);
-		actionBar.setTitle(R.string.action_settings);
+		SystemUiUtils.setStatusBarColor(this, getResources().getColor(R.color.app_color_primary_dark));
 		
-		SystemUiUtils.setStatusBarColor(this, getResources().getColor(R.color.title_background_dark));
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		
-		FragmentManager manager = getSupportFragmentManager();
-		if (manager != null) {
-			FragmentTransaction transaction = manager.beginTransaction();
-			
-			SettingsFragment fragment = new SettingsFragment(this); 
-			transaction.replace(R.id.settings_content, fragment);
+		if (savedInstanceState == null) {
+			SettingsFragment fragment = new SettingsFragment();
+			FragmentManager fragmentManager = getSupportFragmentManager();
+			FragmentTransaction transaction = fragmentManager.beginTransaction();
+			transaction.replace(R.id.prefsContainer, fragment);
 			transaction.commit();
 		}
 	}
 	
 	@Override
-	public boolean onOptionsItemSelected(final MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
-				NavUtils.navigateUpFromSameTask(this);
-				return true;
+				finish();
+				break;
+			default:
+				break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		finish();
 	}
 }

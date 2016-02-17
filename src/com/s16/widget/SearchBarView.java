@@ -4,6 +4,7 @@ import com.s16.engmyan.R;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -32,6 +33,7 @@ public class SearchBarView extends FrameLayout {
 	private ImageButton mButtonSearch;
 	private ImageButton mButtonClear;
 	private CharSequence mSearchText;
+	private boolean mIsSearching;
 	
 	private ListAdapter mAdapter;
 	private OnQueryTextListener mOnQueryTextListener;
@@ -107,7 +109,7 @@ public class SearchBarView extends FrameLayout {
 	
 	public SearchBarView(Context context) {
 		super(context);
-		initialize(context);
+		initialize(context, null);
 	}
 	
 	public SearchBarView(Context context, AttributeSet attrs) {
@@ -116,13 +118,22 @@ public class SearchBarView extends FrameLayout {
 	
 	public SearchBarView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        initialize(context);
+        initialize(context, attrs);
 	}
 	
-	private void initialize(Context context) {
+	private void initialize(Context context, AttributeSet attrs) {
 		if (isInEditMode()) {
 			return;
 		}
+		
+		TypedArray a = context.obtainStyledAttributes(attrs, new int[] { android.R.attr.text, android.R.attr.textColor, 
+				android.R.attr.hint, android.R.attr.textColorHint });
+		CharSequence text = a.getText(0);
+		int textColor = a.getColor(1, -1);
+		CharSequence hint = a.getText(2);
+		int hintColor = a.getColor(3, -1);
+		a.recycle();
+		
 		LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.searchbar_view, this, true);
         
@@ -134,7 +145,12 @@ public class SearchBarView extends FrameLayout {
         mTextSearch.setOnKeyListener(mTextSearchOnKeyListener);
         mTextSearch.setOnEditorActionListener(mTextSearchOnEditorActionListener);
         mTextSearch.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-		mTextSearch.setHint(R.string.search_hint);
+        
+        if (text != null) mTextSearch.setText(text);
+        if (textColor != -1) mTextSearch.setTextColor(textColor);
+        if (hint != null) mTextSearch.setHint(hint);
+        if (hintColor != -1) mTextSearch.setHintTextColor(hintColor);
+        
 		mTextSearch.setFocusableInTouchMode(true);
 		mTextSearch.setSaveEnabled(true);
 		mTextSearch.requestFocus();
@@ -146,6 +162,7 @@ public class SearchBarView extends FrameLayout {
 				clearText();
 			}
 		});
+        mButtonClear.setVisibility(View.GONE);
 	}
 	
 	@Override
@@ -188,7 +205,9 @@ public class SearchBarView extends FrameLayout {
 	}
     
     public final void setHint(int resid) {
-        setHint(getContext().getResources().getText(resid));
+    	if (mTextSearch != null) {
+    		mTextSearch.setHint(resid);
+    	}
     }
     
     public Typeface getTypeface() {
@@ -302,16 +321,15 @@ public class SearchBarView extends FrameLayout {
 	
 	protected void onQueryTextChanged(CharSequence s, int count) {
 		if (mTextSearch == null) return;
-		if (mOnQueryTextListener != null) {
+		mSearchText = s;
+		if (!mIsSearching && mOnQueryTextListener != null) {
 			mOnQueryTextListener.onQueryTextChanged(s, count);
 		}
 	}
 	
 	protected boolean onQuerySubmit() {
 		if (mTextSearch == null) return false;
-		mSearchText = mTextSearch.getText();
-		
-		if (mOnQueryTextListener != null) {
+		if (!mIsSearching && mOnQueryTextListener != null) {
 			if (mSearchText == null) {
 				mSearchText = EMPTY_STRING;
 			}
@@ -326,5 +344,13 @@ public class SearchBarView extends FrameLayout {
 			mTextSearch.setText(EMPTY_STRING);
 			mSearchText = EMPTY_STRING;
 		}
+	}
+	
+	public boolean isSearching() {
+		return mIsSearching;
+	}
+	
+	public void setIsSearching(boolean value) {
+		mIsSearching = value;
 	}
 }

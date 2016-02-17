@@ -3,23 +3,11 @@
 	<name>EngMyan</name>
 	<comment></comment>
 	<projects>
-		<project>support-v7-appcompat-21</project>
+		<project>android-support-design</project>
+		<project>android-support-v7-appcompat</project>
+		<project>android-support-v7-recyclerview</project>
 	</projects>
 	<buildSpec>
-		<buildCommand>
-			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
-			<triggers>auto,full,incremental,</triggers>
-			<arguments>
-				<dictionary>
-					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/EngMyan Auto Version.launch</value>
-				</dictionary>
-				<dictionary>
-					<key>incclean</key>
-					<value>true</value>
-				</dictionary>
-			</arguments>
-		</buildCommand>
 		<buildCommand>
 			<name>com.android.ide.eclipse.adt.ResourceManagerBuilder</name>
 			<arguments>

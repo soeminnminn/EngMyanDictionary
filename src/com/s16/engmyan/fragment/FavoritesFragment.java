@@ -1,251 +1,211 @@
 package com.s16.engmyan.fragment;
 
-import com.s16.engmyan.R;
-import com.s16.engmyan.Utility;
-import com.s16.engmyan.data.FavoritesListAdapter;
-import com.s16.engmyan.data.UserDataProvider;
-
-import android.app.AlertDialog;
-import android.content.Context;
+import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.text.TextUtils;
-import android.view.ContextThemeWrapper;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.Animation.AnimationListener;
+import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
-public class FavoritesFragment extends Fragment
-	implements OnItemClickListener, AnimationListener {
-	
+import com.s16.app.ActionBarUtils;
+import com.s16.engmyan.R;
+import com.s16.engmyan.adapters.FavoritesListAdapter;
+import com.s16.engmyan.data.UserDataProvider;
+import com.s16.engmyan.data.UserQueryHelper;
+
+public class FavoritesFragment extends DialogFragment {
+
 	protected static String TAG = FavoritesFragment.class.getSimpleName();
 	
-	private Context mContext;
-	private int mVisibility;
-	
-	private FrameLayout mFrameFavoritesTitle;
-	private FrameLayout mFrameFavoritesEdit;
-	private Animation mShowAnimation;
-	private Animation mHideAnimation;
-	private ListView mListFavorites;
-	private ImageButton mEditButton;
-	private FavoritesListAdapter mListAdapter;
-	private OnVisibilityChangeListener mOnVisibilityChangeListener;
-	private OnFavoritesListItemClickListener mOnFavoritesListItemClickListener;
-	
-	public interface OnVisibilityChangeListener {
-		void onVisibilityChanged(int visible);
-	}
-	
 	public interface OnFavoritesListItemClickListener {
-		public void onFavoritesListItemClick(View view, long id, long refId);
+		public void onFavoritesListItemClick(DialogInterface dialog, View view, long id, long refId);
 	}
 	
-	private final AdapterView.OnItemLongClickListener mOnItemLongClickListener = new AdapterView.OnItemLongClickListener() {
+	private AdapterView.OnItemClickListener mItemClickListener = new AdapterView.OnItemClickListener() {
 
 		@Override
-		public boolean onItemLongClick(AdapterView<?> arg0, View view, int position, long arg3) {
+		public void onItemClick(AdapterView<?> parent, View view, int position,
+				long id) {
+			if ((mListFavorites != null) && (mListAdapter != null) && (!isEditMode()) 
+					&& (mOnFavoritesListItemClickListener != null)) {
+				
+				Cursor cursor = (Cursor)mListAdapter.getItem(position);
+				int colIdx = cursor.getColumnIndex(UserDataProvider.COLUMN_REFRENCE_ID);
+				if (colIdx != -1) {
+					long refId = cursor.getLong(colIdx);
+					mOnFavoritesListItemClickListener.onFavoritesListItemClick(getDialog(), view, id, refId);
+				}
+			}
+		}
+	};
+	
+	private AdapterView.OnItemLongClickListener mItemLongClickListener = new AdapterView.OnItemLongClickListener() {
+
+		@Override
+		public boolean onItemLongClick(AdapterView<?> parent, View view, int position,
+				long id) {
 			if ((mListFavorites != null) && setEditMode()) {
 				mListFavorites.setItemChecked(position, true);
 				return true;
 			}
 			return false;
 		}
-		
 	};
 	
-	private final View.OnLongClickListener mViewOnLongClickListener = new View.OnLongClickListener() {
-		
-		@Override
-		public boolean onLongClick(View v) {
-			if (v != null) {
-				final CharSequence description = v.getContentDescription();
-				if (!TextUtils.isEmpty(description)) {
-					Toast.makeText(getContext(), description, Toast.LENGTH_LONG).show();
-					return true;	
-				}
-			}
-			return false;
-		}
-	};
+	private ViewGroup mFrameTitle;
+	private ViewGroup mFrameTitleEdit;
+	private View mActionEdit;
+	private ListView mListFavorites;
+	private FavoritesListAdapter mListAdapter;
+	private OnFavoritesListItemClickListener mOnFavoritesListItemClickListener;
 	
-	public FavoritesFragment() {
-		super();
-		mVisibility = View.VISIBLE;
-	}
-	
-	public FavoritesFragment(Context context) {
-		this();
-		mContext = context;
-	}
-	
-	protected Context getContext() {
-		return mContext;
+	@SuppressLint("InlinedApi")
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+	    super.onCreate(savedInstanceState);
+	    setStyle(DialogFragment.STYLE_NO_TITLE, R.style.AppTranslucentTheme);
 	}
 	
 	@Override
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
-        
-        View view = getView();
-		if (view != null) {
-			view.setVisibility(mVisibility);
-		}
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		Dialog dialog = super.onCreateDialog(savedInstanceState);
 		
-		setListData();
+		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+		dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+		
+			@Override
+			public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+				if (keyCode ==  KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+					if (onBackPressed()) {
+						return true;
+					}
+					
+					dismiss();
+					return true;
+				}
+				return false;
+			}
+		});
+		
+		return dialog;
 	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		View view = inflater.inflate(R.layout.favorites_fragment, container, false);
-		if (mContext == null) {
-			mContext = inflater.getContext();
-		}
-		ImageButton doneButton = (ImageButton)view.findViewById(R.id.doneButton);
-		doneButton.setOnClickListener(new View.OnClickListener() {
+		ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_favorites, container, false);
+		
+		mFrameTitle = (ViewGroup)rootView.findViewById(R.id.frameFavoritesTitle);
+		mFrameTitleEdit = (ViewGroup)rootView.findViewById(R.id.frameFavoritesEditTitle);
+		mFrameTitleEdit.setVisibility(View.GONE);
+		
+		View actionClose = mFrameTitle.findViewById(R.id.closeButton);
+		ActionBarUtils.getInstance(getContext()).makeActionButton(actionClose);
+		actionClose.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				performDone();
+				dismiss();
 			}
 		});
-		doneButton.setLongClickable(true);
-		doneButton.setOnLongClickListener(mViewOnLongClickListener);
 		
-		mEditButton = (ImageButton)view.findViewById(R.id.editButton);
-		mEditButton.setOnClickListener(new View.OnClickListener() {
+		mActionEdit = mFrameTitle.findViewById(R.id.editButton);
+		ActionBarUtils.getInstance(getContext()).makeActionButton(mActionEdit);
+		mActionEdit.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				setEditMode();
 			}
 		});
-		mEditButton.setLongClickable(true);
-		mEditButton.setOnLongClickListener(mViewOnLongClickListener);
 		
-		ImageButton selectAllButton = (ImageButton)view.findViewById(R.id.selectAllButton);
-		selectAllButton.setOnClickListener(new View.OnClickListener() {
+		View actionDone = mFrameTitleEdit.findViewById(R.id.doneButton);
+		ActionBarUtils.getInstance(getContext()).makeActionButton(actionDone);
+		actionDone.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				performSelectAll();
+				performDone();
 			}
 		});
-		selectAllButton.setLongClickable(true);
-		selectAllButton.setOnLongClickListener(mViewOnLongClickListener);
 		
-		ImageButton deleteButton = (ImageButton)view.findViewById(R.id.deleteButton);
-		deleteButton.setOnClickListener(new View.OnClickListener() {
+		View actionDelete = mFrameTitleEdit.findViewById(R.id.deleteButton);
+		ActionBarUtils.getInstance(getContext()).makeActionButton(actionDelete);
+		actionDelete.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				performDelete();
 			}
 		});
-		deleteButton.setLongClickable(true);
-		deleteButton.setOnLongClickListener(mViewOnLongClickListener);
 		
-		ImageButton closeButton = (ImageButton)view.findViewById(R.id.closeButton);
-		closeButton.setOnClickListener(new View.OnClickListener() {
+		View actionSelectAll = mFrameTitleEdit.findViewById(R.id.selectAllButton);
+		ActionBarUtils.getInstance(getContext()).makeActionButton(actionSelectAll);
+		actionSelectAll.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				performClose();
+				performSelectAll();
 			}
 		});
-		closeButton.setLongClickable(true);
-		closeButton.setOnLongClickListener(mViewOnLongClickListener);
 		
-		mFrameFavoritesTitle = (FrameLayout)view.findViewById(R.id.frameFavoritesTitle);
-		mFrameFavoritesEdit = (FrameLayout)view.findViewById(R.id.frameFavoritesEdit);
-		mFrameFavoritesEdit.setVisibility(View.GONE);
-		
-		mListFavorites = (ListView)view.findViewById(R.id.listViewFavorites);
+		mListFavorites = (ListView)rootView.findViewById(R.id.listViewFavorites);
 		mListFavorites.setSmoothScrollbarEnabled(true);
-		mListFavorites.setSaveEnabled(true);
-		mListFavorites.setOnItemClickListener(this);
+		mListFavorites.setOnItemClickListener(mItemClickListener);
 		mListFavorites.setLongClickable(true);
-		mListFavorites.setOnItemLongClickListener(mOnItemLongClickListener);
+		mListFavorites.setOnItemLongClickListener(mItemLongClickListener);
 		
-		mShowAnimation = (Animation)AnimationUtils.loadAnimation(mContext, R.anim.dialog_enter);
-        mShowAnimation.setAnimationListener(this);
-        
-        mHideAnimation = (Animation)AnimationUtils.loadAnimation(mContext, R.anim.dialog_exit);
-        mHideAnimation.setAnimationListener(this);
+		setCancelable(false);
+		bindList();
 		
-		return view;
+		return rootView;
 	}
 	
-	@Override
-	public void onAnimationStart(Animation animation) {
-	}
-
-	@Override
-	public void onAnimationEnd(Animation animation) {
-		if (mOnVisibilityChangeListener != null) {
-			mOnVisibilityChangeListener.onVisibilityChanged(mVisibility);
+	private boolean onBackPressed() {
+		if (isEditMode()) {
+			performDone();
+			return true;
 		}
-	}
-
-	@Override
-	public void onAnimationRepeat(Animation animation) {
-	}
-
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		if ((mListFavorites != null) && (mListAdapter != null) && (!isEditMode()) 
-				&& (mOnFavoritesListItemClickListener != null)) {
-			Cursor cursor = (Cursor)mListAdapter.getItem(position);
-			if (!Utility.isNull(cursor, UserDataProvider.COLUMN_REFRENCE_ID)) {
-				int refIdColumnIndex = cursor.getColumnIndex(UserDataProvider.COLUMN_REFRENCE_ID); 
-				long refId = cursor.getLong(refIdColumnIndex);
-				mOnFavoritesListItemClickListener.onFavoritesListItemClick(view, id, refId);
-			}
-		}
+		return false;
 	}
 	
-	protected void setListData() {
+	private boolean bindList() {
 		boolean hasData = false;
 		if (mListFavorites != null) {
-			Cursor cursor = UserDataProvider.getAllFavorites(getContext());
+			Cursor cursor = UserQueryHelper.getInstance(getContext()).getAllFavorites();
 			if (cursor != null) {
-				mListAdapter = new FavoritesListAdapter(getContext(), cursor
-						, UserDataProvider.COLUMN_ID, UserDataProvider.COLUMN_WORD);
+				mListAdapter = new FavoritesListAdapter(getContext(), cursor, UserDataProvider.COLUMN_WORD);
 				mListFavorites.setAdapter(mListAdapter);
-				hasData = mListAdapter.getCount() > 0;  
+				hasData = mListAdapter.getCount() > 0;
 			}
 		}
 		
-		if (mEditButton != null) {
-			mEditButton.setEnabled(hasData);
+		if (mActionEdit != null) {
+			mActionEdit.setEnabled(hasData);
 		}
+		return hasData;
 	}
 	
-	protected boolean setEditMode() {
+	private boolean setEditMode() {
 		if ((mListFavorites != null) && (mListAdapter != null)) {
 			if (!mListAdapter.getCheckable()) {
 				mListAdapter.setCheckable(true);
 				mListAdapter.notifyDataSetInvalidated();
 				
-				if (mFrameFavoritesEdit != null) {
-		        	mFrameFavoritesEdit.setVisibility(View.VISIBLE);
+				if (mFrameTitleEdit != null) {
+					mFrameTitleEdit.setVisibility(View.VISIBLE);
 		        }
-				
-				if (mFrameFavoritesTitle != null) {
-					mFrameFavoritesTitle.setVisibility(View.GONE);
+				if (mFrameTitle != null) {
+					mFrameTitle.setVisibility(View.GONE);
 		        }
 				
 				mListFavorites.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -255,23 +215,25 @@ public class FavoritesFragment extends Fragment
 		return false;
 	}
 	
-	protected void performDone() {
-		setListData();
-		
-		if (mFrameFavoritesEdit != null) {
-        	mFrameFavoritesEdit.setVisibility(View.GONE);
+	private void releaseEditMode() {
+		if (mFrameTitleEdit != null) {
+			mFrameTitleEdit.setVisibility(View.GONE);
         }
-		
-		if (mFrameFavoritesTitle != null) {
-			mFrameFavoritesTitle.setVisibility(View.VISIBLE);
+		if (mFrameTitle != null) {
+			mFrameTitle.setVisibility(View.VISIBLE);
         }
 	}
 	
-	protected void performDelete() {
+	private void performDone() {
+		bindList();
+		releaseEditMode();
+	}
+	
+	private void performDelete() {
 		if ((mListFavorites != null) && (mListAdapter != null)) {
 			final long[] checkedItems = mListFavorites.getCheckedItemIds();
 			if ((checkedItems != null) && (checkedItems.length > 0)) {
-				final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(getContext(), R.style.DialogTheme_Alert));
+				final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
 				dialogBuilder.setIcon(android.R.drawable.ic_dialog_info);
 				dialogBuilder.setTitle(R.string.favorites_edit_title);
 				dialogBuilder.setMessage(R.string.favorites_delete_message);
@@ -288,10 +250,14 @@ public class FavoritesFragment extends Fragment
 						dialog.dismiss();
 						
 						for(long id : checkedItems) {
-							UserDataProvider.removeFavorite(getContext(), id);
+							UserQueryHelper.getInstance(getContext()).removeFavorite(id);
 						}
-						setListData();
-						setEditMode();
+						
+						if (bindList()) {
+							setEditMode();
+						} else {
+							releaseEditMode();
+						}
 					}
 				});
 				dialogBuilder.show();
@@ -299,7 +265,7 @@ public class FavoritesFragment extends Fragment
 		}
 	}
 	
-	protected void performSelectAll() {
+	private void performSelectAll() {
 		if (mListFavorites != null) {
 			long[] checkedItems = mListFavorites.getCheckedItemIds();
 			if ((checkedItems != null) && (checkedItems.length > 0)) {
@@ -314,74 +280,14 @@ public class FavoritesFragment extends Fragment
 		}
 	}
 	
-	protected void performClose() {
-		hide();
-	}
-	
-	protected boolean isEditMode() {
-		if (mFrameFavoritesEdit != null) {
-        	return mFrameFavoritesEdit.getVisibility() == View.VISIBLE;
+	private boolean isEditMode() {
+		if (mFrameTitleEdit != null) {
+        	return mFrameTitleEdit.getVisibility() == View.VISIBLE;
         }
 		return false;
 	}
 	
-	public boolean performBackPress() {
-		if (isEditMode()) {
-			performDone();
-			return true;
-		}
-		return false;
-	}
-	
-	public void setOnVisibilityChangeListener(OnVisibilityChangeListener listener) {
-		mOnVisibilityChangeListener = listener;
-	}
-	
 	public void setOnFavoritesListItemClickListener(OnFavoritesListItemClickListener listener) {
 		mOnFavoritesListItemClickListener = listener;
-	}
-	
-	public int getVisibility() {
-		View view = getView();
-		if (view != null) {
-			mVisibility = view.getVisibility();
-		}
-		return mVisibility;
-	}
-	
-	public void setVisibility(int visible) {
-		mVisibility = visible;
-		View view = getView();
-		if ((view != null) && (view.getVisibility() != mVisibility)) {
-			view.setVisibility(mVisibility);
-			if (mOnVisibilityChangeListener != null) {
-				mOnVisibilityChangeListener.onVisibilityChanged(mVisibility);
-			}
-		}
-	}
-	
-	public void show() {
-		View view = getView();
-		if ((view != null) && (view.getVisibility() != View.VISIBLE)) {
-			view.startAnimation(mShowAnimation);
-			view.setVisibility(View.VISIBLE);
-			mVisibility = View.VISIBLE;
-			setListData();
-			if (mOnVisibilityChangeListener != null) {
-				mOnVisibilityChangeListener.onVisibilityChanged(mVisibility);
-			}
-		}
-	}
-	
-	public void hide() {
-		View view = getView();
-		if ((view != null) && (view.getVisibility() != View.GONE)) {
-			view.startAnimation(mHideAnimation);
-			view.setVisibility(View.GONE);
-			mVisibility = View.GONE;
-			if (mOnVisibilityChangeListener != null) {
-				mOnVisibilityChangeListener.onVisibilityChanged(mVisibility);
-			}
-		}
 	}
 }

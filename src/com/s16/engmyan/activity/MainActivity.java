@@ -2,69 +2,47 @@ package com.s16.engmyan.activity;
 
 import java.io.File;
 
-import com.s16.engmyan.Constants;
-import com.s16.engmyan.InstallationService;
-import com.s16.engmyan.Utility;
-import com.s16.engmyan.data.DictionaryDataProvider;
-import com.s16.engmyan.data.DictionaryItem;
-import com.s16.engmyan.data.UserDataProvider;
-import com.s16.engmyan.fragment.FavoritesFragment;
-import com.s16.engmyan.fragment.DetailViewFragment;
-import com.s16.engmyan.fragment.ProgressWheelFragment;
-import com.s16.engmyan.fragment.RecentsFragment;
-import com.s16.engmyan.fragment.SearchListFragment;
-import com.s16.engmyan.R;
-import com.s16.widget.ActionBarNavigationButtons;
-import com.s16.widget.MoreMenuActionProvider;
-
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.database.SQLException;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.SystemUiUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.text.TextUtils;
-import android.view.KeyEvent;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
 
-public class MainActivity extends ActionBarActivity 
-		implements SearchListFragment.OnSearchListItemClickListener
-		, ActionBarNavigationButtons.ActionBarContentViewActivity {
+import com.s16.app.AboutPreference;
+import com.s16.engmyan.Common;
+import com.s16.engmyan.Constants;
+import com.s16.engmyan.R;
+import com.s16.engmyan.data.DictionaryDataProvider;
+import com.s16.engmyan.data.DictionaryItem;
+import com.s16.engmyan.data.SearchQueryHelper;
+import com.s16.engmyan.data.UserQueryHelper;
+import com.s16.engmyan.fragment.DetailsFragment;
+import com.s16.engmyan.fragment.FavoritesFragment;
+import com.s16.engmyan.fragment.LoadingFragment;
+import com.s16.engmyan.fragment.MainListFragment;
+import com.s16.engmyan.fragment.RecentsFragment;
+import com.s16.engmyan.install.InstallationService;
+import com.s16.widget.ActionBarNavigationButtons;
+import com.s16.widget.SearchBarView;
 
-	protected static String TAG = MainActivity.class.getSimpleName();
+public class MainActivity extends AppCompatActivity 
+		implements MainListFragment.OnListItemClickListener  {
 	
-	private DictionaryDataProvider mDictDataProvider;
-	
-	private ProgressWheelFragment mLoading;
-	private SearchListFragment mSearchList;
-	private DetailViewFragment mDetailView;
-	private FavoritesFragment mFavoritesView;
-	private RecentsFragment mRecentsView;
-	
-	private Menu mMenu;
-	private MoreMenuActionProvider mMoreMenu;
-	private MenuItem mMenuItemFavorite;
-	private MenuItem mMenuItemSound;
-	private MenuItem mMenuItemPicture;
-	private boolean mIsMenuEnabled = true;
-	
-	private ActionBarNavigationButtons mActionBarContent; 
+	protected static final String TAG = MainActivity.class.getSimpleName();
 	
 	private class InstallBroadcastReceiver extends BroadcastReceiver {
 
@@ -75,210 +53,157 @@ public class MainActivity extends ActionBarActivity
 				showLoading();
 			} else if (dataStatus == InstallationService.STATE_ACTION_COMPLETE) {
 				hideLoading();
-				showMessage(R.string.install_complete_message);
-				openDatabase();
+				Common.showMessage(getContext(), R.string.install_complete_message);
+				openDatabase(Common.getDatabaseFile(getContext()));
 			} else {
-				showMessage(R.string.install_error_message);
+				Common.showMessage(getContext(), R.string.install_error_message);
 				System.exit(0);
 			}
 		}
 		
 	}
-	private InstallBroadcastReceiver mInstallBroadcastReceiver;
 	
-	private final FavoritesFragment.OnVisibilityChangeListener mOnFavoritesVisibilityChangeListener = 
-			new FavoritesFragment.OnVisibilityChangeListener() {
-
-				@Override
-				public void onVisibilityChanged(int visible) {
-					setViewEnabled(visible == View.GONE);
-				}
+	private ActionBarNavigationButtons.OnActionBarNavigationClickListener mNavigationClickListener = 
+			new ActionBarNavigationButtons.OnActionBarNavigationClickListener() {
+		
+		@Override
+		public void onNavigationForward(View v) {
+			performNavForward();
+		}
+		
+		@Override
+		public void onNavigationBack(View v) {
+			performNavBack();
+		}
+	};
+	
+	private DetailsFragment.DetailsDataChangeListener mDataChangeListener = new DetailsFragment.DetailsDataChangeListener() {
+		
+		@Override
+		public void onNavigationChanged(boolean navBackEnabled,
+				boolean navForwardEnabled) {
+			if (mActionBarContent != null) {
+				mActionBarContent.setNavBackEnabled(navBackEnabled);
+				mActionBarContent.setNavForwardEnabled(navForwardEnabled);
+			}
+		}
+		
+		@Override
+		public void onLoadFinished() {
+			setDetailsTitle();
+			setIfFavorties();
+		}
+		
+		@Override
+		public DictionaryItem onLoadDetailData(long id, String word) {
+			if (id > -1) {
+				return DictionaryItem.getFrom(SearchQueryHelper.getInstance(getContext()), id);
+			}
+			return DictionaryItem.getFrom(SearchQueryHelper.getInstance(getContext()), word);
+		}
 	};
 	
 	private final FavoritesFragment.OnFavoritesListItemClickListener mOnFavoritesListItemClickListener =
-		new FavoritesFragment.OnFavoritesListItemClickListener() {
+			new FavoritesFragment.OnFavoritesListItemClickListener() {
 
 			@Override
-			public void onFavoritesListItemClick(View view, long id, long refId) {
-				onSearchListItemClick(refId, null);
+			public void onFavoritesListItemClick(DialogInterface dialog, View view, long id, long refId) {
+				if (!isTwoPanes()) {
+					dialog.dismiss();
+				}
+				onListItemClick(refId, null);
 			}
 		
-	};
-	
-	private final RecentsFragment.OnVisibilityChangeListener mOnRecentsVisibilityChangeListener = 
-			new RecentsFragment.OnVisibilityChangeListener() {
-
-				@Override
-				public void onVisibilityChanged(int visible) {
-					setViewEnabled(visible == View.GONE);
-				}
 	};
 	
 	private final RecentsFragment.OnRecentsListItemClickListener mOnRecentsListItemClickListener =
-		new RecentsFragment.OnRecentsListItemClickListener() {
+			new RecentsFragment.OnRecentsListItemClickListener() {
 
 			@Override
-			public void onRecentsListItemClick(View view, long id, long refId) {
-				onSearchListItemClick(refId, null);
+			public void onRecentsListItemClick(DialogInterface dialog, View view, long id, long refId) {
+				if (!isTwoPanes()) {
+					dialog.dismiss();
+				}
+				onListItemClick(refId, null);
 			}
 		
 	};
 	
-	private DetailViewFragment.DetailDataChangeListener mDataChangeListener =
-			new DetailViewFragment.DetailDataChangeListener() {
-
-				@Override
-				public void onNavigationChanged(boolean navBackEnabled,
-						boolean navForwardEnabled) {
-					if (mActionBarContent != null) {
-						mActionBarContent.setNavBackEnabled(navBackEnabled);
-						mActionBarContent.setNavForwardEnabled(navForwardEnabled);
-					}
-				}
-
-				@Override
-				public DictionaryItem onLoadDetailData(long id, String word) {
-					if (mDictDataProvider != null) {
-						if (id > -1) {
-							return DictionaryItem.getFrom(mDictDataProvider, id);
-						}
-						return DictionaryItem.getFrom(mDictDataProvider, word);
-					}
-					return null;
-				}
-
-				@Override
-				public void onLoadFinished() {
-					setDetailTitle();
-					setIfFavorties();
-				}
-	};
+	private InstallBroadcastReceiver mInstallBroadcastReceiver;
+	
+	private SearchBarView mTextSearch;
+	private LoadingFragment mLoadingDialog;
+	private MainListFragment mListFragment;
+	private DetailsFragment mDetailsFragment;
+	
+	private ActionBarNavigationButtons mActionBarContent;
+	
+	private MenuItem mMenuItemFavorite;
+	private MenuItem mMenuItemSound;
+	private MenuItem mMenuItemPicture;
 	
 	protected Context getContext() {
-		return (Context)this;
+		return this;
 	}
 	
-	@SuppressLint("InlinedApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		SystemUiUtils.setStatusBarColor(this, getResources().getColor(R.color.title_background_dark));
+		SystemUiUtils.setStatusBarColor(this, getResources().getColor(R.color.app_color_primary_dark));
 		
-		initialize();
-		performInstall();
-	}
-	
-	private void initialize() {
-		FragmentManager manager = getSupportFragmentManager();
-		Fragment listFragment = manager.findFragmentById(R.id.listContainer);
-		if (listFragment != null) {
-			mSearchList = (SearchListFragment)listFragment;
-			mSearchList.setOnSearchListItemClickListener(this);
-		}
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		getSupportActionBar().setDisplayShowTitleEnabled(true);
 		
-		Fragment favoritesFragment = manager.findFragmentById(R.id.favoritesContainer);
-		if (favoritesFragment != null) {
-			mFavoritesView = (FavoritesFragment)favoritesFragment;
-			mFavoritesView.setVisibility(View.GONE);
-			mFavoritesView.setOnVisibilityChangeListener(mOnFavoritesVisibilityChangeListener);
-			mFavoritesView.setOnFavoritesListItemClickListener(mOnFavoritesListItemClickListener);
-		}
-		
-		Fragment recentsFragment = manager.findFragmentById(R.id.recentsContainer);
-		if (recentsFragment != null) {
-			mRecentsView = (RecentsFragment)recentsFragment;
-			mRecentsView.setVisibility(View.GONE);
-			mRecentsView.setOnVisibilityChangeListener(mOnRecentsVisibilityChangeListener);
-			mRecentsView.setOnRecentsListItemClickListener(mOnRecentsListItemClickListener);
-		}
-		
-		View detailView = findViewById(R.id.detailContainer);
-		if (detailView != null) {
-			FragmentTransaction transaction = manager.beginTransaction();
-			mDetailView = new DetailViewFragment(getContext());
-			transaction.replace(R.id.detailContainer, mDetailView);
-			transaction.commit();
+		mTextSearch = (SearchBarView)findViewById(R.id.searchBarView);
+		mTextSearch.setOnQueryTextListener(new SearchBarView.OnQueryTextListener() {
 			
-			ViewGroup content = (ViewGroup)findViewById(R.id.mainContent);
-			mActionBarContent = (ActionBarNavigationButtons)content.findViewById(R.id.detailActionBar);
-			if (mActionBarContent != null) {
-				content.removeView(mActionBarContent);
-				
-				final ActionBar actionBar = getSupportActionBar();
-				actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
-				actionBar.setCustomView(mActionBarContent);
-				
-				mActionBarContent.setVisibility(View.VISIBLE);
-				mActionBarContent.setNavigationVisible(true);
+			@Override
+			public void onQueryTextChanged(CharSequence query, int count) {
+				performSearch(query);
 			}
 			
-			mDetailView.setDetailDataChangeListener(mDataChangeListener);
-		}
+			@Override
+			public boolean onQuerySubmit(CharSequence query) {
+				return submitSearch(query);
+			}
+		});
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String constraint = prefs.getString(Constants.SEARCH_TEXT_KEY, null);
+		
+		mTextSearch.setText(constraint);
+		mTextSearch.requestFocus();
+		
+		FragmentManager manager = getSupportFragmentManager();
+		mListFragment = (MainListFragment)manager.findFragmentById(R.id.listContainer);
+		mListFragment.setOnListItemClickListener(this);
+		
+		initializeDetails(toolbar);
+		performInstall();
 	}
-	
-	@Override
-    protected void onStart() {
-        super.onStart();
-    }
-	
-	@Override
-    public void onStop() {
-        super.onStop();
-    }
-	
-	@Override
-    protected void onPause() {
-        super.onPause();
-    }
-	
-	@Override
-    protected void onResume() {
-        super.onResume();
-        if (Constants.isServiceRunning(getContext(), InstallationService.class)) {
-        	registerInstallReceiver();
-        	showLoading();
-        }
-    }
-    
-    @Override
-    protected void onDestroy() {
-    	performCleanAndSave();
-        super.onDestroy();
-    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		if (mMenu == null) {
-			mMenu = menu;
-		}
-		
-		if (mDetailView == null) {
-			getMenuInflater().inflate(R.menu.menu_main, menu);
-		} else {
-			getMenuInflater().inflate(R.menu.menu_main_two_pane, menu);
-		}
+		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
 	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		//final MenuItem actionSettings = menu.findItem(R.id.action_settings);
-		//if (actionSettings != null) MenuItemCompat.setShowAsAction(actionSettings, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-		
 		mMenuItemFavorite = menu.findItem(R.id.action_favorite);
 		if (mMenuItemFavorite != null) {
 			MenuItemCompat.setShowAsAction(mMenuItemFavorite, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 			setIfFavorties();
-			mMenuItemFavorite.setEnabled(mIsMenuEnabled);
 		}
 		
 		mMenuItemSound = menu.findItem(R.id.action_sound);
 		if (mMenuItemSound != null) {
 			MenuItemCompat.setShowAsAction(mMenuItemSound, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-			if (mDetailView != null) 
-				mMenuItemSound.setVisible(mDetailView.getHasSound());
+			if (mDetailsFragment != null) 
+				mMenuItemSound.setVisible(mDetailsFragment.getHasSound());
 			else
 				mMenuItemSound.setVisible(false);
 		}
@@ -286,56 +211,35 @@ public class MainActivity extends ActionBarActivity
 		mMenuItemPicture = menu.findItem(R.id.action_picture);
 		if (mMenuItemPicture != null) {
 			MenuItemCompat.setShowAsAction(mMenuItemPicture, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-			if (mDetailView != null) 
-				mMenuItemPicture.setVisible(mDetailView.getHasPicture());
+			if (mDetailsFragment != null) 
+				mMenuItemPicture.setVisible(mDetailsFragment.getHasPicture());
 			else
 				mMenuItemPicture.setVisible(false);
 		}
-		
-		if (android.os.Build.VERSION.SDK_INT < 21) {
-			final MenuItem actionMoreoverflow = menu.findItem(R.id.action_moreoverflow);
-			if (actionMoreoverflow != null) {
-				MenuItemCompat.setShowAsAction(actionMoreoverflow, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-				mMoreMenu = new MoreMenuActionProvider(this, menu, actionMoreoverflow, R.menu.menu_overflow_light);
-				mMoreMenu.setEnabled(mIsMenuEnabled);
-				MenuItemCompat.setActionProvider(actionMoreoverflow, mMoreMenu);
-				actionMoreoverflow.setEnabled(mIsMenuEnabled);
-			}
-		}
-		
-		return true;
+		return super.onPrepareOptionsMenu(menu);
 	}
-	
+
 	@Override
-	public boolean onOptionsItemSelected(final MenuItem item) {
-		if (!mIsMenuEnabled) {
-			return super.onOptionsItemSelected(item);
-		}
-		
-		switch (item.getItemId()) {
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		switch (id) {
 			case R.id.action_favorite:
 				performFavorite();
 				break;
-			case R.id.action_settings:
-				performSettings();
-				break;
 			case R.id.action_sound:
-				doSpeak();
+				performSpeak();
 				break;
 			case R.id.action_picture:
 				toggleImageView();
 				break;
 			case R.id.action_recent:
-				performRecents();
+				performManageRecents();
 				break;
 			case R.id.action_manage_favorites:
 				performManageFavorites();
 				break;
-			case R.id.actionbar_item_nav_back:
-				performNavBack();
-				break;
-			case R.id.actionbar_item_nav_forward:
-				performNavForward();
+			case R.id.action_settings:
+				performSettings();
 				break;
 			case R.id.action_about:
 				performAbout();
@@ -348,22 +252,29 @@ public class MainActivity extends ActionBarActivity
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
+	
+	@Override
+    protected void onPause() {
+        super.onPause();
+    }
+	
+	@Override
+    protected void onResume() {
+        super.onResume();
+        if (Common.isServiceRunning(getContext(), InstallationService.class)) {
+        	registerInstallReceiver();
+        }
+    }
+	
+	@Override
+    protected void onDestroy() {
+    	performCleanAndSave();
+        super.onDestroy();
+    }
+	
 	@Override
 	public void onBackPressed() {
-		if ((mRecentsView != null) && (mRecentsView.isVisible())) {
-			mRecentsView.hide();
-			return;
-		}
-		
-		if ((mFavoritesView != null) && (mFavoritesView.isVisible())) {
-			if (!mFavoritesView.performBackPress()) {
-				mFavoritesView.hide();
-			}
-			return;
-		}
-		
-		if ((mDetailView != null) && (mDetailView.getImageVisible())) {
+		if ((mDetailsFragment != null) && (mDetailsFragment.getImageVisible())) {
 			toggleImageView();
 			return;
 		}
@@ -371,208 +282,209 @@ public class MainActivity extends ActionBarActivity
 		super.onBackPressed();
 	}
 	
-	@Override
-	public boolean onKeyUp(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_MENU) {
-			if (!mIsMenuEnabled) {
-				return true;
+	private void initializeDetails(Toolbar toolbar) {
+		
+		FragmentManager manager = getSupportFragmentManager();
+		Fragment fragment = manager.findFragmentById(R.id.detailsContainer);
+		if (fragment != null) {
+			mDetailsFragment = (DetailsFragment)fragment;
+			getSupportActionBar().setDisplayShowTitleEnabled(false);
+			
+			mActionBarContent = (ActionBarNavigationButtons)toolbar.findViewById(R.id.frameToolbarContent);
+			if (mActionBarContent != null) {
+				mActionBarContent.setNavigationVisible(true);
+				mActionBarContent.setNavBackEnabled(mDetailsFragment.getCanGoBack());
+				mActionBarContent.setNavForwardEnabled(mDetailsFragment.getCanGoForward());
+				mActionBarContent.setNavigationClickListener(mNavigationClickListener);
 			}
 			
-			if (mMoreMenu != null) {
-				mMoreMenu.performClick();
-				return true;
-			}
-		}
-		return super.onKeyUp(keyCode, event);
-	}
-	
-	@Override
-	public void onSearchListItemClick(long id, CharSequence searchText) {
-		if (id < 0) return;
-		if (mDictDataProvider == null) return;
-		
-		final DictionaryItem itemData = DictionaryItem.getFrom(mDictDataProvider, id);
-		if (itemData != null) {
-			UserDataProvider.createHistory(getContext(), itemData.word, id);
-			
-			if (mDetailView == null) {
-				
-				Intent intent = new Intent(getBaseContext(), DetailActivity.class);
-				intent.putExtra(Constants.DETAIL_ID_KEY, id);
-				//intent.putExtra(Constants.DETAIL_DATA_KEY, itemData);
-				
-				ActivityCompat.startActivity(this, intent, null);
-			} else {
-				setDetailData(itemData);
-			}
-		}
-	}
-	
-	protected void setViewEnabled(boolean enabled) {
-		mIsMenuEnabled = enabled;
-		if (mSearchList != null) {
-			if (mSearchList.getSearchView() != null) {
-				if (!enabled) {
-					SystemUiUtils.hideSoftKeyboard(this, mSearchList.getSearchView());
-				}
-				mSearchList.getSearchView().setEnabled(enabled);
-			}
-			mSearchList.setEnabled(enabled);
-		}
-		if ((!enabled) && isActionBarHideOnView()) {
-			getSupportActionBar().show();
-		}
-		/*
-		if (mMenu != null) {
-			int menuCount = mMenu.size();
-			for(int i=0; i<menuCount;i++) {
-				mMenu.getItem(i).setVisible(enabled);
-			}
-		} else {
-			if (mMenuItemFavorite != null) {
-				mMenuItemFavorite.setEnabled(enabled);
-			}
-		}
-		if (mMoreMenu != null) {
-			mMoreMenu.setEnabled(enabled);
-		}
-		
-		if (mActionBarContent != null) {
-			mActionBarContent.setEnabled(enabled);
-		} */
-	}
-	
-	protected boolean isActionBarHideOnView() {
-		return (Utility.getConfigScreenSize(this) == 1);
-	}
-	
-	protected void performNavBack() {
-		if (mDetailView != null) {
-			mDetailView.performNavBack();
-		}
-	}
-	
-	protected void performNavForward() {
-		if (mDetailView != null) {
-			mDetailView.performNavForward();
+			mDetailsFragment.setDetailsDataChangeListener(mDataChangeListener);
 		}
 	}
 
-	protected void performSettings() {
-		Intent intent = new Intent(getBaseContext(), SettingsActivity.class);
-		ActivityCompat.startActivity(this, intent, null);
-	}
-	
-	protected void performRecents() {
-		if ((mFavoritesView != null) 
-				&& (mFavoritesView.getVisibility() == View.VISIBLE)) return; 
+	@Override
+	public void onListItemClick(long id, CharSequence searchText) {
+		if (id < 0) return;
+
+		DictionaryItem itemData = DictionaryItem.getFrom(SearchQueryHelper.getInstance(getContext()), id);
+		UserQueryHelper.getInstance(getContext()).createHistory(itemData.word, id);
 		
-		if (mRecentsView != null) {
-			if (isActionBarHideOnView()) {
-				getSupportActionBar().hide();
-			}
-			mRecentsView.show();
+		if (mDetailsFragment == null) {
+			Intent intent = new Intent(getBaseContext(), DetailsActivity.class);
+			intent.putExtra(Constants.DETAIL_ID_KEY, id);
+			ActivityCompat.startActivity(this, intent, null);
+			
+		} else {
+			setDetailsData(itemData);
 		}
 	}
 	
-	protected void performManageFavorites() {
-		if ((mRecentsView != null) 
-				&& (mRecentsView.getVisibility() == View.VISIBLE)) return;
+	private boolean isTwoPanes() {
+		return (mDetailsFragment != null);
+	}
+	
+	private void setDetailsData(DictionaryItem itemData) {
+		if (!isTwoPanes()) return;
+		if (mDetailsFragment == null) return;
+		if (itemData == null) return;
 		
-		if (mFavoritesView != null) {
-			if (isActionBarHideOnView()) {
-				getSupportActionBar().hide();
-			}
-			mFavoritesView.show();
+		mDetailsFragment.setData(itemData);
+		setDetailsTitle();
+		
+		if (mMenuItemPicture != null) {
+			mMenuItemPicture.setVisible(mDetailsFragment.getHasPicture());
+		}
+		
+		if (mMenuItemSound != null) {
+			mMenuItemSound.setVisible(mDetailsFragment.getHasSound());
+		}
+		
+		if (mActionBarContent != null) {
+			mActionBarContent.setNavBackEnabled(mDetailsFragment.getCanGoBack());
+			mActionBarContent.setNavForwardEnabled(mDetailsFragment.getCanGoForward());
+		}
+		
+		setIfFavorties();
+	}
+	
+	private void setDetailsTitle() {
+		if (!isTwoPanes()) return;
+		if (mDetailsFragment == null) return;
+		
+		if (mActionBarContent != null) {
+			String detailTitle = mDetailsFragment.getTitle();
+			String title = getString(R.string.app_name) + " [ " + detailTitle + " ]";
+			mActionBarContent.setTitle(title);
 		}
 	}
 	
-	protected void performFavorite() {
-		if (mDetailView != null) {
-			long id = mDetailView.getDetailId();
-			if (id > -1) {
-				if (!UserDataProvider.isFavorited(this, id)) {
-					UserDataProvider.createFavorite(this, mDetailView.getTitle(), id);
-					
-					if (UserDataProvider.isFavorited(this, id)) {
-						showMessage(R.string.add_favorites_message);
-						mMenuItemFavorite.setIcon(R.drawable.ic_action_star_on);
-					}
-				} else {
-					int result = UserDataProvider.removeFavoriteByRef(this, id);
-					if (result == 1) {
-						showMessage(R.string.remove_favorites_message);
-						mMenuItemFavorite.setIcon(R.drawable.ic_action_star);
-					}
-				}
-			}
+	private void showLoading() {
+		FragmentManager manager = getSupportFragmentManager();
+		if (mLoadingDialog == null) {
+			mLoadingDialog = new LoadingFragment();
+			mLoadingDialog.setMessage(R.string.install_message);
+			mLoadingDialog.setCancelable(false);
+			mLoadingDialog.show(manager, "loadingDialog");
 		}
 	}
 	
-	protected void performAbout() {
-		Utility.showAboutDialog(this);
+	private void hideLoading() {
+		if(mLoadingDialog != null) {
+			mLoadingDialog.dismiss();
+			mLoadingDialog = null;
+		}	
 	}
 	
-	protected void performExit() {
+	private void performSearch(CharSequence query) {
+		if (mListFragment != null) {
+			mListFragment.performSearch(query);
+		}
+	}
+	
+	private boolean submitSearch(CharSequence query) {
+		if (mListFragment != null) {
+			return mListFragment.submitSearch(query);
+		}
+		return false;
+	}
+	
+	private void performNavBack() {
+		if (mDetailsFragment != null) {
+			mDetailsFragment.performNavBack();
+		}
+	}
+	
+	private void performNavForward() {
+		if (mDetailsFragment != null) {
+			mDetailsFragment.performNavForward();
+		}
+	}
+	
+	private void performSettings() {
+		Intent intent = new Intent(this, SettingsActivity.class);
+		startActivity(intent);
+	}
+	
+	private void performAbout() {
+		AboutPreference.showAboutDialog(getContext());
+	}
+	
+	private void performExit() {
 		finish();
 		System.exit(0);
 	}
 	
-	protected void performCleanAndSave() {
+	private void performManageRecents() {
+		RecentsFragment fragment = new RecentsFragment();
+		fragment.setOnRecentsListItemClickListener(mOnRecentsListItemClickListener);
+		fragment.show(getSupportFragmentManager(), "RecentsFragment");
+	}
+	
+	private void performManageFavorites() {
+		FavoritesFragment fragment = new FavoritesFragment();
+		fragment.setOnFavoritesListItemClickListener(mOnFavoritesListItemClickListener);
+		fragment.show(getSupportFragmentManager(), "FavoritesFragment");
+	}
+	
+	private void performFavorite() {
+		if (mDetailsFragment != null) {
+			long id = mDetailsFragment.getDetailId();
+			if (id > -1) {
+				UserQueryHelper queryHelper = UserQueryHelper.getInstance(getContext());
+				if (!queryHelper.isFavorited(id)) {
+					queryHelper.createFavorite(mDetailsFragment.getTitle(), id);
+					
+					if (queryHelper.isFavorited(id)) {
+						Common.showMessage(getContext(), R.string.add_favorites_message);
+						mMenuItemFavorite.setIcon(R.drawable.ic_favorite_on_36dp);
+					}
+				} else {
+					int result = queryHelper.removeFavoriteByRef(id);
+					if (result == 1) {
+						Common.showMessage(getContext(), R.string.remove_favorites_message);
+						mMenuItemFavorite.setIcon(R.drawable.ic_favorite_off_36dp);
+					}
+				}
+			}
+		}
+	}
+	
+	private void performCleanAndSave() {
 		saveState();
     	
 		if (mInstallBroadcastReceiver != null) {
 			LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mInstallBroadcastReceiver);
 			mInstallBroadcastReceiver = null;
 		}
-		
-    	if (mDictDataProvider != null) {
-			mDictDataProvider.close();
+	}
+	
+	private void toggleImageView() {
+		if (mDetailsFragment != null) {
+			mDetailsFragment.toggleImageView();
 		}
 	}
 	
-	protected void setIfFavorties() {
-		if ((mDetailView != null) && (mMenuItemFavorite != null)) {
-			long id = mDetailView.getDetailId();
-			if ((id > -1) && (UserDataProvider.isFavorited(this, id))) {
-				mMenuItemFavorite.setIcon(R.drawable.ic_action_star_on);
+	private void performSpeak() {
+		if (mDetailsFragment != null) {
+			mDetailsFragment.doSpeak();
+		}
+	}
+	
+	private void setIfFavorties() {
+		if ((mDetailsFragment != null) && (mMenuItemFavorite != null)) {
+			long id = mDetailsFragment.getDetailId();
+			if ((id > -1) && (UserQueryHelper.getInstance(getContext()).isFavorited(id))) {
+				mMenuItemFavorite.setIcon(R.drawable.ic_favorite_on_36dp);
 			} else {
-				mMenuItemFavorite.setIcon(R.drawable.ic_action_star);
+				mMenuItemFavorite.setIcon(R.drawable.ic_favorite_off_36dp);
 			}
 		}
 	}
-
-	protected void toggleImageView() {
-		if (mDetailView != null) {
-			mDetailView.toggleImageView();
-		}
-	}
-
-	protected void doSpeak() {
-		if (mDetailView != null) {
-			mDetailView.doSpeak();
-		}
-	}
 	
-	protected void showLoading() {
-		FragmentManager manager = getSupportFragmentManager();
-		if (mLoading == null) {
-			mLoading = new ProgressWheelFragment(this);
-			mLoading.show(manager, "loadingDialog");
-		}
-	}
-	
-	protected void hideLoading() {
-		if(mLoading != null) {
-			mLoading.dismiss();
-		}
-		setViewEnabled(true);
-	}
-	
-	protected synchronized void performInstall() {
-		File dbFile = Constants.getDatabaseFile(this);
+	private synchronized void performInstall() {
+		File dbFile = Common.getDatabaseFile(getContext());
 		if(dbFile == null) {
-			showMessage(R.string.install_error_folder_create);
+			Common.showMessage(getContext(), R.string.install_error_folder_create);
 			return;
 		}
 		
@@ -582,28 +494,28 @@ public class MainActivity extends ActionBarActivity
 		isSuccess = (isSuccess && DictionaryDataProvider.versionCheck(this, dbFile));
 		
 		if(!isSuccess && dbFile.exists() && !dbFile.delete()) {
-			showMessage(R.string.install_error_data_load);
+			Common.showMessage(getContext(), R.string.install_error_data_load);
 			return;
 		}
 		
 		if(!isSuccess || !dbFile.exists()) {
 			final File dataFolder = dbFile.getParentFile();
-			//InstallationTask task = new InstallationTask(this, dataFolder, this);
-			//task.execute(Constants.ASSERT_ZIP_PKG);
 			registerInstallReceiver();
 			
 			Bundle args = new Bundle();
+			args.putString(InstallationService.INSTALL_ASSETS_NAME, Constants.ASSERT_ZIP_PKG);
 			args.putString(InstallationService.INSTALL_FOLDER, dataFolder.getAbsolutePath());
+			
 			Intent serviceIntent = new Intent(getContext(), InstallationService.class);
 			serviceIntent.putExtras(args);
 			startService(serviceIntent);
 			
 		} else {
-			openDatabase();
+			openDatabase(dbFile);
 		}
 	}
 	
-	protected void registerInstallReceiver() {
+	private void registerInstallReceiver() {
 		if (mInstallBroadcastReceiver == null) {
 			mInstallBroadcastReceiver = new InstallBroadcastReceiver();
 			IntentFilter filter = new IntentFilter(InstallationService.BROADCAST_ACTION);
@@ -612,116 +524,45 @@ public class MainActivity extends ActionBarActivity
 		}
 	}
 	
-	protected void showMessage(int messageId) {
-		Toast.makeText(getContext(), messageId, Toast.LENGTH_LONG).show();
-	}
-	
-	protected void openDatabase() {
+	private void openDatabase(File dbFile) {
+		if (dbFile == null) return;
+		getContentResolver().call(DictionaryDataProvider.CONTENT_URI, DictionaryDataProvider.METHOD_OPEN, 
+				dbFile.getAbsolutePath(), Bundle.EMPTY);
 		
-		if (mDictDataProvider == null) {
-			mDictDataProvider = Constants.getDataProvider(this);
-		}
-		
-		try {
-			if(!mDictDataProvider.isOpen()) 
-				mDictDataProvider.open();
-		} catch(SQLException ex) {
-			ex.printStackTrace();
-		}
-		
-		prepareSearch();
-	}
-	
-	protected void prepareSearch() {
-		if (mSearchList != null) {
-			
+		if (mListFragment != null) {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 			String constraint = prefs.getString(Constants.SEARCH_TEXT_KEY, "");
 			long id = prefs.getLong(Constants.DETAIL_ID_KEY, -1);
 			
-			if (constraint != null) {
-				mSearchList.setSearchText(constraint);
-				mSearchList.setSelection();
-			}
-			mSearchList.setDataProvider(mDictDataProvider);
-			mSearchList.prepareSearch();
+			mListFragment.prepareSearch(constraint);
 			
-			if (id >= 0) {
-				if ((mDictDataProvider != null) && (mDictDataProvider.isOpen())) {
-					setDetailData(DictionaryItem.getFrom(mDictDataProvider, id));
-				}
+			if (id > 0) {
+				DictionaryItem itemData = DictionaryItem.getFrom(SearchQueryHelper.getInstance(getContext()), id);
+				setDetailsData(itemData);
 			}
 		}
 	}
 	
-	protected void setDetailData(DictionaryItem itemData) {
-		if (mDetailView == null) return;
-		if (itemData == null) return;
-		
-		mDetailView.setData(itemData);
-		setDetailTitle();
-		
-		if (mMenuItemPicture != null) {
-			mMenuItemPicture.setVisible(mDetailView.getHasPicture());
-		}
-		
-		if (mMenuItemSound != null) {
-			mMenuItemSound.setVisible(mDetailView.getHasSound());
-		}
-		
-		if (mActionBarContent != null) {
-			mActionBarContent.setNavBackEnabled(mDetailView.getCanGoBack());
-			mActionBarContent.setNavForwardEnabled(mDetailView.getCanGoForward());
-		}
-		
-		setIfFavorties();
-	}
-	
-	protected void setDetailTitle() {
-		if (mDetailView == null) return;
-		
-		String detailTitle = mDetailView.getTitle();
-		final ActionBar actionBar = getSupportActionBar();
-		if ((actionBar != null) && (!TextUtils.isEmpty(detailTitle))) {
-			String title = getString(R.string.app_name) + " [ " + detailTitle + " ]";
-			if (mActionBarContent != null) {
-				mActionBarContent.setTitle(title);
-			} else {
-				actionBar.setTitle(title);
-			}
-		}
-	}
-	
-	protected void saveState() {
-		if (mSearchList == null) return;
+	private void saveState() {
+		if (mTextSearch == null) return;
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		SharedPreferences.Editor editor = prefs.edit();
 		
-		CharSequence constraint = mSearchList.getSearchText();
+		CharSequence constraint = mTextSearch.getText();
 		if (constraint == null) {
 			editor.putString(Constants.SEARCH_TEXT_KEY, null);
 		} else {
 			editor.putString(Constants.SEARCH_TEXT_KEY, constraint.toString());
 		}
 		
-		if (mDetailView != null) {
-			long id = mDetailView.getDetailId();
+		if (mDetailsFragment != null) {
+			long id = mDetailsFragment.getDetailId();
 			editor.putLong(Constants.DETAIL_ID_KEY, id);
 		} else {
 			editor.putLong(Constants.DETAIL_ID_KEY, -1);
 		}
 		
 		editor.commit();
-	}
-
-	@Override
-	public void setActionBarContentView(ActionBarNavigationButtons view) {
-		mActionBarContent = view;
-		mActionBarContent.setTitleVisible(true);
-		if (mDetailView != null) {
-			mActionBarContent.setNavBackEnabled(mDetailView.getCanGoBack());
-			mActionBarContent.setNavForwardEnabled(mDetailView.getCanGoForward());
-		}
 	}
 }

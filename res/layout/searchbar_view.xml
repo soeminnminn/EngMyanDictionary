@@ -9,6 +9,7 @@
 	    style="@style/SearchBar.Button.Glass"
 	    android:layout_gravity="center_vertical"
 	    android:layout_marginLeft="3.0dip"
+	    android:layout_marginStart="3.0dip"
 	    android:contentDescription="@string/empty_string" />
 
      <AutoCompleteTextView
@@ -22,8 +23,9 @@
      <ImageButton
          android:id="@+id/btnSearhClear"
          style="@style/SearchBar.Button.Clear"
-         android:layout_gravity="right|center_vertical"
+         android:layout_gravity="end|right|center_vertical"
          android:layout_marginRight="8.0dip"
+         android:layout_marginEnd="8.0dip"
          android:contentDescription="@string/empty_string" />
 
 </FrameLayout>

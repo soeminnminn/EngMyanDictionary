@@ -1,12 +1,11 @@
 package com.s16.widget;
 
-import com.s16.engmyan.R;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.support.v4.view.GravityCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.ActionProvider;
@@ -19,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.s16.engmyan.R;
+
 public class ActionBarNavigationButtons extends LinearLayout
 		implements View.OnLongClickListener {
 	
@@ -30,11 +31,17 @@ public class ActionBarNavigationButtons extends LinearLayout
 		boolean onOptionsItemSelected(MenuItem item);
 	}
 	
+	public interface OnActionBarNavigationClickListener {
+		public void onNavigationBack(View v);
+		public void onNavigationForward(View v);
+	}
+	
 	private TextView mTitle;
 	private View mNavBack;
 	private View mNavForward;
 	private View mNavigation;
 	private ActionBarContentViewActivity mContentViewActivity;
+	private OnActionBarNavigationClickListener mNavigationClickListener;
 	
 	private boolean mTitleVisible;
 	private boolean mNavigationVisible;
@@ -47,9 +54,19 @@ public class ActionBarNavigationButtons extends LinearLayout
 
 		@Override
 		public void onClick(View v) {
-			if (v.isEnabled() && (mContentViewActivity != null)) {
-				final MenuItem item = new ActionMenuItem(v, v.getId());
-				mContentViewActivity.onOptionsItemSelected(item);
+			if (v.isEnabled()) {
+				if (mNavigationClickListener != null) {
+					if (v.getId() == R.id.actionbar_item_nav_back) {
+						mNavigationClickListener.onNavigationBack(v);
+						
+					} else if (v.getId() == R.id.actionbar_item_nav_forward) {
+						mNavigationClickListener.onNavigationForward(v);
+					}
+					
+				} else if (mContentViewActivity != null) {
+					final MenuItem item = new ActionMenuItem(v, v.getId());
+					mContentViewActivity.onOptionsItemSelected(item);
+				}
 			}
 		}
     	
@@ -77,6 +94,10 @@ public class ActionBarNavigationButtons extends LinearLayout
 	@Override
 	protected void onFinishInflate() {
 		super.onFinishInflate();
+		
+		if (isInEditMode()) {
+			return;
+		}
 		
 		mTitle = (TextView)findViewById(R.id.actionbar_title);
 		mNavBack = findViewById(R.id.actionbar_item_nav_back);
@@ -109,6 +130,11 @@ public class ActionBarNavigationButtons extends LinearLayout
 	
 	@Override
 	public void setEnabled(boolean enabled) {
+		if (isInEditMode()) {
+			super.setEnabled(enabled);
+			return;
+		}
+		
 		if (mNavBack != null) {
 			mNavBack.setEnabled(mNavBackEnabled && enabled);
 		}
@@ -197,6 +223,10 @@ public class ActionBarNavigationButtons extends LinearLayout
 		}
 	}
 	
+	public void setNavigationClickListener(OnActionBarNavigationClickListener listener) {
+		mNavigationClickListener = listener;
+	}
+	
 	@Override
 	public boolean onLongClick(View v) {
 		if (!v.isEnabled()) return false;
@@ -217,7 +247,7 @@ public class ActionBarNavigationButtons extends LinearLayout
         Toast cheatSheet = Toast.makeText(context, description, Toast.LENGTH_SHORT);
         if (midy < displayFrame.height()) {
             // Show along the top; follow action buttons
-            cheatSheet.setGravity(Gravity.TOP | Gravity.RIGHT, screenWidth - screenPos[0] - width / 2, height);
+            cheatSheet.setGravity(Gravity.TOP | GravityCompat.END, screenWidth - screenPos[0] - width / 2, height);
         } else {
             // Show along the bottom center
             cheatSheet.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, height);

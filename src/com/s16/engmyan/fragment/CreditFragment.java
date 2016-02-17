@@ -1,42 +1,33 @@
 package com.s16.engmyan.fragment;
 
-import com.s16.engmyan.Constants;
-import com.s16.engmyan.R;
-
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.os.Build;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.webkit.WebView;
-import android.widget.Button;
+
+import com.s16.app.ActionBarUtils;
+import com.s16.engmyan.Constants;
+import com.s16.engmyan.R;
 
 public class CreditFragment extends DialogFragment {
 
-	private Context mContext;
-	
-	public CreditFragment() {
-		super();
-	}
-	
-	public CreditFragment(Context context) {
-		super();
-		mContext = context;
-	}
-	
-	protected Context getContext() {
-		return mContext;
+	@SuppressLint("InlinedApi")
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+	    super.onCreate(savedInstanceState);
+	    setStyle(DialogFragment.STYLE_NO_TITLE, R.style.AppTranslucentTheme);
 	}
 	
 	@Override
-    public void onCreate(Bundle icicle) {
-		if (Build.VERSION.SDK_INT < 21) {
-			setStyle(STYLE_NORMAL, R.style.DialogTheme);
-		}
-        super.onCreate(icicle);
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		Dialog dialog = super.onCreateDialog(savedInstanceState);
+		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+		return dialog;
 	}
 	
 	@SuppressLint("SetJavaScriptEnabled")
@@ -44,30 +35,23 @@ public class CreditFragment extends DialogFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		View view = inflater.inflate(R.layout.credit_fragment, container, false);
-		if (mContext == null) {
-			mContext = inflater.getContext();
-		}
+		ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_credit, container, false);
 		
-		if (Build.VERSION.SDK_INT < 11) {
-			getDialog().getWindow().setBackgroundDrawableResource(R.drawable.dialog_full_holo_dark);
-		}
-		getDialog().setTitle(R.string.prefs_credit);
-		
-		WebView webView = (WebView)view.findViewById(R.id.webViewCredit);
+		WebView webView = (WebView)rootView.findViewById(R.id.webViewCredit);
 		webView.getSettings().setAllowFileAccess(true);
 		webView.getSettings().setJavaScriptEnabled(true);
 		webView.loadUrl(Constants.URL_CREDIT);
 		
-		Button closeButton = (Button)view.findViewById(android.R.id.closeButton); 
-		closeButton.setOnClickListener(new View.OnClickListener() {
+		View actionClose = rootView.findViewById(R.id.closeButton);
+		ActionBarUtils.getInstance(getContext()).makeActionButton(actionClose);
+		actionClose.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				getDialog().dismiss();
+				dismiss();
 			}
 		});
 		
-		return view;
+		return rootView;
 	}
 }

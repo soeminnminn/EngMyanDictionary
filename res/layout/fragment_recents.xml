@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="?attr/actionBarSize" >
+
+	<RelativeLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:background="@drawable/dialog_full_holo_light" >
+	
+	    <include layout="@layout/layout_recents_title"
+	        android:layout_width="match_parent"
+	        android:layout_height="?attr/actionBarSize" />
+	    
+	    <View 
+	        android:id="@+id/dividerActionbar"
+	        android:layout_width="match_parent"
+	        android:layout_height="1dip"
+	        android:layout_marginTop="?attr/actionBarSize"
+	        android:background="@drawable/divider_background" />
+	
+	    <ListView
+	        android:id="@+id/listViewRecents"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:layout_below="@+id/dividerActionbar"
+	        android:background="@drawable/white" />
+	    
+	</RelativeLayout>
+	
+	<FrameLayout 
+	    android:id="@+id/frameDummy"
+	    android:layout_width="match_parent"
+	    android:layout_height="0dip" />
+
+</RelativeLayout>

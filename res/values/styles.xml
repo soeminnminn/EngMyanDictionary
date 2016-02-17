@@ -1,208 +1,42 @@
-<resources 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:appcompat="http://schemas.android.com/apk/res/android.support.v7.appcompat">
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
     -->
-    <style name="AppBaseTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
         -->
-        
-        <item name="colorPrimary">@color/title_background</item>
-	    <item name="colorPrimaryDark">@color/title_background_dark</item>
-	    <item name="colorAccent">@color/title_background_accent</item>
-	    
-        <item name="android:colorForeground">@color/bright_foreground_holo_light</item>
-        <item name="android:colorForegroundInverse">@color/bright_foreground_inverse_holo_light</item>
-        <item name="android:colorBackground">@color/background_holo_light</item>
-        <item name="android:disabledAlpha">0.5</item>
-        <item name="android:backgroundDimAmount">0.6</item>
+        <item name="colorPrimary">@color/app_color_primary</item>
+        <item name="colorPrimaryDark">@color/app_color_primary_dark</item>
+        <item name="colorAccent">@color/app_color_accent</item>
+    </style>
 
-		<!-- <item name="android:listSelector">@drawable/list_selector_background</item> -->
-		<item name="android:absListViewStyle">@style/AbsListViewLight</item>
-		<item name="android:checkboxStyle">@style/CheckBoxLight</item>
-		<item name="android:radioButtonStyle">@style/RadioButtonLight</item>
-		
-		<item name="android:progressBarStyle">@style/Widget.Holo.ProgressBar</item>
-		<item name="android:progressBarStyleHorizontal">@style/Widget.Holo.ProgressBar.Horizontal</item>
-        <item name="android:progressBarStyleSmall">@style/Widget.Holo.ProgressBar.Small</item>
-        <item name="android:progressBarStyleLarge">@style/Widget.Holo.ProgressBar.Large</item>
-		
-		<item name="actionBarStyle">@style/ActionBar</item>
-		<item name="actionBarSplitStyle">@style/ActionBarSplit</item>
-		
-		<item name="pmPopupWindowStyle">@style/PopupMenuCompatStyle.ListPopupWindow.Light</item>
-		<item name="pmDropDownListViewStyle">@style/PopupMenuCompatStyle.DropDownListView.Light</item>
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppBaseTheme">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
     
-    <style name="ActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@drawable/actionbar_background</item>
-        <item name="background">@drawable/actionbar_background</item>
-        <item name="customNavigationLayout">@layout/actionbar_content</item>
-    </style>
-    <style name="ActionBarSplit" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@drawable/actionbar_background</item>
-        <item name="background">@drawable/actionbar_background</item>
+    <style name="AppTranslucentTheme" parent="@style/AppBaseTheme">
+        <item name="android:windowBackground">@drawable/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+    	<item name="android:windowIsTranslucent">true</item>
     </style>
     
-    <style name="DialogTheme" parent="@android:style/Theme.Dialog">
-        <item name="android:windowBackground">@drawable/dialog_full_holo_dark</item>
-    </style>
-    <style name="DialogTheme.Alert" parent="@style/DialogTheme">
-    </style>
-    <style name="DialogTheme.NoTitle" parent="@style/DialogTheme">
+    <style name="DialogNoTitle" parent="@android:style/Theme.Dialog">
         <item name="android:windowNoTitle">true</item>
     </style>
-    <style name="DialogTheme.Light" parent="@android:style/Theme.Dialog">
-        <item name="android:windowBackground">@drawable/dialog_full_holo_light</item>
-    </style>
-    <style name="DialogTheme.Light.NoTitle" parent="@style/DialogTheme.Light">
-        <item name="android:windowNoTitle">true</item>
-    </style>
-    
-    <style name="AbsListViewLight" parent="@android:style/Widget.AbsListView">
-        <item name="android:listSelector">@drawable/list_selector_holo_light</item>
-        <item name="android:divider">@drawable/list_divider_holo_light</item>
-    </style>
-    
-    <style name="CheckBoxLight" parent="@android:style/Widget.CompoundButton.CheckBox">
-        <item name="android:button">@drawable/btn_check_holo_light</item>
-    </style>
-    
-    <style name="RadioButtonLight" parent="@android:style/Widget.CompoundButton.RadioButton">
-        <item name="android:button">@drawable/btn_radio_holo_light</item>
-    </style>
-    
-    <style name="Widget.Holo.ProgressBar" parent="@android:style/Widget.ProgressBar">
-        <item name="android:indeterminateDrawable">@drawable/progress_medium_holo</item>
-    </style>
-    <style name="Widget.Holo.ProgressBar.Horizontal" parent="@android:style/Widget.ProgressBar.Horizontal">
-        <item name="android:progressDrawable">@drawable/progress_horizontal_holo_dark</item>
-        <item name="android:indeterminateDrawable">@drawable/progress_indeterminate_horizontal_holo</item>
-        <item name="android:minHeight">16dip</item>
-        <item name="android:maxHeight">16dip</item>
-    </style>
-    <style name="Widget.Holo.ProgressBar.Small" parent="@android:style/Widget.ProgressBar.Small">
-        <item name="android:indeterminateDrawable">@drawable/progress_small_holo</item>
-    </style>
-    <style name="Widget.Holo.ProgressBar.Large" parent="@android:style/Widget.ProgressBar.Large">
-        <item name="android:indeterminateDrawable">@drawable/progress_large_holo</item>
-    </style>
-    
-    <style name="SearchBar">
-	    <item name="android:background">@drawable/bg_search</item>
-	    <item name="android:layout_height">@dimen/searchbar_height</item>
-	</style>
-    <style name="SearchBar.EditText" parent="@android:style/Widget.TextView">
-	    <item name="android:background">@android:color/transparent</item>
-	    <item name="android:textColor">@android:color/black</item>
-	    <item name="android:layout_marginLeft">30.0dip</item>
-	    <item name="android:layout_marginRight">30.0dip</item>
-	    <item name="android:singleLine">true</item>
-	    <item name="android:inputType">textFilter</item>
-	</style>
-    <style name="SearchBar.Button" parent="@android:style/Widget.Button">
-	    <item name="android:padding">6dp</item>
-	    <item name="android:layout_height">@dimen/action_button_height</item>
-	    <item name="android:layout_width">@dimen/action_button_width</item>
-	    <item name="android:background">@drawable/searchbar_btn</item>
-	    <item name="android:textColor">@android:color/white</item>
-	    <item name="android:gravity">center</item>
-	    <item name="android:textStyle">bold</item>
-	    <item name="android:minHeight">30dp</item>
-        <item name="android:minWidth">30dp</item>
-	</style>
-    <style name="SearchBar.Button.Disable" parent="@style/SearchBar.Button">
-	    <item name="android:background">@android:color/transparent</item>
-	</style>
-    <style name="SearchBar.Button.Glass" parent="@style/SearchBar.Button.Disable">
-	    <item name="android:layout_height">@dimen/search_button_width</item>
-	    <item name="android:layout_width">@dimen/search_button_height</item>
-	    <item name="android:src">@drawable/ic_action_search</item>
-	</style>
-    <style name="SearchBar.Button.Clear" parent="@style/SearchBar.Button">
-	    <item name="android:layout_height">@dimen/clear_button_height</item>
-	    <item name="android:layout_width">@dimen/clear_button_width</item>
-	    <item name="android:src">@drawable/ic_clear_search</item>
-	</style>
 	
-    <style name="ButtonBar">
-        <item name="android:background">@color/background_default</item>
-        <item name="android:divider">@drawable/divider_horizontal_holo_dark</item>
-        <item name="android:paddingBottom">0dip</item>
-        <item name="android:paddingLeft">0dip</item>
-        <item name="android:paddingRight">0dip</item>
-        <item name="android:paddingTop">0dip</item>
-        <item name="android:layout_height">@dimen/dialog_button_bar_height</item>
-    </style>
-    <style name="ButtonBar.Material" parent="@style/ButtonBar">
-    </style>
-    <style name="ButtonBar.Button">
-        <item name="android:layout_marginTop">1dp</item>
-	    <item name="android:background">@drawable/buttonbar_btn</item>
-	    <item name="android:textColor">@color/bright_foreground_holo_dark</item>
-	    <item name="android:textStyle">normal</item>
-	</style>
-	<style name="ButtonBar.Button.Material" parent="@style/ButtonBar.Button">
-	</style>
-    
-    <style name="ActionMenuTheme">
-        <item name="popupMenuStyle">@style/PopupMenuTheme</item>
-        <item name="android:textColorPrimaryDisableOnly">@android:color/white</item>
-    </style>
-    <style name="ActionMenuButtonTheme" parent="@android:style/Widget.ImageButton">
-        <item name="android:src">@drawable/ic_action_moreoverflow</item>
-        <item name="android:background">@drawable/buttonbar_btn</item>
-    </style>
-    <style name="PopupMenuTheme" parent="@style/Widget.AppCompat.PopupMenu">
-        <item name="android:dropDownSelector">@drawable/list_selector_holo_light</item>
-        <item name="android:popupBackground">@drawable/menu_dropdown_panel_holo_dark</item>
-        <item name="android:textColor">@android:color/white</item>
+	<style name="BorderlessButton" parent="@style/Widget.AppCompat.Button.Borderless">
     </style>
     
-    <style name="PopupBox">
-        <item name="android:background">@drawable/dialog_full_holo_light</item>
-    </style>
-    <style name="PopupBox.Content">
-        <item name="android:background">@drawable/content_bottom_background</item>
-        <item name="android:layout_marginBottom">@dimen/dialog_vertical_margin</item>
-        <item name="android:layout_marginTop">@dimen/action_bar_default_height</item>
-        <item name="android:paddingTop">1dip</item>
-        <item name="android:paddingLeft">@dimen/dialog_horizontal_margin</item>
-        <item name="android:paddingRight">@dimen/dialog_horizontal_margin</item>
+	<style name="ActionbarButton" parent="@style/Widget.AppCompat.ActionButton">
     </style>
     
-    <style name="DoneBar">
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">@dimen/action_bar_default_height</item>
-        <item name="android:textColor">@color/bright_foreground_holo_dark</item>
+	<style name="ActionbarTitle" parent="@style/Widget.AppCompat.ActionButton">
     </style>
-    <style name="DoneBar.Bottom">
-        <item name="android:background">@drawable/donebar_bottom_background</item>
-    </style>
-    <style name="DoneBar.Title" parent="@android:style/Widget.EditText">
-        <item name="android:background">@android:color/transparent</item>
-	    <item name="android:textColor">@color/dim_foreground_holo_light</item>
-    </style>
-    <style name="DoneBar.Button" parent="@android:style/Widget.Button">
-	    <item name="android:padding">6dp</item>
-	    <item name="android:layout_height">@dimen/action_button_height</item>
-	    <item name="android:layout_width">@dimen/action_button_width</item>
-	    <item name="android:background">@drawable/action_button</item>
-	    <item name="android:textColor">@android:color/white</item>
-	    <item name="android:gravity">center</item>
-	    <item name="android:textStyle">bold</item>
-	    <item name="android:minHeight">30dp</item>
-        <item name="android:minWidth">30dp</item>
-	</style>
-	<style name="DoneBar.ActionButton" parent="@style/DoneBar.Button">
-	    <item name="android:layout_height">@dimen/action_button_height</item>
-	    <item name="android:layout_width">@dimen/action_button_width</item>
-	    <item name="android:layout_marginLeft">4dip</item>
-	</style>
+	
 </resources>

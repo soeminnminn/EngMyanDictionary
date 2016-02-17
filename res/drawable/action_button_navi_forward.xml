@@ -8,8 +8,8 @@
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:drawable="@drawable/ic_action_navi_forward" android:state_pressed="true"/> <!-- pressed -->
-    <item android:drawable="@drawable/ic_action_navi_forward_disabled" android:state_enabled="false"/> <!-- enabled -->
-    <item android:drawable="@drawable/ic_action_navi_forward"/> <!-- default -->
+    <item android:drawable="@drawable/ic_arrow_right_white_36dp" android:state_pressed="true"/> <!-- pressed -->
+    <item android:drawable="@drawable/ic_arrow_right_white_disable_36dp" android:state_enabled="false"/> <!-- enabled -->
+    <item android:drawable="@drawable/ic_arrow_right_white_36dp"/> <!-- default -->
 
 </selector>

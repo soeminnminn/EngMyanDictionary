@@ -1,0 +1,87 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mainContent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_background"
+    tools:context=".activity.MainActivity" >
+    
+    <android.support.v7.widget.Toolbar 
+	    android:id="@+id/toolbar"
+	    android:layout_width="match_parent"
+	    android:layout_height="?attr/actionBarSize"
+	    android:background="@drawable/appbar_background"
+	    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+	    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+	    app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
+	    
+	    <include 
+	        layout="@layout/layout_toolbar_content"
+	        android:layout_width="wrap_content"
+	    	android:layout_height="match_parent" />
+	    
+	</android.support.v7.widget.Toolbar>
+    
+    <LinearLayout 
+        android:id="@+id/frameMainTwoPanes"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar"
+        android:baselineAligned="false"
+        android:weightSum="5"
+        android:orientation="horizontal" >
+        
+        <RelativeLayout
+	        android:id="@+id/layoutMainContent"
+	        android:layout_width="0dp"
+	        android:layout_height="match_parent"
+	        android:layout_weight="2" >
+	        
+            <FrameLayout 
+		        android:id="@+id/frameSearchBar"
+		        android:layout_width="match_parent"
+		        android:layout_height="?attr/actionBarSize" >
+		        
+		    	<com.s16.widget.SearchBarView
+				    android:id="@+id/searchBarView"
+				    android:layout_width="match_parent"
+				    android:layout_height="match_parent"
+				    android:layout_marginLeft="@dimen/searchbar_horizontal_margin" 
+		    		android:layout_marginStart="@dimen/searchbar_horizontal_margin"
+		    		android:layout_marginRight="@dimen/searchbar_horizontal_margin" 
+		    		android:layout_marginEnd="@dimen/searchbar_horizontal_margin"
+		    		android:layout_marginTop="@dimen/searchbar_vertical_margin"
+		    		android:layout_marginBottom="@dimen/searchbar_vertical_margin"
+				    android:layout_gravity="center"
+				    android:background="@drawable/searchbar_background_border" />
+		    	
+		    </FrameLayout>
+        
+	        <fragment 
+				android:id="@+id/listContainer"
+				android:name="com.s16.engmyan.fragment.MainListFragment"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_below="@+id/frameSearchBar"
+				tools:layout="@layout/fragment_main_list_twopanes" />
+        
+        </RelativeLayout>
+        
+        <FrameLayout 
+            android:layout_width="0dp"
+			android:layout_height="match_parent"
+			android:layout_weight="3" >
+            
+            <fragment
+				android:id="@+id/detailsContainer"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:name="com.s16.engmyan.fragment.DetailsFragment"
+				tools:layout="@layout/fragment_details" />
+            
+        </FrameLayout>
+        
+    </LinearLayout>
+    
+</RelativeLayout>

@@ -1,5 +1,10 @@
 <resources>
 
-	<item name="activity_main" type="layout">@layout/activity_main_two_pane</item>
+	<item name="activity_main" type="layout">@layout/activity_main_twopanes</item>
+	<item name="main" type="menu">@menu/main_two_pane</item>
 
+	<item name="fragment_main_list" type="layout">@layout/fragment_main_list_twopanes</item>
+	<item name="fragment_favorites" type="layout">@layout/fragment_favorites_twopanes</item>
+	<item name="fragment_recents" type="layout">@layout/fragment_recents_twopanes</item>
+	
 </resources>

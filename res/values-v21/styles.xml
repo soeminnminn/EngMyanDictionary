@@ -1,102 +1,29 @@
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
+<resources>
 
-    <style name="AppBaseTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/ActionBar</item>
-        <item name="android:dialogTheme">@style/DialogTheme</item>
+    <!--
+        Base application theme for API 21+. This theme completely replaces
+        AppBaseTheme from res/values/styles.xml on API 21+ devices.
+    -->
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- API 21 theme customizations can go here. -->
+        <item name="colorPrimary">@color/app_color_primary</item>
+        <item name="colorPrimaryDark">@color/app_color_primary_dark</item>
+        <item name="colorAccent">@color/app_color_accent</item>
         
-        <item name="actionBarStyle">@style/ActionBar</item>
-        <item name="actionBarSplitStyle">@style/ActionBarSplit</item>
-        
-        <!-- Main theme colors -->
-	    <!--   your app branding color for the app bar -->
-	    <item name="android:colorPrimary">@color/title_background</item>
-	    <item name="colorPrimary">@color/title_background</item>
-	    <!--   darker variant for the status bar and contextual app bars -->
-	    <item name="android:colorPrimaryDark">@color/title_background_dark</item>
-	    <item name="colorPrimaryDark">@color/title_background_dark</item>
-	    <!--   theme UI controls like checkboxes and text fields -->
-	    <item name="android:colorAccent">@color/title_background_accent</item>
-	    <item name="colorAccent">@color/title_background_accent</item>
-        
-        <item name="android:absListViewStyle">@style/AbsListViewLight</item>
-        <item name="android:checkboxStyle">@style/CheckBoxLight</item>
-        <item name="android:checkedTextViewStyle">@style/CheckedTextViewLight</item>
-		<item name="android:radioButtonStyle">@style/RadioButtonLight</item>
+        <item name="android:colorPrimary">@color/app_color_primary</item>
+        <item name="android:colorPrimaryDark">@color/app_color_primary_dark</item>
+        <item name="android:colorAccent">@color/app_color_accent</item>
     </style>
     
-    <style name="ActionBar" parent="@style/Widget.AppCompat.ActionBar.Solid">
-        <item name="android:background">@drawable/actionbar_background</item>
-        <item name="android:customNavigationLayout">@layout/actionbar_content</item>
+    <style name="DialogNoTitle" parent="@android:style/Theme.Material.Light.Dialog.NoActionBar.MinWidth">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
     </style>
-    
-    <style name="AbsListViewLight" parent="@android:style/Widget.AbsListView">
-    </style>
-    <style name="CheckBoxLight" parent="@android:style/Widget.Material.CompoundButton.CheckBox">
-    </style>
-    <style name="CheckedTextViewLight" parent="@android:style/Widget.Material.CheckedTextView">
-    </style>
-    <style name="RadioButtonLight" parent="@android:style/Widget.Material.CompoundButton.RadioButton">
-    </style>
-    
-    <style name="DialogTheme" parent="@android:style/Theme.Holo.Dialog">
-    </style>
-    <style name="DialogTheme.Alert" parent="@android:style/Theme.Material.Dialog.Alert">
-    </style>
-    
-    <style name="SearchBar.Button" parent="@android:style/Widget.Material.Button.Borderless">
-	    <item name="android:padding">6dp</item>
-	    <item name="android:layout_height">@dimen/action_button_height</item>
-	    <item name="android:layout_width">@dimen/action_button_width</item>
-	    <item name="android:textColor">@android:color/white</item>
-	    <item name="android:gravity">center</item>
-	    <item name="android:textStyle">bold</item>
-	    <item name="android:minHeight">30dp</item>
-        <item name="android:minWidth">30dp</item>
-	</style>
-    
-    <style name="ButtonBar.Material" parent="@style/ButtonBar">
-        <item name="android:background">@drawable/transparent</item>
-	    <item name="android:layout_width">fill_parent</item>
-	    <item name="android:layout_height">@dimen/dialog_button_bar_height</item>
-	    <item name="android:paddingRight">@dimen/dialog_buttonbar_right_margin</item>
-    </style>
-    <style name="ButtonBar.Button.Material.Active" parent="@android:style/Widget.Material.Button.Borderless">
-        <item name="android:layout_marginTop">2dp</item>
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginBottom">2dp</item>
-        <item name="android:minWidth">56dip</item>
-        <item name="android:textColor">@color/material_active_button_text</item>
-	</style>
 	
-    <style name="DoneBar">
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">@dimen/action_bar_default_height</item>
-        <item name="android:textColor">@color/bright_foreground_holo_dark</item>
-        <item name="android:background">@null</item>
+	<style name="BorderlessButton" parent="@android:style/Widget.Material.Button.Borderless">
     </style>
-    <style name="DoneBar.Button" parent="@android:style/Widget.Material.Button.Borderless">
-        <item name="android:padding">6dp</item>
-	    <item name="android:layout_height">@dimen/action_button_height</item>
-	    <item name="android:layout_width">@dimen/action_button_width</item>
-	    <item name="android:textColor">@android:color/white</item>
-	    <item name="android:gravity">center</item>
-	    <item name="android:textStyle">bold</item>
-	    <item name="android:minHeight">30dp</item>
-        <item name="android:minWidth">30dp</item>
-	</style>
-	<style name="DoneBar.ActionButton" parent="@android:style/Widget.Material.ActionButton">
-	    <item name="android:layout_height">@dimen/action_button_height</item>
-	    <item name="android:layout_width">@dimen/action_button_width</item>
-	    <item name="android:layout_marginLeft">-2dip</item>
-	</style>
-	
-	<style name="PopupBox.Content">
-	    <item name="android:background">@drawable/content_bottom_background_l</item>
-	    <item name="android:paddingTop">1dip</item>
-        <item name="android:layout_marginBottom">@dimen/dialog_vertical_margin</item>
-        <item name="android:layout_marginTop">@dimen/action_bar_default_height</item>
-        <item name="android:paddingLeft">@dimen/dialog_horizontal_margin</item>
-        <item name="android:paddingRight">@dimen/dialog_horizontal_margin</item>
+    
+	<style name="ActionbarButton" parent="@android:style/Widget.Material.ActionButton">
     </style>
 
 </resources>

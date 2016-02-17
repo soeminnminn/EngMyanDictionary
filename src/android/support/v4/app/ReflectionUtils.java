@@ -66,21 +66,29 @@ public class ReflectionUtils {
         return null;
     }
 
-    public static Object invoke(
-            Object receiver, Object defaultValue, Method method, Object... args) {
+	@SuppressWarnings("unchecked")
+	public static <T> T invoke(
+            Object receiver, T defaultValue, Method method, Object... args) {
         if (method == null) return defaultValue;
         try {
-            return method.invoke(receiver, args);
+        	Object retValue = method.invoke(receiver, args);
+        	if (retValue != null) {
+        		return (T)retValue;
+        	}
         } catch (Exception e) {
             Log.e(TAG, "Exception in invoke: " + e.getClass().getSimpleName());
         }
         return defaultValue;
     }
 
-    public static Object getFieldValue(Object receiver, Object defaultValue, Field field) {
+    @SuppressWarnings("unchecked")
+    public static <T> T getFieldValue(Object receiver, T defaultValue, Field field) {
         if (field == null) return defaultValue;
         try {
-            return field.get(receiver);
+        	Object retValue = field.get(receiver);
+        	if (retValue != null) {
+        		return (T)retValue;
+        	}
         } catch (Exception e) {
             Log.e(TAG, "Exception in getFieldValue: " + e.getClass().getSimpleName());
         }

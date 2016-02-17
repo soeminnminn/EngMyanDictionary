@@ -1,164 +1,108 @@
 package com.s16.engmyan.data;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.List;
 
-import com.s16.engmyan.Constants;
-
+import android.content.ContentProvider;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.UriMatcher;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
+import android.support.v4.app.ReflectionUtils;
 import android.text.TextUtils;
 import android.util.Log;
 
-public class DictionaryDataProvider {
+import com.s16.data.DataTable;
+import com.s16.engmyan.Constants;
+
+public class DictionaryDataProvider extends ContentProvider 
+		implements DataContents {
 	
-	protected static String TAG = DictionaryDataProvider.class.getSimpleName();
+	protected static final String TAG = DictionaryDataProvider.class.getSimpleName();
+	
+	public static final String AUTHORITY = "com.s16.engmyan.data.dictionarydataprovider";
+	private static final String SCHEME = "content://";
+	public static final Uri CONTENT_URI = Uri.parse(SCHEME + AUTHORITY);
 	
 	private static final int DATABASE_VERSION = Constants.DATA_VERSION;
 	
-	public static String DICTIONARY_TABLE = "dictionary";
+	public static final DataTable TABLE_DICTIONARY = DataTable.newInstance(CONTENT_URI, DICTIONARY_TABLE)
+			.addPrimaryKey(COLUMN_ID, "INTEGER", false)
+			.addColumn(COLUMN_WORD, "VARCHAR")
+			.addColumn(COLUMN_STRIPWORD, "VARCHAR")
+			.addColumn(COLUMN_TITLE, "TEXT")
+			.addColumn(COLUMN_DEFINITION, "TEXT")
+			.addColumn(COLUMN_KEYWORDS, "TEXT")
+			.addColumn(COLUMN_SYNONYM, "TEXT")
+			.addColumn(COLUMN_FILENAME, "VARCHAR")
+			.addColumn(COLUMN_PICTURE, "BOOLEAN")
+			.addColumn(COLUMN_SOUND, "BOOLEAN");
 	
-	public static String COLUMN_ID = "_id";
-	public static String COLUMN_WORD = "word";
-	public static String COLUMN_STRIPWORD = "stripword";
+	public static DataTable[] TABLES = new DataTable[] {
+		TABLE_DICTIONARY
+	};
 	
-	public static String COLUMN_TITLE = "title";
-	public static String COLUMN_DEFINITION = "definition";
-	public static String COLUMN_KEYWORDS = "keywords";
-	public static String COLUMN_SYNONYM = "synonym";
-	public static String COLUMN_FILENAME = "filename";
-	public static String COLUMN_PICTURE = "picture";
-	public static String COLUMN_SOUND = "sound";
-	
-	static String[] SELECT_WORD_COLUMNS;
-	static String[] SELECT_DETAIL_COLUMNS;
+	static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
 	static {
-		SELECT_WORD_COLUMNS = new String[] {
-				  COLUMN_ID
-				, COLUMN_WORD
-				, COLUMN_STRIPWORD
-		};
-		
-		SELECT_DETAIL_COLUMNS = new String[] {
-				  COLUMN_ID
-				, COLUMN_WORD
-				, COLUMN_STRIPWORD
-				, COLUMN_TITLE
-				, COLUMN_DEFINITION
-				, COLUMN_KEYWORDS
-				, COLUMN_SYNONYM
-				, COLUMN_FILENAME
-				, COLUMN_PICTURE
-				, COLUMN_SOUND
-		};
+		for(int i=0; i<TABLES.length; i++) {
+			DataTable table = TABLES[i].setId(i + 1);
+			URI_MATCHER.addURI(AUTHORITY, table.getTableName(), MATCH_ALL);
+			URI_MATCHER.addURI(AUTHORITY, table.getTableName() + "/#", MATCH_ID);
+		}
 	}
 	
-	private final Context mContext;
-	private File mDbFile;
-
-	private DatabaseHelper mDbHelper;
-	private int mLimit = 1000;
-	private int mSuggestLimit = 50;
-	
-	private static class DatabaseHelper extends SQLiteOpenHelper {
-
-		public int version = DATABASE_VERSION;
+	private static class ReadOnlyDbHelper extends SQLiteOpenHelper {
 		
-		DatabaseHelper(Context context, String databasePath) {
-			super(context, databasePath, null, DATABASE_VERSION);
+		private int version = DATABASE_VERSION;
+		
+		public ReadOnlyDbHelper(Context context, File dbFile) {
+			super(context, dbFile.getPath(), null, DATABASE_VERSION);
 		}
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
 		}
-		
+
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			Log.i("DatabaseHelper.onUpgrade", "Old Version : " + oldVersion + ", New Version : " + newVersion);
 			version = oldVersion;
 		}
-	}	
-	
-	public DictionaryDataProvider(Context context) {
-		super();
-		mContext = context;
-	}
-	
-	public DictionaryDataProvider(Context context, File dbFile) {
-		this(context);
-		mDbFile = dbFile;
-	}
-	
-	protected Context getContext() {
-		return mContext;
-	}
 		
-	public SQLiteDatabase getDatabase() {
-		if (mDbHelper == null) return null;
-		SQLiteDatabase database = null;
-		try {
-			database = mDbHelper.getReadableDatabase();
-		} catch (SQLException ex) {
-			ex.printStackTrace();
+		public int getVersion() {
+			return version;
 		}
-		
-		return database;
 	}
 	
-	public DictionaryDataProvider open() {
-		if(mDbHelper == null && mDbFile != null) {
-			mDbHelper = new DatabaseHelper(getContext(), mDbFile.getPath());
-		}
-		return this;
-	}
+	private ReadOnlyDbHelper mDbHelper;
+	private SQLiteDatabase mDatabase;
 	
-	public void close() {
-		if (mDbHelper != null) mDbHelper.close();
-	}
-	
-	public boolean isOpen() {
-		SQLiteDatabase database = getDatabase();
-		return (database != null) && (database.isOpen());
-	}
-	
-	public void setLimit(int value) {
-		mLimit = value;
-	}
-	
-	protected String getLimitStr() {
-		return mLimit > 0 ? String.valueOf(mLimit) : null;
-	}
-	
-	public void setSuggestLimit(int value) {
-		mSuggestLimit = value;
-	}
-	
-	protected String getSuggestLimitStr() {
-		return mSuggestLimit > 0 ? String.valueOf(mSuggestLimit) : null;
-	}
-	
-	public File getDatabaseFile() {
-		return mDbFile;
-	}
-	
-	public void setDatabaseFile(File file) {
-		mDbFile = file;
-	}
+	private static final Method METHOD_isDatabaseIntegrityOk = ReflectionUtils.getMethod(
+			SQLiteDatabase.class, "isDatabaseIntegrityOk");
 	
 	public static boolean versionCheck(Context context, File dbFile) {
-		DatabaseHelper helper = new DatabaseHelper(context, dbFile.getPath());
+		final ReadOnlyDbHelper helper = new ReadOnlyDbHelper(context, dbFile);
 		
 		boolean retValue = false;
 		try {
 			SQLiteDatabase dataBase = helper.getReadableDatabase();
-			if (helper.version != DATABASE_VERSION) return false;
-			if (!dataBase.isDatabaseIntegrityOk()) return false;
+			if (helper.getVersion() != DATABASE_VERSION) return false;
+			if (!ReflectionUtils.invoke(dataBase, true, METHOD_isDatabaseIntegrityOk)) 
+				return false;
 			
 			int dbVersion = dataBase.getVersion();
 			Log.i(TAG, "Old Version : " + dbVersion + ", New Version : " + DATABASE_VERSION);
 			retValue = (dbVersion == DATABASE_VERSION);
+			
 		} catch(SQLException ex) {
 			ex.printStackTrace();
 		} finally {
@@ -167,101 +111,129 @@ public class DictionaryDataProvider {
 		return retValue;
 	}
 	
-	public Cursor querySuggestWord() {
-		
-		final SQLiteDatabase database = getDatabase();
-		if (database == null) return null;
-		
-		Cursor cursor = database.query(DICTIONARY_TABLE, SELECT_WORD_COLUMNS, null, null, null, null
-				, COLUMN_STRIPWORD + " ASC", getSuggestLimitStr());
-		if (cursor != null) {
-			cursor.moveToFirst();
+	protected SQLiteDatabase getDatabase() {
+		if (mDatabase == null) {
+			if (mDbHelper == null) return null;
+			try {
+				mDatabase = mDbHelper.getReadableDatabase();
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
 		}
-		
-		return cursor;
+		return mDatabase;
 	}
 	
-	public Cursor query(String searchword) {
-		
+	protected DataTable getTable(Uri uri) {
+		int matchId = URI_MATCHER.match(uri);
+		if (matchId != -1) {
+			return TABLE_DICTIONARY;	
+		}
+		return null;
+	}
+
+	@Override
+	public boolean onCreate() {
+		return true;
+	}
+	
+	public void open(Uri url) {
+		mDbHelper = new ReadOnlyDbHelper(getContext(), new File(url.toString()));
+    }
+	
+	public void close() {
+		if (mDbHelper != null) {
+			mDbHelper.close();
+			mDatabase = null;
+			mDbHelper = null;
+		}
+    }
+
+	@Override
+	public String getType(Uri uri) {
+		int matchId = URI_MATCHER.match(uri);
+		if (matchId == MATCH_ID) {
+			return TABLE_DICTIONARY.getContentTypeItem();
+		} else if (matchId == MATCH_ALL) {
+			return TABLE_DICTIONARY.getContentTypeDir();
+		}
+		return null;
+	}
+
+	@Override
+	public Cursor query(Uri uri, String[] projection, String selection,
+			String[] selectionArgs, String sortOrder) {
+		Cursor result = null;
 		final SQLiteDatabase database = getDatabase();
-		if (database == null) return null;
+		if (database == null) return result;
 		
-		String selection = null;
-		if (!TextUtils.isEmpty(searchword))  {
-			searchword = searchword.replace("'", "''").replace("%", "").replace("_", "").trim();
-			if ((searchword.indexOf('*') > -1) || (searchword.indexOf('?') > -1)) {
-				searchword = searchword.replace('?', '_');
-				searchword = searchword.replace('*', '%');
+		DataTable table = getTable(uri);
+		if (table != null) {
+			if (projection == null) {
+				result = table.from(database).where(selection, selectionArgs).query(false, sortOrder, null);
 			} else {
-				searchword = searchword + "%";
+				result = table.from(database).where(selection, selectionArgs).query(false, projection, sortOrder, null);	
 			}
-			
-			selection = COLUMN_STRIPWORD + " LIKE '" + searchword + "'";
-			
-			Cursor cursor = database.query(DICTIONARY_TABLE, SELECT_WORD_COLUMNS, selection
-					, null, null, null, COLUMN_STRIPWORD + " ASC", getLimitStr());
+			if (result != null) {
+				result.moveToFirst();
+				result.setNotificationUri(getContext().getContentResolver(), uri);
+			}
+		}
+		return result;
+	}
 
-			if (cursor != null) {
-				cursor.moveToFirst();
-				return cursor;
-			}
-		}
-		
+	@Override
+	public Uri insert(Uri uri, ContentValues values) {
 		return null;
 	}
-	
-	public Cursor stripQuery(String searchword) {
-		
-		final SQLiteDatabase database = getDatabase();
-		if (database == null) return null;
-		
-		String selection = "";
-		if (!TextUtils.isEmpty(searchword)) {
-			searchword = searchword.replace("'", "''").replace("%", "").replace("_", "").trim();
-			selection += COLUMN_STRIPWORD + " LIKE '" + searchword + "'";
-			
-			Cursor cursor = database.query(DICTIONARY_TABLE, SELECT_WORD_COLUMNS, selection
-					, null, null, null, null, null);
 
-			if (cursor != null) {
-				cursor.moveToFirst();
-				return cursor;
-			}
-		}
-		
-		return null;
+	@Override
+	public int delete(Uri uri, String selection, String[] selectionArgs) {
+		return 0;
+	}
+
+	@Override
+	public int update(Uri uri, ContentValues values, String selection,
+			String[] selectionArgs) {
+		return 0;
 	}
 	
-	public Cursor exactQuery(String searchword) {
-		final SQLiteDatabase database = getDatabase();
-		if (database == null) return null;
-		
-		String selection = "";
-		if (!TextUtils.isEmpty(searchword)) {
-			searchword = searchword.replace("'", "''").replace("%", "").replace("_", "").trim().toLowerCase();
-			selection += COLUMN_STRIPWORD + " IS '" + searchword + "'";
-		
-			Cursor cursor = database.query(DICTIONARY_TABLE, SELECT_WORD_COLUMNS, selection
-								, null, null, null, null, null);
+	@Override
+	public Bundle call(String method, String arg, Bundle extras) {
+		if (METHOD_OPEN.equals(method)) {
+			open(Uri.parse(arg));
+			return Bundle.EMPTY;
 			
-			if (cursor != null) {
-				cursor.moveToFirst();
-				return cursor;
-			}
+		} else if (METHOD_CLOSE.equals(method)) {
+			close();
+			return Bundle.EMPTY;
 		}
-		return null;
+		
+		return super.call(method, arg, extras);
 	}
 	
-	public Cursor queryDefinition(long id) {
+	@Override
+	public ParcelFileDescriptor openFile(Uri uri, String mode)
+			throws FileNotFoundException {
 		
-		final SQLiteDatabase database = getDatabase();
-		if (database == null) return null;
-		
-		Cursor cursor = database.query(DICTIONARY_TABLE, SELECT_DETAIL_COLUMNS, COLUMN_ID + " IS ?"
-							, new String[] { String.valueOf(id) }, null, null, null, "1");
-		if (cursor != null) {
-			cursor.moveToFirst();
+		String fileName = "";
+		List<String> segments = uri.getPathSegments();
+		for(int i=0; i<segments.size(); i++) {
+			if (fileName.length() == 0) {
+				fileName += segments.get(i); 
+			} else {
+				fileName += "/" + segments.get(i);
+			}
 		}
-		return cursor;
+		
+		if (!TextUtils.isEmpty(fileName)) {
+			Log.i(TAG, "assetsFileName = " + fileName);
+			try {
+				AssetFileDescriptor descriptor = getContext().getAssets().openFd(fileName);
+				return descriptor.getParcelFileDescriptor();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return super.openFile(uri, mode);
 	}
 }

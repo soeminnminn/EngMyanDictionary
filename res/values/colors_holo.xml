@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="actionbar_separator">#808080</color>
+    <color name="actionbar_title">#FFFFFF</color>
+    <color name="actionbar_background_start">#505050</color>
+    <color name="actionbar_background_end">#242424</color>
+    
+    <color name="grey_90">#E5E5E5</color>
+    <color name="grey_80">#cccccc</color>
+    <color name="grey_75">#BFBFBF</color>
+    <color name="grey_70">#B2B2B2</color>
+    <color name="grey_60">#999999</color>
+    <color name="grey_50">#808080</color>
+    <color name="grey_45">#727272</color>
+    <color name="grey_40">#666666</color>
+    <color name="grey_30">#4C4C4C</color>
+    <color name="grey_25">#3F3F3F</color>
+    <color name="grey_20">#333333</color>
+    <color name="grey_15">#262626</color>
+    <color name="grey_10">#1a1a1a</color>
+    <color name="transparent">#00000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="black_50_opacity">#80000000</color>
+    <color name="white_50_opacity">#80FFFFFF</color>
+    <color name="white_33_opacity">#54FFFFFF</color>
+    <color name="white_20_opacity">#33FFFFFF</color>
+    <color name="tab_top">@color/bright_accent</color>
+    <color name="tab_bg_check_off">@color/background_default</color>
+    <color name="tab_bg_check_on">@color/background_highlight</color>
+    <color name="textColorPrimary">@color/grey_90</color>
+    <color name="textColorHighlight">@color/white</color>
+    <color name="textColorHint">@color/grey_60</color>
+    <color name="textColorLink">@color/bright_accent</color>
+    <color name="ab_top">@color/grey_40</color>
+    <color name="ab_bottom">@color/grey_20</color>
+    <color name="ab_underline">@color/bright_accent</color>
+    <color name="background_default">@color/grey_20</color>
+    <color name="background_highlight">@color/grey_30</color>
+    <color name="bright_accent">@color/holo_blue_light</color>
+
+    <!-- FROM ANDROID SDK SOURCE -->
+    <!-- For holo theme -->
+    <drawable name="screen_background_holo_light">#fff3f3f3</drawable>
+    <drawable name="screen_background_holo_dark">#ff000000</drawable>
+
+    <color name="background_holo_dark">#ff000000</color>
+    <color name="background_holo_light">#fff3f3f3</color>
+    <color name="bright_foreground_holo_dark">@color/background_holo_light</color>
+    <color name="bright_foreground_holo_light">@color/background_holo_dark</color>
+    <color name="bright_foreground_disabled_holo_dark">#ff4c4c4c</color>
+    <color name="bright_foreground_disabled_holo_light">#ffb2b2b2</color>
+    <color name="bright_foreground_inverse_holo_dark">@color/bright_foreground_holo_light</color>
+    <color name="bright_foreground_inverse_holo_light">@color/bright_foreground_holo_dark</color>
+    <color name="dim_foreground_holo_dark">#bebebe</color>
+    <color name="dim_foreground_disabled_holo_dark">#80bebebe</color>
+    <color name="dim_foreground_inverse_holo_dark">#323232</color>
+    <color name="dim_foreground_inverse_disabled_holo_dark">#80323232</color>
+    <color name="hint_foreground_holo_dark">#808080</color>
+    <color name="dim_foreground_holo_light">#323232</color>
+    <color name="dim_foreground_disabled_holo_light">#80323232</color>
+    <color name="dim_foreground_inverse_holo_light">#bebebe</color>
+    <color name="dim_foreground_inverse_disabled_holo_light">#80bebebe</color>
+    <color name="hint_foreground_holo_light">#808080</color>
+    <color name="highlighted_text_holo_dark">#6633b5e5</color>
+    <color name="highlighted_text_holo_light">#6633b5e5</color>
+    <color name="link_text_holo_dark">#5c5cff</color>
+    <color name="link_text_holo_light">#0000ee</color>
+
+    <!-- Group buttons -->
+    <eat-comment />
+
+    <color name="group_button_dialog_pressed_holo_dark">#46c5c1ff</color>
+    <color name="group_button_dialog_focused_holo_dark">#2699cc00</color>
+    <color name="group_button_dialog_pressed_holo_light">#ffffffff</color>
+    <color name="group_button_dialog_focused_holo_light">#4699cc00</color>
+
+    <!-- Highlight colors for the legacy themes -->
+    <eat-comment />
+
+    <color name="legacy_pressed_highlight">#fffeaa0c</color>
+    <color name="legacy_selected_highlight">#fff17a0a</color>
+    <color name="legacy_long_pressed_highlight">#ffffffff</color>
+
+    <!-- General purpose colors for Holo-themed elements -->
+    <eat-comment />
+
+    <!-- A light Holo shade of blue -->
+    <color name="holo_blue_light">#ff33b5e5</color>
+    <!-- A light Holo shade of green -->
+    <color name="holo_green_light">#ff99cc00</color>
+    <!-- A light Holo shade of red -->
+    <color name="holo_red_light">#ffff4444</color>
+    <!-- A dark Holo shade of blue -->
+    <color name="holo_blue_dark">#ff0099cc</color>
+    <!-- A dark Holo shade of green -->
+    <color name="holo_green_dark">#ff669900</color>
+    <!-- A dark Holo shade of red -->
+    <color name="holo_red_dark">#ffcc0000</color>
+    <!-- A Holo shade of purple -->
+    <color name="holo_purple">#ffaa66cc</color>
+    <!-- A light Holo shade of orange -->
+    <color name="holo_orange_light">#ffffbb33</color>
+    <!-- A dark Holo shade of orange -->
+    <color name="holo_orange_dark">#ffff8800</color>
+    <!-- A really bright Holo shade of blue -->
+    <color name="holo_blue_bright">#ff00ddff</color>
+
+    <!-- RAINBOW -->
+    <color name="red">#FF0000</color>
+    <color name="orange">#FF7F00</color>
+    <color name="yellow">#FFFF00</color>
+    <color name="green">#00FF00</color>
+    <color name="blue">#0000FF</color>
+    <color name="indigo">#4B0082</color>
+    <color name="violet">#8F00FF</color>
+</resources>
