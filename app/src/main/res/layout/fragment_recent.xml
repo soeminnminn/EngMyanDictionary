@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <RelativeLayout
+            android:id="@+id/titleBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/dimen_4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/actionClear"
+                android:layout_toStartOf="@+id/actionClear"
+                android:id="@android:id/title"
+                style="?attr/textAppearanceSubtitle1"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textAlignment="viewStart"
+                android:gravity="start"
+                android:paddingLeft="?attr/dialogPreferredPadding"
+                android:paddingRight="?attr/dialogPreferredPadding"
+                android:paddingTop="@dimen/dialog_padding_top_material"
+                android:text="@string/action_recent" />
+
+        <com.s16.widget.ActionButton
+                android:id="@+id/actionClear"
+                style="@style/AppWidget.ActionbarButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/actionClose"
+                android:layout_toStartOf="@+id/actionClose"
+                android:contentDescription="@string/action_clear"
+                android:src="@drawable/ic_delete_gray" />
+
+        <com.s16.widget.ActionButton
+                android:id="@+id/actionClose"
+                style="@style/AppWidget.ActionbarButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="@dimen/dimen_4dp"
+                android:layout_marginEnd="@dimen/dimen_4dp"
+                android:contentDescription="@string/action_close"
+                android:src="@drawable/ic_close_gray" />
+
+    </RelativeLayout>
+
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_1dp"
+            android:background="@drawable/divider_background"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/titleBar" />
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recentList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/titleBar"
+            tools:listitem="@layout/list_item_selectable"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

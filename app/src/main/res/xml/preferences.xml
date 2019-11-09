@@ -1,0 +1,66 @@
+<!--
+  ~ Copyright 2018 The app Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+            app:title="@string/prefs_category_general">
+
+        <ListPreference
+                app:key="prefs_font_size"
+                app:title="@string/prefs_font_size"
+                app:summary="@string/prefs_font_size_summary"
+                app:defaultValue="16"
+                app:entries="@array/prefs_font_size_entries"
+                app:entryValues="@array/prefs_font_size_values" />
+
+        <CheckBoxPreference
+                app:key="prefs_force_zawgyi"
+                app:title="@string/prefs_force_zawgyi"
+                app:summary="@string/prefs_force_zawgyi_summary"
+                app:defaultValue="false" />
+
+        <CheckBoxPreference
+                app:key="prefs_used_word_clickable"
+                app:title="@string/prefs_used_word_clickable"
+                app:summary="@string/prefs_used_word_clickable_summary"
+                app:defaultValue="true" />
+
+        <CheckBoxPreference
+                app:key="prefs_show_synonym"
+                app:title="@string/prefs_show_synonym"
+                app:summary="@string/prefs_show_synonym_summary"
+                app:defaultValue="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            app:title="@string/prefs_category_about">
+
+        <Preference
+                app:key="prefs_credit"
+                app:summary="@string/prefs_credit_summary"
+                app:title="@string/prefs_credit" />
+
+        <com.s16.app.AboutDialogPreference
+            app:key="prefs_about"
+            app:title="@string/prefs_about"
+            app:dialogTitle="@string/prefs_about"
+            app:dialogMessage="@string/about_text" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

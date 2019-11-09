@@ -1,46 +1,37 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.s16.android.MainActivity" >
-    
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.s16.engmyan.activity.MainActivity">
+
     <!-- Favorites -->
-    <item 
-        android:id="@+id/action_manage_favorites"
-        android:orderInCategory="100"
-        android:icon="@drawable/ic_favorite_border_white_36dp"
-        android:title="@string/action_manage_favorites"
-        app:showAsAction="never" />
-    
+    <item
+            android:id="@+id/action_manage_favorites"
+            android:orderInCategory="100"
+            android:icon="@drawable/ic_favorite_border_white"
+            android:title="@string/action_manage_favorites"
+            app:showAsAction="never"/>
+
     <!-- Recent -->
-    <item 
-        android:id="@+id/action_recent"
-        android:orderInCategory="100"
-        android:icon="@drawable/ic_alarm_white_36dp"
-        android:title="@string/action_recent"
-        app:showAsAction="never" />
+    <item
+            android:id="@+id/action_recent"
+            android:orderInCategory="100"
+            android:icon="@drawable/ic_alarm_white"
+            android:title="@string/action_recent"
+            app:showAsAction="never"/>
 
     <!-- Settings -->
-    <item 
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:icon="@drawable/ic_settings_white_36dp"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
-    
-    <!-- About -->
-    <item 
-        android:id="@+id/action_about"
-        android:orderInCategory="100"
-        android:icon="@drawable/ic_info_outline_white_36dp"
-        android:title="@string/action_about"
-        app:showAsAction="never" />
-    
-    <!-- Exit -->
-    <item 
-        android:id="@+id/action_exit"
-        android:orderInCategory="100"
-        android:icon="@drawable/ic_exit_to_app_white_36dp"
-        android:title="@string/action_exit"
-        app:showAsAction="never" />
+    <item
+            android:id="@+id/action_settings"
+            android:orderInCategory="100"
+            android:icon="@drawable/ic_settings_white"
+            android:title="@string/action_settings"
+            app:showAsAction="never" />
 
+    <!-- Exit -->
+    <item
+            android:id="@+id/action_exit"
+            android:orderInCategory="100"
+            android:icon="@drawable/ic_exit_to_app_white"
+            android:title="@string/action_exit"
+            app:showAsAction="never" />
 </menu>

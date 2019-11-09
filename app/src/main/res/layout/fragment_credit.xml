@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".fragments.CreditFragment">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@android:id/title"
+                style="?attr/textAppearanceSubtitle1"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textAlignment="viewStart"
+                android:gravity="start"
+                android:paddingLeft="?attr/dialogPreferredPadding"
+                android:paddingRight="?attr/dialogPreferredPadding"
+                android:paddingTop="@dimen/dialog_padding_top_material"
+                android:text="@string/title_credit" />
+
+    </LinearLayout>
+
+    <android.widget.Space
+            android:id="@+id/titleDividerNoCustom"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dialog_title_divider_material" />
+
+    <WebView
+            android:id="@+id/webViewCredit"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1" />
+
+    <com.s16.widget.DialogButtonBar
+            android:id="@+id/dialogButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"/>
+
+</LinearLayout>

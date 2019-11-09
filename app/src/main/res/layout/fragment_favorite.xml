@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <RelativeLayout
+            android:id="@+id/titleBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/dimen_4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_toLeftOf="@+id/actionsContainer"
+                android:layout_toStartOf="@+id/actionsContainer"
+                android:paddingLeft="?attr/dialogPreferredPadding"
+                android:paddingRight="?attr/dialogPreferredPadding"
+                android:paddingTop="@dimen/dialog_padding_top_material" >
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@android:id/title"
+                    android:textAppearance="?attr/textAppearanceSubtitle1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textAlignment="viewStart"
+                    android:gravity="start"
+                    android:text="@string/action_manage_favorites" />
+
+        </LinearLayout>
+
+        <FrameLayout
+                android:id="@+id/actionsContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" >
+
+            <LinearLayout
+                    android:id="@+id/actionsNormalMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginRight="@dimen/dimen_4dp"
+                    android:layout_marginEnd="@dimen/dimen_4dp" >
+
+                <com.s16.widget.ActionButton
+                        android:id="@+id/actionEdit"
+                        style="@style/AppWidget.ActionbarButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/action_edit"
+                        android:src="@drawable/ic_edit_gray" />
+
+                <com.s16.widget.ActionButton
+                        android:id="@+id/actionClose"
+                        style="@style/AppWidget.ActionbarButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/action_close"
+                        android:src="@drawable/ic_close_gray" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                    android:id="@+id/actionsEditMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginRight="@dimen/dimen_4dp"
+                    android:layout_marginEnd="@dimen/dimen_4dp"
+                    android:visibility="gone" >
+
+                <com.s16.widget.ActionButton
+                        android:id="@+id/actionDelete"
+                        style="@style/AppWidget.ActionbarButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/action_delete"
+                        android:src="@drawable/ic_delete_gray" />
+
+                <com.s16.widget.ActionButton
+                        android:id="@+id/actionDone"
+                        style="@style/AppWidget.ActionbarButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/action_done"
+                        android:src="@drawable/ic_done_gray" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </RelativeLayout>
+
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_1dp"
+            android:background="@drawable/divider_background"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/titleBar" />
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/favoriteList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/titleBar"
+            android:paddingLeft="@dimen/dimen_8dp"
+            android:paddingStart="@dimen/dimen_8dp"
+            android:paddingRight="@dimen/dimen_8dp"
+            android:paddingEnd="@dimen/dimen_8dp"
+            android:clipToPadding="false"
+            tools:listitem="@layout/list_item_selectable"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
