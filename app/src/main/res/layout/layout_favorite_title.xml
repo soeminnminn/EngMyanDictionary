@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/frameFavoritesTitle"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:layout_alignParentTop="true" >
+    
+    <ImageButton
+       android:id="@+id/closeButton"
+       style="@style/AppWidget.ActionbarButton"
+       android:layout_width="?attr/actionBarSize"
+       android:layout_height="wrap_content"
+       android:layout_centerVertical="true"
+       android:contentDescription="@string/action_close"
+       android:src="@drawable/ic_close_gray" />
+   
+   <View
+       android:layout_width="1dp"
+       android:layout_height="match_parent"
+       android:layout_marginTop="2dp"
+       android:layout_marginBottom="1dp"
+       android:layout_toRightOf="@+id/closeButton"
+       android:layout_toEndOf="@+id/closeButton"
+       android:background="@drawable/divider_background" />
+   
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="match_parent"
+       android:layout_marginLeft="@dimen/popup_divider_margin"
+       android:layout_marginStart="@dimen/popup_divider_margin"
+       android:layout_toRightOf="@+id/closeButton"
+       android:layout_toEndOf="@+id/closeButton"
+       android:textAppearance="?android:attr/textAppearanceMedium"
+       android:textStyle="bold"
+       android:gravity="center_vertical"
+       android:text="@string/favorites_title" />
+   
+   <ImageButton
+        android:id="@+id/editButton"
+        style="@style/AppWidget.ActionbarButton"
+        android:layout_width="?attr/actionBarSize"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:contentDescription="@string/action_edit"
+        android:src="@drawable/ic_mode_edit_gray" />
+
+</RelativeLayout>

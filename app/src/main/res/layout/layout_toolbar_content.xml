@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.s16.widget.ActionBarNavigationButtons 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/frameToolbarContent"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@drawable/appbar_background"
+    android:orientation="horizontal" >
+    
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/actionbar_navigation"
+        android:orientation="horizontal">
+        
+        <ImageButton
+			android:id="@+id/actionbar_item_nav_back"
+			style="@style/AppWidget.ActionbarButton"
+			android:layout_width="?attr/actionBarSize"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="2dp"
+			android:layout_marginStart="2dp"
+			android:layout_gravity="center_vertical"
+			android:contentDescription="@string/action_back"
+			android:src="@drawable/action_button_navi_back" />
+		
+		<ImageButton
+			android:id="@+id/actionbar_item_nav_forward"
+			style="@style/AppWidget.ActionbarButton"
+			android:layout_width="?attr/actionBarSize"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="2dp"
+			android:layout_marginStart="2dp"
+			android:layout_gravity="center_vertical"
+			android:contentDescription="@string/action_forward"
+			android:src="@drawable/action_button_navi_forward" />
+	
+	</LinearLayout>	
+	
+	<TextView 
+	    android:id="@+id/actionbar_title"
+	    android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:layout_marginLeft="2dp"
+		android:layout_marginStart="2dp"
+		android:layout_gravity="center_vertical"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:textColor="@color/foreground_material_dark"
+		android:ellipsize="end"
+		android:singleLine="true"
+		android:gravity="center_vertical"
+		android:text="@string/app_name" />
+        
+</com.s16.widget.ActionBarNavigationButtons>

@@ -11,6 +11,14 @@ You can get it from [Google Play](https://play.google.com/store/apps/details?id=
 
 ## Change Log
 
+#### Version 4.1.0
+- Improve UI
+- Bug fix
+
+#### Version 4.0.0
+- Improve UI
+- Bug fix
+
 #### Version 3.1.0
 - Improve UI
 - Change to install by service

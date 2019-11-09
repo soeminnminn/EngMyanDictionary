@@ -1,0 +1,60 @@
+﻿@font-face {
+    font-family: 'zawgyi-one';
+	 src: url('file:///android_asset/fonts/zawgyi.ttf');
+	 src: url('file:///android_asset/fonts/zawgyi.woff') format('woff'), 
+			url('file:///android_asset/fonts/zawgyi.ttf') format('truetype'), 
+			url('file:///android_asset/fonts/zawgyi.svg#webfont') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body,div,h1,h2,h3,input,textarea {
+	margin: 0px;
+	padding: 0px;
+	font-family: 'zawgyi-one'!important;
+	-webkit-font-smoothing: antialiased!important;
+	text-rendering: optimizeLegibility;
+}
+
+p {
+	margin:0pt;
+	line-height:180%;
+	font-size:12.0pt;
+}
+
+p.desc , p.synonym {
+	margin-left:10pt;
+}
+
+h2 {
+	color: red;
+	font-weight: bold;
+	font-size: 16pt;
+}
+
+h3 {
+	color: #8080C0;
+	font-weight: bold;
+	font-size: 12pt;
+}
+
+a {
+    color: #000;
+    text-decoration: none;
+    border-bottom: 1px dotted #808080;
+}
+
+.loading {
+	cursor: default!important;
+	display: inline-block;
+	height: 30px;
+	width: 120px;
+	padding-top: 5px;
+	color: #808080;
+	background-color: #d0d9e8;
+	border: solid 1px #8492a6;
+	font-weight: bold;
+	font-size: 10pt;
+	border-radius: 4px;
+	box-shadow: 3px 3px 3px #808080;
+}
