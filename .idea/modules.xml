@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/EngMyan.iml" filepath="$PROJECT_DIR$/EngMyan.iml" />
+      <module fileurl="file://$PROJECT_DIR$/EngMyan-android.iml" filepath="$PROJECT_DIR$/EngMyan-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/datatable/datatable.iml" filepath="$PROJECT_DIR$/datatable/datatable.iml" />
     </modules>
   </component>
 </project>

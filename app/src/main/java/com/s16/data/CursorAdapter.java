@@ -395,7 +395,7 @@ public abstract class CursorAdapter extends BaseAdapter implements Filterable {
      * by the filter attached to this adapter.
      *
      * The query is provided by a
-     * {@link android.widget.FilterQueryProvider}.
+     * {@link FilterQueryProvider}.
      * If no provider is specified, the current cursor is not filtered and returned.
      *
      * After this method returns the resulting cursor is passed to {@link #changeCursor(Cursor)}
@@ -413,7 +413,7 @@ public abstract class CursorAdapter extends BaseAdapter implements Filterable {
      *
      * @see #getFilter()
      * @see #getFilterQueryProvider()
-     * @see #setFilterQueryProvider(android.widget.FilterQueryProvider)
+     * @see #setFilterQueryProvider(FilterQueryProvider)
      */
     public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
         if (mFilterQueryProvider != null) {
@@ -436,7 +436,7 @@ public abstract class CursorAdapter extends BaseAdapter implements Filterable {
      *
      * @return the current filter query provider or null if it does not exist
      *
-     * @see #setFilterQueryProvider(android.widget.FilterQueryProvider)
+     * @see #setFilterQueryProvider(FilterQueryProvider)
      * @see #runQueryOnBackgroundThread(CharSequence)
      */
     public FilterQueryProvider getFilterQueryProvider() {
@@ -446,7 +446,7 @@ public abstract class CursorAdapter extends BaseAdapter implements Filterable {
     /**
      * Sets the query filter provider used to filter the current Cursor.
      * The provider's
-     * {@link android.widget.FilterQueryProvider#runQuery(CharSequence)}
+     * {@link FilterQueryProvider#runQuery(CharSequence)}
      * method is invoked when filtering is requested by a client of
      * this adapter.
      *

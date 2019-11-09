@@ -69,7 +69,7 @@ public class SearchBarView extends FrameLayout {
     };
 
     
-    private final View.OnKeyListener mTextSearchOnKeyListener = new View.OnKeyListener() {
+    private final OnKeyListener mTextSearchOnKeyListener = new OnKeyListener() {
 
         @Override
         public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -137,9 +137,9 @@ public class SearchBarView extends FrameLayout {
 		LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.searchbar_view, this, true);
         
-        mButtonSearch = (ImageButton)findViewById(R.id.btnSearhNormal);
+        mButtonSearch = (ImageButton)findViewById(R.id.btnSearchNormal);
         mTextSearch = (AutoCompleteTextView)findViewById(R.id.txtSearch);
-        mButtonClear = (ImageButton)findViewById(R.id.btnSearhClear);
+        mButtonClear = (ImageButton)findViewById(R.id.btnSearchClear);
         
         mTextSearch.addTextChangedListener(mTextSearchTextWatcher);
         mTextSearch.setOnKeyListener(mTextSearchOnKeyListener);
@@ -155,7 +155,7 @@ public class SearchBarView extends FrameLayout {
 		mTextSearch.setSaveEnabled(true);
 		mTextSearch.requestFocus();
         
-        mButtonClear.setOnClickListener(new View.OnClickListener() {
+        mButtonClear.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {

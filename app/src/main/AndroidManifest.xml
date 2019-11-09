@@ -2,19 +2,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.s16.engmyan">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:resizeableActivity="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".activity.MainActivity"
-            android:label="@string/app_name" >
+        <activity
+            android:name=".activity.MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
 
             <meta-data
                 android:name="android.app.searchable"
@@ -27,20 +27,26 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.s16.engmyan.activity.DetailsActivity" >
+        <activity
+            android:name=".activity.DetailsActivity"
+            android:label="@string/title_synonym"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.s16.engmyan.activity.MainActivity" />
         </activity>
 
-        <activity android:name="com.s16.engmyan.activity.SettingsActivity" >
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/action_settings">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.s16.engmyan.activity.MainActivity" />
         </activity>
 
         <service
-            android:name="com.s16.engmyan.install.InstallationService"
+            android:name="com.s16.engmyan.service.InstallationService"
             android:exported="false" />
 
         <provider
@@ -52,7 +58,6 @@
             android:name="com.s16.engmyan.data.UserDataProvider"
             android:authorities="com.s16.engmyan.data.userdataprovider"
             android:exported="false" />
-
     </application>
 
 </manifest>

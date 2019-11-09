@@ -1,8 +1,0 @@
-<resources>
-
-    <dimen name="dialog_horizontal_margin">64dp</dimen>
-    <dimen name="dialog_vertical_margin">20dp</dimen>
-    
-    <dimen name="searchbar_vertical_margin">4dp</dimen>
-
-</resources>

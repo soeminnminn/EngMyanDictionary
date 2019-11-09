@@ -16,7 +16,7 @@
     		android:layout_height="wrap_content" >
             
             <TextView
-		        android:id="@+id/textViewDetails" 
+		        android:id="@id/textViewDetails"
 		        android:layout_width="match_parent"
 		    	android:layout_height="wrap_content"
 		    	android:paddingLeft="@dimen/content_horizontal_margin"
@@ -28,7 +28,7 @@
 		    	android:text="@string/app_name" />
 		    
 		    <RelativeLayout
-		        android:id="@+id/layoutSynonymView"
+		        android:id="@id/layoutSynonymView"
 		        android:layout_width="match_parent"
 		    	android:layout_height="wrap_content"
 		    	android:layout_below="@+id/textViewDetails" >
@@ -56,7 +56,7 @@
 			    	android:text="@string/title_synonym" />
 			    
 			    <TextView 
-			        android:id="@+id/textViewSynonym" 
+			        android:id="@id/textViewSynonym"
 			        android:layout_width="match_parent"
 			    	android:layout_height="wrap_content"
 			    	android:layout_below="@+id/textViewSynonymTitle"
@@ -73,37 +73,5 @@
         </RelativeLayout>
         
     </ScrollView>
-    
-    <RelativeLayout 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:id="@+id/layoutLoading"
-        android:background="@drawable/dialog_full_holo_light"
-        android:paddingLeft="@dimen/dialog_horizontal_margin"
-        android:paddingStart="@dimen/dialog_horizontal_margin"
-        android:paddingRight="@dimen/dialog_horizontal_margin"
-        android:paddingEnd="@dimen/dialog_horizontal_margin"
-        android:paddingTop="@dimen/dialog_vertical_margin"
-        android:paddingBottom="@dimen/dialog_vertical_margin" >
-    
-        <ProgressBar
-	        android:id="@+id/progressLoading"
-	        style="?android:attr/progressBarStyleLarge"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:indeterminateOnly="true" />
-        
-        <TextView 
-            android:id="@+id/textLoading"
-            android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_marginTop="@dimen/dialog_divider_height"
-	        android:layout_below="@+id/progressLoading"
-	        android:textAppearance="?android:attr/textAppearanceMedium"
-	        android:gravity="center"
-	        android:text="@string/loading_text" />
-        
-    </RelativeLayout>
     
 </com.s16.engmyan.widget.DefinitionView>

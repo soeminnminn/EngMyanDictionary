@@ -62,8 +62,8 @@ public class DefinitionView extends RelativeLayout {
 		private String mUrl;
 		private DictionaryItem mDefinition;
 		
-		public static final Parcelable.Creator<HistoryItem> CREATOR
-		        = new Parcelable.Creator<HistoryItem>() {
+		public static final Creator<HistoryItem> CREATOR
+		        = new Creator<HistoryItem>() {
 		    public HistoryItem createFromParcel(Parcel in) {
 		        return new HistoryItem(in);
 		    }
@@ -231,8 +231,8 @@ public class DefinitionView extends RelativeLayout {
 		int mCurrentIndex;
 		Object[] mArray;
 
-        public static final Parcelable.Creator<SavedState> CREATOR
-                = new Parcelable.Creator<SavedState>() {
+        public static final Creator<SavedState> CREATOR
+                = new Creator<SavedState>() {
             public SavedState createFromParcel(Parcel in) {
                 return new SavedState(in);
             }
@@ -304,7 +304,6 @@ public class DefinitionView extends RelativeLayout {
 	
 	private TextView mTextDefinition;
 	private ViewGroup mViewSynonym;
-	private View mProgressLoading;
 	private BackForwardList mBackForwardList;
 	private DefinitionViewClient mDefinitionViewClient;
 	
@@ -335,10 +334,8 @@ public class DefinitionView extends RelativeLayout {
 			return;
 		}
 		
-		mTextDefinition = (TextView)findViewById(R.id.textViewDetails);
-		mViewSynonym = (ViewGroup)findViewById(R.id.layoutSynonymView);
-		mProgressLoading = findViewById(R.id.layoutLoading);
-		mProgressLoading.setVisibility(View.GONE);
+		mTextDefinition = findViewById(R.id.textViewDetails);
+		mViewSynonym = findViewById(R.id.layoutSynonymView);
 	}
 	
 	@Override
@@ -363,11 +360,11 @@ public class DefinitionView extends RelativeLayout {
 	}
 	
 	protected void showLoading() {
-		mProgressLoading.setVisibility(View.VISIBLE);
+
 	}
 	
 	protected void hideLoading() {
-		mProgressLoading.setVisibility(View.GONE);
+
 	}
 	
 	protected boolean isUsedUnicodeFix() {
@@ -463,7 +460,7 @@ public class DefinitionView extends RelativeLayout {
 			mTextDefinition.setMovementMethod(new LocalLinkMovementMethod(this, mDefinitionViewClient, definition.data));
 			
 			if (!TextUtils.isEmpty(definition.synonym)) {
-				TextView textSynonym = (TextView)mViewSynonym.findViewById(R.id.textViewSynonym);
+				TextView textSynonym = mViewSynonym.findViewById(R.id.textViewSynonym);
 				textSynonym.setText(definition.synonym);
 				textSynonym.setLinksClickable(true);
 				textSynonym.setMovementMethod(new LocalLinkMovementMethod(this, mDefinitionViewClient, definition.data));

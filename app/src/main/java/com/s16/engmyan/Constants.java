@@ -9,7 +9,6 @@ public class Constants {
 	public static final String ASSERT_ZIP_PKG = "database/EMDictionary.zip";
 	public static final String DATABASE_FILE = "EMDictionary.db";
 	public static final String DATABASE_FILE_MD5 = "c48b61c6f5543aa0d89c1ff43f11647a";
-	public static final long DATABASE_FILE_MIN_LENGTH = 19700000;//19791872;
 	
 	public static final String DATABASE_FILE_KEY = "database";
 	
@@ -44,6 +43,6 @@ public class Constants {
     public static final int REQUEST_SETTINGS = 1;
     public static final int REQUEST_DETAIL = 2;
     
-    public static final int DATA_VERSION = 3000;
+    public static final int DATA_VERSION = 4000;
 	
 }

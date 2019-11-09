@@ -13,7 +13,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
-import android.support.v4.preference.PreferenceManagerCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -94,7 +93,6 @@ public class AboutPreference  extends Preference implements
 
 	@Override
 	public void onDismiss(DialogInterface dialogInterface) {
-		PreferenceManagerCompat.unregisterOnActivityDestroyListener(getPreferenceManager(), this);
 		mDialog = null;
 	}
 
@@ -114,8 +112,6 @@ public class AboutPreference  extends Preference implements
 
 		View contentView = onCreateDialogView();
 		mBuilder.setView(contentView);
-
-		PreferenceManagerCompat.registerOnActivityDestroyListener(getPreferenceManager(), this);
 
 		// Create the dialog
 		final Dialog dialog = mDialog = mBuilder.create();
@@ -186,8 +182,8 @@ public class AboutPreference  extends Preference implements
 			super(superState);
 		}
 
-		public static final Parcelable.Creator<SavedState> CREATOR =
-				new Parcelable.Creator<SavedState>() {
+		public static final Creator<SavedState> CREATOR =
+				new Creator<SavedState>() {
 					public SavedState createFromParcel(Parcel in) {
 						return new SavedState(in);
 					}

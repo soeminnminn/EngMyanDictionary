@@ -1,12 +1,12 @@
 package com.s16.engmyan.data;
 
-import android.content.ContentResolver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.database.Cursor;
 import android.net.Uri;
 import android.text.TextUtils;
 
-public class SearchQueryHelper {
+public class SearchQueryHelper extends ContextWrapper {
 
 	private static String[] SELECT_WORD_COLUMNS;
 	private static String[] SELECT_DETAIL_COLUMNS;
@@ -32,8 +32,6 @@ public class SearchQueryHelper {
 		};
 	}
 	
-	private final Context mContext;
-
 	private int mLimit = 1000;
 	private int mSuggestLimit = 100;
 	
@@ -46,15 +44,11 @@ public class SearchQueryHelper {
 	}
 
 	private SearchQueryHelper(Context context) {
-		mContext = context;
+		super(context);
 	}
 
 	protected Context getContext() {
-		return mContext;
-	}
-	
-	protected ContentResolver getContentResolver() {
-		return getContext().getContentResolver();
+		return getBaseContext();
 	}
 	
 	public void setLimit(int value) {

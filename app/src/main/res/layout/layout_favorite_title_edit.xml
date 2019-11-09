@@ -12,7 +12,7 @@
        android:layout_height="wrap_content"
        android:layout_centerVertical="true"
        android:contentDescription="@string/action_done"
-       android:src="@drawable/ic_done_gray" />
+       android:src="@drawable/ic_done_gray_36dp" />
    
    <View
        android:layout_width="1dp"
@@ -46,7 +46,7 @@
         android:layout_toLeftOf="@+id/selectAllButton"
         android:layout_toStartOf="@+id/selectAllButton"
         android:contentDescription="@string/action_delete"
-        android:src="@drawable/ic_delete_gray" />
+        android:src="@drawable/ic_delete_gray_36dp" />
    
    <ImageButton
         android:id="@+id/selectAllButton"
@@ -59,6 +59,6 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:contentDescription="@string/action_select_all"
-        android:src="@drawable/ic_select_all_gray" />
+        android:src="@drawable/ic_select_all_gray_36dp" />
     
 </RelativeLayout>

@@ -1,15 +1,13 @@
 package com.s16.engmyan.data;
 
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.database.Cursor;
 import android.net.Uri;
 
-public class UserQueryHelper {
+public class UserQueryHelper extends ContextWrapper {
 
-	private final Context mContext;
-	
 	public static UserQueryHelper getInstance(Context context) {
 		return new UserQueryHelper(context);
 	}
@@ -23,15 +21,11 @@ public class UserQueryHelper {
 	}
 
 	private UserQueryHelper(Context context) {
-		mContext = context;
+		super(context);
 	}
 
 	protected Context getContext() {
-		return mContext;
-	}
-	
-	protected ContentResolver getContentResolver() {
-		return getContext().getContentResolver();
+		return getBaseContext();
 	}
 	
 	public boolean isFavorited(long refId) {

@@ -5,7 +5,7 @@
     android:layout_height="match_parent" >
     
 	<ImageButton
-	    android:id="@+id/btnSearhNormal"
+	    android:id="@+id/btnSearchNormal"
 	    style="@style/SearchBar.Button.Glass"
 	    android:layout_gravity="center_vertical"
 	    android:layout_marginLeft="3.0dip"
@@ -21,7 +21,7 @@
          android:ems="10" />
      
      <ImageButton
-         android:id="@+id/btnSearhClear"
+         android:id="@+id/btnSearchClear"
          style="@style/SearchBar.Button.Clear"
          android:layout_gravity="end|right|center_vertical"
          android:layout_marginRight="8.0dip"

@@ -38,12 +38,12 @@
     <style name="SearchBar.Button.Glass" parent="@style/SearchBar.Button.Disable">
 	    <item name="android:layout_height">@dimen/glass_button_width</item>
 	    <item name="android:layout_width">@dimen/glass_button_height</item>
-	    <item name="android:src">@drawable/ic_search_gray</item>
+	    <item name="android:src">@drawable/ic_search_gray_24dp</item>
 	</style>
     <style name="SearchBar.Button.Clear" parent="@style/SearchBar.Button">
 	    <item name="android:layout_height">@dimen/clear_button_height</item>
 	    <item name="android:layout_width">@dimen/clear_button_width</item>
-	    <item name="android:src">@drawable/ic_clear_gray</item>
+	    <item name="android:src">@drawable/ic_clear_gray_24dp</item>
 	</style>
 
 </resources>

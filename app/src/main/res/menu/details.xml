@@ -1,4 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.s16.android.MainActivity" >
 
@@ -6,21 +7,21 @@
         android:id="@+id/action_favorite"
         android:orderInCategory="100"
         android:icon="@drawable/ic_favorite_off_36dp"
-        android:showAsAction="ifRoom|withText"
-        android:title="@string/action_favorite"/>
+        android:title="@string/action_favorite"
+        app:showAsAction="ifRoom|withText" />
     
     <item
         android:id="@+id/action_sound"
         android:orderInCategory="100"
         android:icon="@drawable/ic_volume_up_white_36dp"
-        android:showAsAction="ifRoom|withText"
-        android:title="@string/action_sound"/>
+        android:title="@string/action_sound"
+        app:showAsAction="ifRoom|withText" />
     
     <item
         android:id="@+id/action_picture"
         android:orderInCategory="100"
         android:icon="@drawable/ic_photo_white_36dp"
-        android:showAsAction="ifRoom|withText"
-        android:title="@string/action_picture"/>
+        android:title="@string/action_picture"
+        app:showAsAction="ifRoom|withText" />
 
 </menu>

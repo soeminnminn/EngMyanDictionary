@@ -18,7 +18,7 @@ public class DictionaryItem implements Parcelable {
 	public boolean picture;
 	public boolean sound;
 	
-	public static final Parcelable.Creator<DictionaryItem> CREATOR = new Parcelable.Creator<DictionaryItem>() {
+	public static final Creator<DictionaryItem> CREATOR = new Creator<DictionaryItem>() {
 		
 		public DictionaryItem createFromParcel(Parcel in) {
 		    return new DictionaryItem(in);

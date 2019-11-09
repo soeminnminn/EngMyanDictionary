@@ -1,56 +1,59 @@
-<android.support.design.widget.CoordinatorLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mainContent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.s16.engmyan.activity.MainActivity">
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
-        
+
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@drawable/appbar_background"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-    		app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:layout_scrollFlags="scroll|enterAlways|snap" />
-        
-        <FrameLayout 
-	        android:id="@+id/frameSearchBar"
-	        android:layout_width="match_parent"
-	        android:layout_height="?attr/actionBarSize"
-	        android:background="@drawable/appbar_background_top" >
-	        
-	    	<com.s16.widget.SearchBarView
-			    android:id="@+id/searchBarView"
-			    android:layout_width="match_parent"
-			    android:layout_height="match_parent"
-			    android:layout_marginLeft="@dimen/searchbar_horizontal_margin" 
-	    		android:layout_marginStart="@dimen/searchbar_horizontal_margin"
-	    		android:layout_marginRight="@dimen/searchbar_horizontal_margin" 
-	    		android:layout_marginEnd="@dimen/searchbar_horizontal_margin"
-	    		android:layout_marginTop="@dimen/searchbar_vertical_margin"
-	    		android:layout_marginBottom="@dimen/searchbar_vertical_margin"
-			    android:layout_gravity="center"
-			    android:hint="@string/search_hint"
-			    android:background="@drawable/searchbar_background" />
-	    	
-	    </FrameLayout>
-        
+
+        <FrameLayout
+            android:id="@+id/frameSearchBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@drawable/appbar_background_top" >
+
+            <com.s16.widget.SearchBarView
+                android:id="@+id/searchBarView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/searchbar_horizontal_margin"
+                android:layout_marginStart="@dimen/searchbar_horizontal_margin"
+                android:layout_marginRight="@dimen/searchbar_horizontal_margin"
+                android:layout_marginEnd="@dimen/searchbar_horizontal_margin"
+                android:layout_marginTop="@dimen/searchbar_vertical_margin"
+                android:layout_marginBottom="@dimen/searchbar_vertical_margin"
+                android:layout_gravity="center"
+                android:hint="@string/search_hint"
+                android:background="@drawable/searchbar_background" />
+
+        </FrameLayout>
+
     </android.support.design.widget.AppBarLayout>
-    
-    <fragment 
-		android:id="@+id/listContainer"
-		android:name="com.s16.engmyan.fragment.MainListFragment"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		app:layout_behavior="@string/appbar_scrolling_view_behavior"
-		tools:layout="@layout/fragment_main_list" />
-    
+
+    <fragment
+        android:id="@+id/listContainer"
+        android:name="com.s16.engmyan.fragment.MainListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:layout="@layout/fragment_main_list" />
+
+
 </android.support.design.widget.CoordinatorLayout>

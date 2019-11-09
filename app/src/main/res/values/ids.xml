@@ -6,4 +6,9 @@
     <item name="actionbar_item_nav_back" type="id" />
     <item name="actionbar_item_nav_forward" type="id" />
 
+    <item name="layoutSynonymView" type="id" />
+    <item name="layoutLoading" type="id" />
+    <item name="textViewDetails" type="id" />
+    <item name="textViewSynonym" type="id" />
+
 </resources>

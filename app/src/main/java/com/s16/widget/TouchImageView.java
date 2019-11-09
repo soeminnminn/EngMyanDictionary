@@ -137,7 +137,7 @@ public class TouchImageView extends ImageView {
     }
 
     @Override
-    public void setOnTouchListener(View.OnTouchListener l) {
+    public void setOnTouchListener(OnTouchListener l) {
         userTouchListener = l;
     }
     
@@ -1177,7 +1177,7 @@ public class TouchImageView extends ImageView {
 		}
     }
     
-    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
+    @TargetApi(VERSION_CODES.GINGERBREAD)
 	private class CompatScroller {
     	Scroller scroller;
     	OverScroller overScroller;
@@ -1244,7 +1244,7 @@ public class TouchImageView extends ImageView {
     	}
     }
     
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    @TargetApi(VERSION_CODES.JELLY_BEAN)
 	private void compatPostOnAnimation(Runnable runnable) {
     	if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
             postOnAnimation(runnable);

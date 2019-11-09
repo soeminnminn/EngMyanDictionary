@@ -1,89 +1,27 @@
 package com.s16.engmyan;
 
-import java.io.File;
-import java.io.IOException;
-
-import android.Manifest;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.graphics.Typeface;
-import android.os.Environment;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
+import java.io.File;
+
 public class Common {
 	
-	private static final String ANDROID_DATA = "/Android/data/";
-	private static String TEMP_FOLDER;
-	private static String DATA_FOLDER;
 	private static Typeface ZAWGYI_TYPEFACE;
-	
-	public static File getExternalDataFolder(Context context) {
-		if(DATA_FOLDER == null) {
-			DATA_FOLDER = ANDROID_DATA + context.getPackageName() + File.separator  + "files" + File.separator;
-		}
-		
-		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath() + DATA_FOLDER;
-			File folder = new File(path);
-			if (!folder.exists()) {
-				if (folder.mkdirs()) {
-					File noMedia = new File(folder.getPath(), ".nomedia");
-					if (!noMedia.exists()) {
-						try {
-							noMedia.createNewFile();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-			return folder;
-	    }
-		
-		return null;
-	}
 
     public static File getDataFolder(Context context) {
         return ContextCompat.getDataDir(context);
     }
+
 	
-	public static File getTempFolder(Context context) {
-		if(TEMP_FOLDER == null) {
-			TEMP_FOLDER = ANDROID_DATA + context.getPackageName() + File.separator + "temp" + File.separator;
-		}
-		
-		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath() + TEMP_FOLDER;
-			File folder = new File(path);
-			if (!folder.exists()) {
-				if (folder.mkdirs()) {
-					File noMedia = new File(folder.getPath(), ".nomedia");
-					if (!noMedia.exists()) {
-						try {
-							noMedia.createNewFile();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-			return folder;
-	    }
-		
-		return null;
-	}
-	
+	@Nullable
 	public static File getDatabaseFile(Context context) {
-        File dataFolder = null;
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            dataFolder = getDataFolder(context);
-        } else {
-            dataFolder = getExternalDataFolder(context);
-        }
+        File dataFolder = getDataFolder(context);
 		if(dataFolder != null) {
 			boolean success = true;
 			if(!dataFolder.exists()) {
@@ -119,4 +57,5 @@ public class Common {
 	public static void showMessage(Context context, int messageId) {
 		Toast.makeText(context, messageId, Toast.LENGTH_LONG).show();
 	}
+
 }

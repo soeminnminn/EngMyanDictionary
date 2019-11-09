@@ -50,7 +50,7 @@ public class ActionBarNavigationButtons extends LinearLayout
 	private boolean mNavBackEnabled;
 	private boolean mNavForwardEnabled;
 	
-	private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
+	private final OnClickListener mOnClickListener = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
