@@ -56,15 +56,16 @@ abstract class BackStackActivity : AppCompatActivity(), FragmentManager.OnBackSt
     }
 
     fun <T: Fragment> addNewFragment(@IdRes containerId: Int, fragment: T, fragmentName: String) {
+        val current = getTopFragment<T>()
+
         val transaction =  supportFragmentManager.beginTransaction()
             .setCustomAnimations(R.anim.fragment_enter, R.anim.fragment_exit, R.anim.fragment_pop_enter, R.anim.fragment_pop_exit)
             .add(containerId, fragment, fragmentName)
 
-        val current = getTopFragment<T>()
-
         if (current != null) {
             transaction.hide(current)
         }
+
         transaction.addToBackStack(fragmentName)
             .commit()
     }

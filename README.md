@@ -11,6 +11,11 @@ English-Myanmar Dictionary
 
 ## Change Log
 
+#### Version 5.1.0
+- Search improvement
+- Bug fix for Android 9,10
+- Improve Tablet UI
+
 #### Version 5.0.0
 - Improve UI
 - Bug fix for Android 9,10

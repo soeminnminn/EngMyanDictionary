@@ -26,7 +26,7 @@ class PictureViewFragment : Fragment() {
 
     fun setBitmap(resource: Resources, bitmap: Bitmap?) {
         if (bitmap != null) {
-            drawable = BitmapDrawable(resources, bitmap)
+            drawable = BitmapDrawable(resource, bitmap)
             image?.setImageDrawable(drawable)
         }
     }

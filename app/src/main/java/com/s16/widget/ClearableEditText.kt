@@ -1,15 +1,17 @@
 package com.s16.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import android.widget.EditText
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
 
 
-class ClearableEditText : EditText, View.OnTouchListener, View.OnFocusChangeListener {
+@SuppressLint("ClickableViewAccessibility")
+class ClearableEditText : AppCompatEditText, View.OnTouchListener, View.OnFocusChangeListener {
 
     enum class Location private constructor(internal val idx: Int) {
         LEFT(0), RIGHT(2)
@@ -28,7 +30,7 @@ class ClearableEditText : EditText, View.OnTouchListener, View.OnFocusChangeList
     }
 
     private val displayedDrawable: Drawable?
-        get() = if (this.loc != null) compoundDrawables[loc!!.idx] else null
+        get() = if (this.loc != null) compoundDrawablesRelative[loc!!.idx] else null
 
     constructor(context: Context)
             : super(context) { }
@@ -37,7 +39,7 @@ class ClearableEditText : EditText, View.OnTouchListener, View.OnFocusChangeList
             : super(context, attrs) {}
 
     constructor(context: Context, attrs: AttributeSet, defStyle: Int)
-            : super(context, attrs) {}
+            : super(context, attrs, defStyle) {}
 
     fun setIconLocation(loc: Location?) {
         this.loc = loc
@@ -90,20 +92,20 @@ class ClearableEditText : EditText, View.OnTouchListener, View.OnFocusChangeList
         super.onTextChanged(text, start, lengthBefore, lengthAfter)
     }
 
-    override fun setCompoundDrawables(
-        left: Drawable?,
+    override fun setCompoundDrawablesRelative(
+        start: Drawable?,
         top: Drawable?,
-        right: Drawable?,
+        end: Drawable?,
         bottom: Drawable?
     ) {
-        super.setCompoundDrawables(left, top, right, bottom)
+        super.setCompoundDrawablesRelative(start, top, end, bottom)
         initIcon()
     }
 
     private fun initIcon() {
         this.xD = null
         if (this.loc != null) {
-            this.xD = compoundDrawables[loc!!.idx]
+            this.xD = compoundDrawablesRelative[loc!!.idx]
         }
         if (this.xD == null) {
             this.xD = ContextCompat.getDrawable(context, android.R.drawable.presence_offline)
@@ -118,12 +120,12 @@ class ClearableEditText : EditText, View.OnTouchListener, View.OnFocusChangeList
     }
 
     private fun setClearIconVisible(visible: Boolean) {
-        val cd = compoundDrawables
+        val cd = compoundDrawablesRelative
         val displayed = this.displayedDrawable
         val wasVisible = displayed != null
         if (visible != wasVisible) {
             val x = if (visible) this.xD else null
-            super.setCompoundDrawables(
+            super.setCompoundDrawablesRelative(
                 if (this.loc === Location.LEFT) x else cd[0],
                 cd[1],
                 if (this.loc === Location.RIGHT) x else cd[2],

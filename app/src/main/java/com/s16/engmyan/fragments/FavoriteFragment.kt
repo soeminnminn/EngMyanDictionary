@@ -4,13 +4,17 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Point
 import android.os.Bundle
+import android.util.DisplayMetrics
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
+import androidx.core.view.GravityCompat
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +28,7 @@ import com.s16.engmyan.data.FavoriteModel
 import com.s16.utils.gone
 import com.s16.utils.startActivity
 import com.s16.utils.visible
+import com.s16.view.Adapter
 import kotlinx.android.synthetic.main.fragment_favorite.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,9 +39,13 @@ class FavoriteFragment : DialogFragment(),
     FavoriteListAdapter.OnItemClickListener, FavoriteListAdapter.OnItemSelectListener {
 
     private lateinit var adapter: FavoriteListAdapter
+    private var onItemClickListener: Adapter.OnItemClickListener? = null
 
     private var backgroundScope = CoroutineScope(Dispatchers.IO)
     private var job: Job? = null
+
+    private val isTwoPane: Boolean
+        get() = arguments?.getBoolean(Constants.ARG_PARAM_TWO_PANE) ?: false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,14 +58,29 @@ class FavoriteFragment : DialogFragment(),
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_favorite, container, false)
+        val view = inflater.inflate(R.layout.fragment_favorite, container, false)
+
+        dialog?.window?.let {
+            if (isTwoPane) {
+                it.setGravity(Gravity.TOP or GravityCompat.START)
+
+                val metrics = requireContext().resources.displayMetrics
+                val px = 16 * (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
+
+                val layoutParams = it.attributes
+                layoutParams.x = px.toInt()
+                it.attributes = layoutParams
+            }
+        }
+
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        favoriteList.layoutManager = LinearLayoutManager(context!!)
-        favoriteList.addItemDecoration(DividerItemDecoration(context!!, LinearLayoutManager.VERTICAL))
+        favoriteList.layoutManager = LinearLayoutManager(requireContext())
+        favoriteList.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
 
         dataBind(favoriteList)
         adapter.setItemClickListener(this)
@@ -82,8 +106,21 @@ class FavoriteFragment : DialogFragment(),
     override fun onStart() {
         super.onStart()
 
-        val height = (getScreenHeight(activity!!) * 0.9).toInt()
-        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, height)
+        dialog?.window?.let {
+            val size = Point()
+            requireActivity().windowManager.defaultDisplay.getSize(size)
+
+            if (isTwoPane) {
+                val height = (size.y * 0.94).toInt()
+                val width = (size.x * 0.35).toInt()
+
+                it.setLayout(width, height)
+
+            } else {
+                val height = (size.y * 0.9).toInt()
+                it.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, height)
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -107,22 +144,12 @@ class FavoriteFragment : DialogFragment(),
         }
     }
 
-    private fun getScreenHeight(activity: Activity): Int {
-        val size = Point()
-        activity.windowManager.defaultDisplay.getSize(size)
-        return size.y
-    }
-
     private fun dataBind(recyclerView: RecyclerView) {
         adapter = FavoriteListAdapter()
         recyclerView.adapter = adapter
 
-        val model = activity?.let { context ->
-            val modelFactory = FavoriteModel.of(DbManager(context).provider())
-            ViewModelProviders.of(context, modelFactory).get(FavoriteModel::class.java)
-        }
-
-        model?.data!!.observe(this, Observer<List<FavoriteItem>> {
+        val model : FavoriteModel by viewModels()
+        model.data.observe(viewLifecycleOwner, Observer<List<FavoriteItem>> {
             adapter.submitList(it)
         })
     }
@@ -130,26 +157,24 @@ class FavoriteFragment : DialogFragment(),
     private fun performDelete() {
         if (!adapter.hasSelectedItems) return
 
-        context?.let { ctx ->
-            val dialogBuilder = AlertDialog.Builder(ctx).apply {
-                setIcon(android.R.drawable.ic_dialog_info)
-                setTitle(R.string.favorites_edit_title)
-                setMessage(R.string.favorites_delete_message)
-                setNegativeButton(android.R.string.cancel) { di, _ ->
-                    di.cancel()
-                }
-                setPositiveButton(android.R.string.ok) { di, _ ->
-                    removeSelected(ctx)
-                    di.dismiss()
-                }
+        val dialogBuilder = AlertDialog.Builder(requireContext()).apply {
+            setIcon(android.R.drawable.ic_dialog_info)
+            setTitle(R.string.favorites_edit_title)
+            setMessage(R.string.favorites_delete_message)
+            setNegativeButton(android.R.string.cancel) { di, _ ->
+                di.cancel()
             }
-
-            dialogBuilder.show()
+            setPositiveButton(android.R.string.ok) { di, _ ->
+                removeSelected()
+                di.dismiss()
+            }
         }
+
+        dialogBuilder.show()
     }
 
-    private fun removeSelected(ctx: Context) {
-        val provider = DbManager(ctx).provider()
+    private fun removeSelected() {
+        val provider = DbManager(requireContext()).provider()
         val selectedItems = adapter.getSelectedItems().map {
             it.refId
         }
@@ -168,14 +193,15 @@ class FavoriteFragment : DialogFragment(),
 
     override fun onItemClick(view: View, id: Long, position: Int) {
         dialog?.dismiss()
-        startActivity<DetailsActivity>(Constants.ARG_PARAM_ID to id)
+        onItemClickListener?.onItemClick(null, view, position, id)
     }
 
     companion object {
         @JvmStatic
-        fun newInstance() =
+        fun newInstance(isTwoPane: Boolean, itemClickListener: Adapter.OnItemClickListener? = null) =
             FavoriteFragment().apply {
-                arguments = Bundle()
+                arguments = bundleOf(Constants.ARG_PARAM_TWO_PANE to isTwoPane)
+                onItemClickListener = itemClickListener
             }
     }
 }

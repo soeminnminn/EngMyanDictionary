@@ -71,7 +71,7 @@ class FavoriteListAdapter :
     override fun onItemClick(view: View, position: Int) {
         if (mItemClickListener != null) {
             getItem(position)?.let { item ->
-                mItemClickListener!!.onItemClick(view, item.id, position)
+                mItemClickListener!!.onItemClick(view, item.refId!!, position)
             }
         }
     }

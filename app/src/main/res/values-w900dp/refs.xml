@@ -1,0 +1,9 @@
+<resources>
+	<integer name="screen_width">900</integer>
+
+	<item name="activity_main" type="layout">@layout/activity_main_twopanes</item>
+	<item name="main" type="menu">@menu/main_two_pane</item>
+	
+	<item name="preferences" type="xml">@xml/preferences_large</item>
+
+</resources>

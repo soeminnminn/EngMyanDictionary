@@ -1,9 +1,11 @@
 package com.s16.engmyan.data
 
+import android.app.Application
 import androidx.lifecycle.*
-import com.s16.app.SingletonHolder
 
-class DictionaryModel(private val provider: DataAccess): ViewModel() {
+class DictionaryModel(application: Application): AndroidViewModel(application) {
+    private val provider: DataAccess = DbManager(application).provider()
+
     private val filterData = MutableLiveData<String?>()
 
     var data: LiveData<List<DictionaryItem>> = Transformations.switchMap(filterData) { constraint ->
@@ -28,20 +30,11 @@ class DictionaryModel(private val provider: DataAccess): ViewModel() {
     fun filter(constraint: String? = "") {
         filterData.value = constraint
     }
-
-    @Suppress("UNCHECKED_CAST")
-    class Factory(private val provider: DataAccess): ViewModelProvider.Factory {
-
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return DictionaryModel(provider) as T
-        }
-
-    }
-
-    companion object: SingletonHolder<Factory, DataAccess>({ Factory(it) })
 }
 
-class DefinitionModel(private val provider: DataAccess): ViewModel() {
+class DefinitionModel(application: Application): AndroidViewModel(application) {
+    private val provider: DataAccess = DbManager(application).provider()
+
     private val idData = MutableLiveData<Long>()
 
     var data: LiveData<DefinitionItem> = Transformations.switchMap(idData) { id ->
@@ -51,47 +44,16 @@ class DefinitionModel(private val provider: DataAccess): ViewModel() {
     fun fetch(id: Long) {
         idData.value = id
     }
-
-    @Suppress("UNCHECKED_CAST")
-    class Factory(private val provider: DataAccess): ViewModelProvider.Factory {
-
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return DefinitionModel(provider) as T
-        }
-
-    }
-
-    companion object: SingletonHolder<Factory, DataAccess>({ Factory(it) })
 }
 
-class FavoriteModel(provider: DataAccess): ViewModel() {
+class FavoriteModel(application: Application): AndroidViewModel(application) {
+    private val provider: DataAccess = DbManager(application).provider()
 
     var data : LiveData<List<FavoriteItem>> = provider.queryFavorites()
-
-    @Suppress("UNCHECKED_CAST")
-    class Factory(private val provider: DataAccess): ViewModelProvider.Factory {
-
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return FavoriteModel(provider) as T
-        }
-
-    }
-
-    companion object: SingletonHolder<Factory, DataAccess>({ Factory(it) })
 }
 
-class RecentModel(provider: DataAccess): ViewModel() {
+class RecentModel(application: Application): AndroidViewModel(application) {
+    private val provider: DataAccess = DbManager(application).provider()
 
     var data : LiveData<List<HistoryItem>> = provider.queryHistories()
-
-    @Suppress("UNCHECKED_CAST")
-    class Factory(private val provider: DataAccess): ViewModelProvider.Factory {
-
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return RecentModel(provider) as T
-        }
-
-    }
-
-    companion object: SingletonHolder<Factory, DataAccess>({ Factory(it) })
 }

@@ -38,7 +38,7 @@ class SearchUiHelper(
 
     }
 
-    private val mTextSearchOnKeyListener = View.OnKeyListener { v, keyCode, event ->
+    private val mTextSearchOnKeyListener = View.OnKeyListener { _, keyCode, event ->
         if (event.action == KeyEvent.ACTION_UP) {
             when (keyCode) {
                 KeyEvent.KEYCODE_ENTER -> {

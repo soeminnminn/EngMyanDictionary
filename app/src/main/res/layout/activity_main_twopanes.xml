@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/mainRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".activity.MainActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBar"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent" >
+
+        <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                android:theme="@style/AppTheme.AppBarOverlay"
+                app:popupTheme="@style/AppTheme.PopupOverlay"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <RelativeLayout
+                android:id="@+id/mainContent"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:paddingStart="@dimen/dimen_0dp"
+                android:paddingEnd="@dimen/dimen_1dp"
+                android:background="@drawable/right_divider_background"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintWidth_percent="0.4">
+
+            <FrameLayout
+                    android:id="@+id/searchContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:padding="@dimen/dimen_8dp"
+                    android:background="?attr/colorPrimary" >
+
+                <com.s16.widget.ClearableEditText
+                        android:id="@+id/searchText"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:lines="1"
+                        android:paddingLeft="@dimen/dimen_8dp"
+                        android:paddingStart="@dimen/dimen_8dp"
+                        android:paddingRight="@dimen/dimen_8dp"
+                        android:paddingEnd="@dimen/dimen_8dp"
+                        android:drawableStart="@drawable/ic_search_gray"
+                        android:drawableEnd="@drawable/ic_clear_gray"
+                        android:drawablePadding="@dimen/dimen_4dp"
+                        android:inputType="text"
+                        android:hint="@string/search_hint"
+                        android:background="@drawable/searchbar_background" />
+
+            </FrameLayout>
+
+            <include layout="@layout/content_main"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/searchContainer"/>
+
+        </RelativeLayout>
+
+        <FrameLayout
+                android:id="@+id/detailsContent"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/mainContent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -279,7 +279,7 @@ abstract class RecyclerViewArrayAdapter<VH: RecyclerView.ViewHolder, T>:
             if (prefix == null || prefix.isEmpty()) {
                 val list: ArrayList<T>
                 synchronized(mLock) {
-                    list = ArrayList(mOriginalValues)
+                    list = ArrayList(mOriginalValues!!)
                 }
                 results.values = list
                 results.count = list.size
@@ -288,7 +288,7 @@ abstract class RecyclerViewArrayAdapter<VH: RecyclerView.ViewHolder, T>:
                 val prefixString = "$prefix".toLowerCase(Locale.getDefault())
                 val values: ArrayList<T>
                 synchronized(mLock) {
-                    values = ArrayList(mOriginalValues)
+                    values = ArrayList(mOriginalValues!!)
                 }
 
                 val newValues = values.filter { value ->

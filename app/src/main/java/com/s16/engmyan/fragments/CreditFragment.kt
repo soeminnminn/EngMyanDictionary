@@ -1,17 +1,15 @@
 package com.s16.engmyan.fragments
 
+import android.app.Activity
+import android.graphics.Point
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
 import androidx.fragment.app.DialogFragment
 import com.s16.engmyan.Constants
 import com.s16.engmyan.R
-import com.s16.widget.DialogButtonBar
 import com.s16.widget.setPositiveButton
-import android.app.Activity
-import android.graphics.Point
 import kotlinx.android.synthetic.main.fragment_credit.*
 
 
@@ -44,7 +42,7 @@ class CreditFragment : DialogFragment() {
     override fun onResume() {
         super.onResume()
 
-        val height = (getScreenHeight(activity!!) * 0.95).toInt()
+        val height = (getScreenHeight(requireActivity()) * 0.95).toInt()
         dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, height)
     }
 

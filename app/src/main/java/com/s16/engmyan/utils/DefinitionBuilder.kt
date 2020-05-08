@@ -95,7 +95,7 @@ class DefinitionBuilder {
             val word = uri.getQueryParameter("w")
 
             if (linkClickListener != null) {
-                linkClickListener!!.onWordLinkClick(word)
+                linkClickListener!!.onWordLinkClick(word ?: "")
             }
         }
 

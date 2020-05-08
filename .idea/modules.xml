@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/EngMyan.iml" filepath="$PROJECT_DIR$/EngMyan.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/touchimageview/touchimageview.iml" filepath="$PROJECT_DIR$/touchimageview/touchimageview.iml" />
+      <module fileurl="file://$PROJECT_DIR$/EngMyan.iml" filepath="$PROJECT_DIR$/EngMyan.iml" group="EngMyan" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="EngMyan/app" />
     </modules>
   </component>
 </project>

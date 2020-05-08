@@ -9,8 +9,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import com.s16.engmyan.Constants
 import com.s16.engmyan.R
 import com.s16.engmyan.data.*
@@ -29,9 +29,10 @@ class DetailsFragment : Fragment() {
     private lateinit var picFragment : PictureViewFragment
 
     private val isShowSynonym: Boolean
-        get() = context?.run {
-            defaultSharedPreferences booleanOf Constants.PREFS_SHOW_SYNONYM
-        } ?: true
+        get() = requireContext().defaultSharedPreferences booleanOf Constants.PREFS_SHOW_SYNONYM
+
+    private val isTwoPane: Boolean
+        get() = arguments?.getBoolean(Constants.ARG_PARAM_TWO_PANE) ?: false
 
     private lateinit var definitionBuilder: DefinitionBuilder
 
@@ -48,23 +49,22 @@ class DetailsFragment : Fragment() {
 
         picFragment = PictureViewFragment()
 
-        context?.let { ctx ->
-            definitionBuilder = DefinitionBuilder().apply {
-                setClickableWordLink(ctx.defaultSharedPreferences booleanOf Constants.PREFS_WORD_CLICKABLE)
-            }
-
-            if (activity is DefinitionBuilder.OnWordLinkClickListener) {
-                definitionBuilder.setOnWordLinkClickListener(activity as DefinitionBuilder.OnWordLinkClickListener)
-            }
-
-            val optionsModel = PreferencesLiveData(ctx.defaultSharedPreferences,
-                Constants.PREFS_FONT_SIZE, Constants.PREFS_FORCE_ZAWGYI,
-                Constants.PREFS_WORD_CLICKABLE, Constants.PREFS_SHOW_SYNONYM)
-            optionsModel.observe(this, Observer {
-                // it[Constants.PREFS_WORD_CLICKABLE].
-                dataBind()
-            })
+        val isWordClickable = requireContext().defaultSharedPreferences booleanOf Constants.PREFS_WORD_CLICKABLE && !isTwoPane
+        definitionBuilder = DefinitionBuilder().apply {
+            setClickableWordLink(isWordClickable)
         }
+
+        if (activity is DefinitionBuilder.OnWordLinkClickListener) {
+            definitionBuilder.setOnWordLinkClickListener(activity as DefinitionBuilder.OnWordLinkClickListener)
+        }
+
+        val optionsModel = PreferencesLiveData(requireContext().defaultSharedPreferences,
+            Constants.PREFS_FONT_SIZE, Constants.PREFS_FORCE_ZAWGYI,
+            Constants.PREFS_WORD_CLICKABLE, Constants.PREFS_SHOW_SYNONYM)
+        optionsModel.observe(viewLifecycleOwner, Observer {
+            // it[Constants.PREFS_WORD_CLICKABLE].
+            dataBind()
+        })
 
         childFragmentManager.beginTransaction()
             .replace(R.id.imageContainer, picFragment, "picture")
@@ -74,35 +74,33 @@ class DetailsFragment : Fragment() {
 
     private fun dataBind() {
         textViewDetails.text = ""
-        textViewDetails.movementMethod = LinkMovementMethod.getInstance()
+
+        if (!isTwoPane) {
+            textViewDetails.movementMethod = LinkMovementMethod.getInstance()
+        }
 
         var forceZawgyi = false
 
-        context?.let { context ->
-            val textSize = context.defaultSharedPreferences.getStringAsFloat(Constants.PREFS_FONT_SIZE, Constants.TEXT_SIZE)
+        val textSize = requireContext().defaultSharedPreferences.getStringAsFloat(Constants.PREFS_FONT_SIZE, Constants.TEXT_SIZE)
 
-            textViewDetails.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
+        textViewDetails.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
 
-            textViewSynonymTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize * 1.1f)
-            textViewSynonym.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
+        textViewSynonymTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize * 1.1f)
+        textViewSynonym.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
 
-            forceZawgyi = context.defaultSharedPreferences booleanOf Constants.PREFS_FORCE_ZAWGYI
-            textViewDetails.typeface = if (forceZawgyi) {
-                Constants.getZawgyiTypeface(context)
-            } else {
-                Constants.getMMTypeFace(context)
-            }
+        forceZawgyi = requireContext().defaultSharedPreferences booleanOf Constants.PREFS_FORCE_ZAWGYI
+        textViewDetails.typeface = if (forceZawgyi) {
+            Constants.getZawgyiTypeface(requireContext())
+        } else {
+            Constants.getMMTypeFace(requireContext())
         }
 
         layoutSynonymView.gone()
 
-        val model = context?.let { context ->
-            val modelFactory = DefinitionModel.of(DbManager(context).provider())
-            ViewModelProviders.of(this, modelFactory).get(DefinitionModel::class.java)
-        }
+        val model : DefinitionModel by viewModels()
 
-        model?.data!!.observe(
-            this, Observer<DefinitionItem> { item ->
+        model.data.observe(
+            viewLifecycleOwner, Observer<DefinitionItem> { item ->
                 definitionBuilder.setDefinition("${item.definition}")
                     .setKeywords(item.keywords)
 
@@ -116,7 +114,7 @@ class DetailsFragment : Fragment() {
                                 val convertedItem = ConvertedItem(refId = item.id,
                                     mode = "zawgyi", value = converted,
                                     timestamp = System.currentTimeMillis())
-                                DbManager(context!!).provider().insertConverted(convertedItem)
+                                DbManager(requireContext()).provider().insertConverted(convertedItem)
                             }
                         }
 
@@ -140,7 +138,7 @@ class DetailsFragment : Fragment() {
         )
 
         arguments?.getLong(Constants.ARG_PARAM_ID)?.let {
-            model.fetch(it)
+            if (it > -1) model.fetch(it)
         }
     }
 
@@ -185,9 +183,9 @@ class DetailsFragment : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(id: Long) =
+        fun newInstance(id: Long, twoPane: Boolean = false) =
             DetailsFragment().apply {
-                arguments = bundleOf(Constants.ARG_PARAM_ID to id)
+                arguments = bundleOf(Constants.ARG_PARAM_ID to id, Constants.ARG_PARAM_TWO_PANE to twoPane)
             }
     }
 }

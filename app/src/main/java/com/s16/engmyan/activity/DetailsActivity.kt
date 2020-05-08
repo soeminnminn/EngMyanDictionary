@@ -5,7 +5,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.s16.app.BackStackActivity
 import com.s16.engmyan.Constants
@@ -35,6 +35,7 @@ class DetailsActivity : BackStackActivity(),
     }
 
     private val menuPicture = MenuItemToggle()
+    private lateinit var menuSound : MenuItem
 
     private lateinit var model: DefinitionModel
     private lateinit var textToSpeech: TextToSpeechHelper
@@ -55,9 +56,15 @@ class DetailsActivity : BackStackActivity(),
         recordId = intent.getLongExtra(Constants.ARG_PARAM_ID, 0)
 
         textToSpeech = TextToSpeechHelper(this)
+        textToSpeech.onTextToSpeechListener = object: TextToSpeechHelper.OnTextToSpeechListener {
+            override fun onTextToSpeechInit(enabled: Boolean) {
+                if (::menuSound.isInitialized) {
+                    menuSound.isVisible = enabled
+                }
+            }
+        }
 
-        val modelFactory = DefinitionModel.of(DbManager(this).provider())
-        model = ViewModelProviders.of(this, modelFactory).get(DefinitionModel::class.java)
+        model = ViewModelProvider(this).get(DefinitionModel::class.java)
         model.data.observe(
             this, Observer<DefinitionItem> { item ->
                 saveHistory(item)
@@ -94,7 +101,10 @@ class DetailsActivity : BackStackActivity(),
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         menuFavorite.menuItem = menu.findItem(R.id.action_favorite)
         menuPicture.menuItem = menu.findItem(R.id.action_picture)
-
+        menuSound = menu.findItem(R.id.action_sound)
+        if (::textToSpeech.isInitialized) {
+            menuSound.isVisible = textToSpeech.isEnabled
+        }
         return super.onPrepareOptionsMenu(menu)
     }
 

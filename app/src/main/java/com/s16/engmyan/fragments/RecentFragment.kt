@@ -1,16 +1,21 @@
 package com.s16.engmyan.fragments
 
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.graphics.Point
 import android.os.Bundle
+import android.util.DisplayMetrics
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
+import androidx.core.view.GravityCompat
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +27,7 @@ import com.s16.engmyan.data.DbManager
 import com.s16.engmyan.data.HistoryItem
 import com.s16.engmyan.data.RecentModel
 import com.s16.utils.startActivity
+import com.s16.view.Adapter
 import com.s16.view.RecyclerViewArrayAdapter
 import kotlinx.android.synthetic.main.fragment_recent.*
 import kotlinx.coroutines.CoroutineScope
@@ -34,10 +40,13 @@ class RecentFragment : DialogFragment(), RecyclerViewArrayAdapter.OnItemClickLis
     private var backgroundScope = CoroutineScope(Dispatchers.IO)
     private var job: Job? = null
     private lateinit var adapter: RecentListAdapter
+    private var onItemClickListener: Adapter.OnItemClickListener? = null
+
+    private val isTwoPane: Boolean
+        get() = arguments?.getBoolean(Constants.ARG_PARAM_TWO_PANE) ?: false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setStyle(STYLE_NO_TITLE, R.style.AppTheme_Dialog_NoTitle)
     }
 
@@ -46,14 +55,30 @@ class RecentFragment : DialogFragment(), RecyclerViewArrayAdapter.OnItemClickLis
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_recent, container, false)
+        val view = inflater.inflate(R.layout.fragment_recent, container, false)
+
+        dialog?.window?.let {
+            if (isTwoPane) {
+                it.setGravity(Gravity.TOP or GravityCompat.START)
+
+                val metrics = requireContext().resources.displayMetrics
+                val px = 16 * (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
+
+                val layoutParams = it.attributes
+                layoutParams.x = px.toInt()
+                it.attributes = layoutParams
+
+            }
+        }
+
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        recentList.layoutManager = LinearLayoutManager(context!!)
-        recentList.addItemDecoration(DividerItemDecoration(context!!, LinearLayoutManager.VERTICAL))
+        recentList.layoutManager = LinearLayoutManager(requireContext())
+        recentList.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
 
         dataBind(recentList)
         adapter.setOnItemClickListener(this)
@@ -70,8 +95,21 @@ class RecentFragment : DialogFragment(), RecyclerViewArrayAdapter.OnItemClickLis
     override fun onStart() {
         super.onStart()
 
-        val height = (getScreenHeight(activity!!) * 0.9).toInt()
-        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, height)
+        dialog?.window?.let {
+            val size = Point()
+            requireActivity().windowManager.defaultDisplay.getSize(size)
+
+            if (isTwoPane) {
+                val height = (size.y * 0.94).toInt()
+                val width = (size.x * 0.35).toInt()
+
+                it.setLayout(width, height)
+
+            } else {
+                val height = (size.y * 0.9).toInt()
+                it.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, height)
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -79,16 +117,10 @@ class RecentFragment : DialogFragment(), RecyclerViewArrayAdapter.OnItemClickLis
         super.onDestroy()
     }
 
-    private fun getScreenHeight(activity: Activity): Int {
-        val size = Point()
-        activity.windowManager.defaultDisplay.getSize(size)
-        return size.y
-    }
-
     override fun onItemClick(view: View, position: Int) {
         adapter.getItem(position)?.let {
             dialog?.dismiss()
-            startActivity<DetailsActivity>(Constants.ARG_PARAM_ID to it.refId)
+            onItemClickListener?.onItemClick(null, view, position, it.refId!!)
         }
     }
 
@@ -96,12 +128,8 @@ class RecentFragment : DialogFragment(), RecyclerViewArrayAdapter.OnItemClickLis
         adapter = RecentListAdapter()
         recyclerView.adapter = adapter
 
-        val model = activity?.let { context ->
-            val modelFactory = RecentModel.of(DbManager(context).provider())
-            ViewModelProviders.of(context, modelFactory).get(RecentModel::class.java)
-        }
-
-        model?.data!!.observe(this, Observer<List<HistoryItem>> {
+        val model : RecentModel by viewModels()
+        model.data.observe(viewLifecycleOwner, Observer<List<HistoryItem>> {
             adapter.submitList(it)
         })
     }
@@ -109,26 +137,24 @@ class RecentFragment : DialogFragment(), RecyclerViewArrayAdapter.OnItemClickLis
     private fun performClear() {
         if (adapter.itemCount == 0) return
 
-        context?.let { ctx ->
-            val dialogBuilder = AlertDialog.Builder(ctx).apply {
-                setIcon(android.R.drawable.ic_dialog_info)
-                setTitle(R.string.clear_recent_title)
-                setMessage(R.string.clear_recent_message)
-                setNegativeButton(android.R.string.cancel) { di, _ ->
-                    di.cancel()
-                }
-                setPositiveButton(android.R.string.ok) { di, _ ->
-                    removeAllHistory(ctx)
-                    di.dismiss()
-                }
+        val dialogBuilder = AlertDialog.Builder(requireContext()).apply {
+            setIcon(android.R.drawable.ic_dialog_info)
+            setTitle(R.string.clear_recent_title)
+            setMessage(R.string.clear_recent_message)
+            setNegativeButton(android.R.string.cancel) { di, _ ->
+                di.cancel()
             }
-
-            dialogBuilder.show()
+            setPositiveButton(android.R.string.ok) { di, _ ->
+                removeAllHistory()
+                di.dismiss()
+            }
         }
+
+        dialogBuilder.show()
     }
 
-    private fun removeAllHistory(ctx: Context) {
-        val provider = DbManager(ctx).provider()
+    private fun removeAllHistory() {
+        val provider = DbManager(requireContext()).provider()
 
         job = backgroundScope.launch {
             provider.deleteAllHistory()
@@ -137,9 +163,10 @@ class RecentFragment : DialogFragment(), RecyclerViewArrayAdapter.OnItemClickLis
 
     companion object {
         @JvmStatic
-        fun newInstance() =
+        fun newInstance(isTwoPane: Boolean, itemClickListener: Adapter.OnItemClickListener? = null) =
             RecentFragment().apply {
-                arguments = Bundle()
+                arguments = bundleOf(Constants.ARG_PARAM_TWO_PANE to isTwoPane)
+                onItemClickListener = itemClickListener
             }
     }
 }

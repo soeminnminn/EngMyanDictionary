@@ -9,6 +9,10 @@ import java.util.*
 
 class TextToSpeechHelper(context: Context) : TextToSpeech.OnInitListener {
 
+    interface OnTextToSpeechListener {
+        fun onTextToSpeechInit(enabled: Boolean)
+    }
+
     private val textToSpeech = TextToSpeech(context, this)
 
     var text: String? = null
@@ -16,16 +20,26 @@ class TextToSpeechHelper(context: Context) : TextToSpeech.OnInitListener {
     var isEnabled: Boolean = false
         private set
 
+    var onTextToSpeechListener : OnTextToSpeechListener? = null
+
     private val utteranceId: String
         get() = "${hashCode()}"
 
     override fun onInit(status: Int) {
-        isEnabled = status == TextToSpeech.SUCCESS
-        if (isEnabled) {
-            textToSpeech.language = Locale.US
+        if (Build.MANUFACTURER.toLowerCase(Locale.ENGLISH) != "huawei") {
+            isEnabled = status == TextToSpeech.SUCCESS
+            if (isEnabled) {
+                if (textToSpeech.isLanguageAvailable(Locale.ENGLISH) == TextToSpeech.LANG_AVAILABLE) {
+                    textToSpeech.language = Locale.ENGLISH
+                } else {
+                    isEnabled = false
+                }
+            }
+            onTextToSpeechListener?.onTextToSpeechInit(isEnabled)
         }
     }
 
+    @Suppress("DEPRECATION")
     fun speak() {
         text?.let {
             if (isEnabled && it.isNotEmpty()) {
@@ -49,4 +63,13 @@ class TextToSpeechHelper(context: Context) : TextToSpeech.OnInitListener {
             textToSpeech.shutdown()
         }
     }
+
+//    companion object {
+//        @Volatile private var instance: TextToSpeechHelper? = null
+//        private val LOCK = Any()
+//
+//        operator fun invoke(context: Context)= instance ?: synchronized(LOCK){
+//            instance ?: TextToSpeechHelper(context).also { instance = it}
+//        }
+//    }
 }
