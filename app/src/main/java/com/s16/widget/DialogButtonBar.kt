@@ -15,9 +15,9 @@ import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Space
-import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.graphics.ColorUtils
 
 open class DialogButtonBar : LinearLayout, DialogInterface {
@@ -271,7 +271,7 @@ open class DialogButtonBar : LinearLayout, DialogInterface {
         updateLayout()
     }
 
-    private class DialogButton: TextView {
+    private class DialogButton: AppCompatTextView {
 
         constructor(context: Context) : super(context) {
             initialize(context, null, 0)

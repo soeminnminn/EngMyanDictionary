@@ -21,12 +21,12 @@ import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 
 import java.text.NumberFormat
 
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import com.s16.widget.CircularProgressDrawable
 
 class ProgressDialog : AlertDialog {
 

@@ -8,6 +8,12 @@ object Constants {
     const val ARG_PARAM_TWO_PANE = "twoPane"
     const val TEXT_SIZE = 16f
 
+    const val PREFS_THEMES = "prefs_theme"
+    const val PREFS_THEMES_LIGHT = "light"
+    const val PREFS_THEMES_DARK = "dark"
+    const val PREFS_THEMES_BATTERY = "battery"
+    const val PREFS_THEMES_SYSTEM = "system"
+
     const val PREFS_FONT_SIZE = "prefs_font_size"
     const val PREFS_FORCE_ZAWGYI = "prefs_force_zawgyi"
     const val PREFS_WORD_CLICKABLE = "prefs_used_word_clickable"

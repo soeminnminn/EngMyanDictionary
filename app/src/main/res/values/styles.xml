@@ -1,11 +1,23 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="colorPrimaryVariant">#000000</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">#2962FF</item>
+        <item name="colorSecondaryVariant">#0039CB</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorError">#F44336</item>
+        <item name="colorOnError">#FFFFFF</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorOnSurface">#212121</item>
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="colorOnBackground">#212121</item>
 
         <item name="dialogTheme">@style/AppTheme.Dialog</item>
     </style>
@@ -15,19 +27,29 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.Dialog" parent="@style/Theme.MaterialComponents.Light.Dialog" />
-
-    <style name="AppTheme.Dialog.NoTitle" parent="@android:style/Theme.Holo.Light.Dialog.NoActionBar.MinWidth">
+    <style name="AppTheme.Dialog" parent="@style/Theme.MaterialComponents.DayNight.Dialog.MinWidth">
+        <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
+        <item name="iconTint">@color/white</item>
+    </style>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
 
     <style name="AppWidget" />
 
-    <style name="AppWidget.BorderlessButton" parent="@style/Widget.AppCompat.Button.Borderless" />
-
-    <style name="AppWidget.ActionbarButton" parent="@style/Widget.AppCompat.ActionButton" />
+    <style name="AppWidget.ActionButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="iconPadding">0dp</item>
+        <item name="iconTint">@color/colorForeground</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingLeft">14dp</item>
+        <item name="android:paddingRight">14dp</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
 
 </resources>

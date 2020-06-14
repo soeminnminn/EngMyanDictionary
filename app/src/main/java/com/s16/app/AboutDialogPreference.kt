@@ -7,16 +7,27 @@ import android.os.Build
 import android.text.method.LinkMovementMethod
 import android.util.AttributeSet
 import android.util.DisplayMetrics
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.text.HtmlCompat
 import androidx.preference.DialogPreference
+import androidx.preference.PreferenceViewHolder
 
 class AboutDialogPreference : DialogPreference,
     DialogInterface.OnClickListener, DialogInterface.OnDismissListener {
 
     private var mMessage: CharSequence? = null
     private var mDialog: Dialog? = null
+
+    private val messageTextColor: Int
+        get() {
+            val a = context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.textColorSecondary))
+            val color = a.getColor(0, 0x808080)
+            a.recycle()
+            return color
+        }
 
     constructor(context: Context) : super(context) {
         initialize(context)
@@ -46,6 +57,17 @@ class AboutDialogPreference : DialogPreference,
         mDialog?.dismiss()
         mDialog = null
         super.onDetached()
+    }
+
+    override fun onBindViewHolder(holder: PreferenceViewHolder) {
+        super.onBindViewHolder(holder)
+
+        val imageView: ImageView = holder.findViewById(android.R.id.icon) as ImageView
+        val textColor = messageTextColor
+        if (textColor != -1) {
+            DrawableCompat.setTint(icon, textColor)
+            imageView.setImageDrawable(icon)
+        }
     }
 
     override fun onClick() {
@@ -82,13 +104,6 @@ class AboutDialogPreference : DialogPreference,
         }
     }
 
-    private fun getMessageTextColor(): Int {
-        val a = context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.textColorSecondary))
-        val color = a.getColor(0, 0x808080)
-        a.recycle()
-        return color
-    }
-
     @Suppress("DEPRECATION")
     private fun createDialog() {
         val builder = AlertDialog.Builder(context)
@@ -109,7 +124,7 @@ class AboutDialogPreference : DialogPreference,
             messageView.setTextAppearance(context, textAppearanceId)
         }
 
-        val textColor = getMessageTextColor()
+        val textColor = messageTextColor
         if (textColor != -1) {
             messageView.setTextColor(textColor)
         }
@@ -123,6 +138,9 @@ class AboutDialogPreference : DialogPreference,
     }
 
     private fun showDialog() {
+        if (mDialog == null) {
+            createDialog()
+        }
         mDialog?.let {
             if (!it.isShowing) {
                 it.setOnDismissListener(this)

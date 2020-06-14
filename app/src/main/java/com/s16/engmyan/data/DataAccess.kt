@@ -48,8 +48,11 @@ interface DataAccess {
         }
     }
 
-    @Query("SELECT * FROM favorites")
+    @Query("SELECT * FROM favorites ORDER BY timestamp DESC")
     fun queryFavorites() : LiveData<List<FavoriteItem>>
+
+    @Query("SELECT * FROM favorites ORDER BY timestamp DESC LIMIT 3")
+    fun queryTopFavorites() : List<FavoriteItem>
 
     @Query("SELECT * FROM favorites WHERE refrence_id IS :refId LIMIT 1")
     fun queryFavoriteByRef(refId: Long) : FavoriteItem?
@@ -64,7 +67,7 @@ interface DataAccess {
     @Query("DELETE FROM histories")
     suspend fun deleteAllHistory()
 
-    @Query("SELECT * FROM histories")
+    @Query("SELECT * FROM histories ORDER BY timestamp DESC")
     fun queryHistories() : LiveData<List<HistoryItem>>
 
     @Query("SELECT * FROM histories WHERE refrence_id IS :refId LIMIT 1")

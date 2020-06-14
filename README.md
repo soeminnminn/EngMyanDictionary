@@ -11,6 +11,11 @@ English-Myanmar Dictionary
 
 ## Change Log
 
+#### Version 5.2.0
+- Bug fix
+- Add android 10 themes
+- Add favorites shortcut
+
 #### Version 5.1.0
 - Search improvement
 - Bug fix for Android 9,10

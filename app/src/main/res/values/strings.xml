@@ -32,6 +32,8 @@
     <string name="title_credit">Credit</string>
     <string name="title_synonym">Synonym</string>
 
+    <string name="title_shortcut">Definition of \'%s\'</string>
+
     <string name="favorites_title">Favorites</string>
     <string name="favorites_edit_title">Edit Favorites</string>
     <string name="favorites_delete_message">Are you sure to delete selected favorites?</string>
@@ -41,6 +43,27 @@
     <string name="clear_recent_message">Are you sure to clear all recent?</string>
 
     <string name="prefs_category_general">General</string>
+
+    <string name="prefs_theme">Theme</string>
+
+    <string name="prefs_theme_light">Light theme</string>
+    <string name="prefs_theme_dark">Dark theme</string>
+    <string name="prefs_theme_battery">Auto battery</string>
+    <string name="prefs_theme_system">Follow system</string>
+
+    <string-array name="prefs_theme_names">
+        <item>@string/prefs_theme_light</item>
+        <item>@string/prefs_theme_dark</item>
+        <item>@string/prefs_theme_battery</item>
+        <item>@string/prefs_theme_system</item>
+    </string-array>
+
+    <string-array name="prefs_theme_values" translatable="false">
+        <item>light</item>
+        <item>dark</item>
+        <item>battery</item>
+        <item>system</item>
+    </string-array>
 
     <string name="prefs_font_size">Font size</string>
     <string name="prefs_font_size_summary">Change definition font size</string>

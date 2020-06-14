@@ -31,7 +31,6 @@ class MenuItemToggle(private val isCheckable: Boolean = false) {
     fun toggle() {
         setCheck(!mIsChecked)
     }
-
     fun setCheck(check: Boolean) {
         if (!isCheckable) return
         menuItem?.let {

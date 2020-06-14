@@ -66,10 +66,8 @@ open class AlertDialogFragment : DialogFragment(), DialogInterface.OnShowListene
         if (view != null) {
             dialog.setView(view)
         }
-        val activity = activity
-        if (activity != null) {
-            dialog.ownerActivity = activity
-        }
+
+        dialog.setOwnerActivity(requireActivity())
         dialog.setCancelable(isCancelable)
         dialog.setOnShowListener(this)
         dialog.setOnCancelListener(this)
@@ -84,7 +82,7 @@ open class AlertDialogFragment : DialogFragment(), DialogInterface.OnShowListene
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(context!!, theme)
+        val builder = AlertDialog.Builder(requireContext(), theme)
         P.apply(builder)
         return builder.create()
     }

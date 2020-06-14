@@ -20,8 +20,17 @@
             app:title="@string/prefs_category_general">
 
         <ListPreference
+                app:key="prefs_theme"
+                app:defaultValue="system"
+                app:entries="@array/prefs_theme_names"
+                app:entryValues="@array/prefs_theme_values"
+                app:icon="@drawable/ic_color_lens"
+                app:title="@string/prefs_theme" />
+
+        <ListPreference
                 app:key="prefs_font_size"
                 app:title="@string/prefs_font_size"
+                app:icon="@drawable/ic_font"
                 app:summary="@string/prefs_font_size_summary"
                 app:defaultValue="16"
                 app:entries="@array/prefs_font_size_entries"
@@ -30,18 +39,21 @@
         <CheckBoxPreference
                 app:key="prefs_force_zawgyi"
                 app:title="@string/prefs_force_zawgyi"
+                app:icon="@drawable/ic_font_force"
                 app:summary="@string/prefs_force_zawgyi_summary"
                 app:defaultValue="false" />
 
         <CheckBoxPreference
                 app:key="prefs_used_word_clickable"
                 app:title="@string/prefs_used_word_clickable"
+                app:icon="@drawable/ic_link"
                 app:summary="@string/prefs_used_word_clickable_summary"
                 app:defaultValue="true" />
 
         <CheckBoxPreference
                 app:key="prefs_show_synonym"
                 app:title="@string/prefs_show_synonym"
+                app:icon="@drawable/ic_visibility"
                 app:summary="@string/prefs_show_synonym_summary"
                 app:defaultValue="true" />
 
@@ -53,13 +65,15 @@
         <Preference
                 app:key="prefs_credit"
                 app:summary="@string/prefs_credit_summary"
-                app:title="@string/prefs_credit" />
+                app:title="@string/prefs_credit"
+                app:icon="@drawable/ic_credit" />
 
         <com.s16.app.AboutDialogPreference
-            app:key="prefs_about"
-            app:title="@string/prefs_about"
-            app:dialogTitle="@string/prefs_about"
-            app:dialogMessage="@string/about_text" />
+                app:key="prefs_about"
+                app:title="@string/prefs_about"
+                app:icon="@drawable/ic_info_outline"
+                app:dialogTitle="@string/prefs_about"
+                app:dialogMessage="@string/about_text" />
 
     </PreferenceCategory>
 

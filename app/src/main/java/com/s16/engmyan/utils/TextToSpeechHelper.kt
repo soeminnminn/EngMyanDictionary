@@ -7,7 +7,8 @@ import android.speech.tts.TextToSpeech
 import java.lang.Exception
 import java.util.*
 
-class TextToSpeechHelper(context: Context) : TextToSpeech.OnInitListener {
+class TextToSpeechHelper(context: Context, private val checkManufacturer: Boolean = false)
+    : TextToSpeech.OnInitListener {
 
     interface OnTextToSpeechListener {
         fun onTextToSpeechInit(enabled: Boolean)
@@ -26,12 +27,19 @@ class TextToSpeechHelper(context: Context) : TextToSpeech.OnInitListener {
         get() = "${hashCode()}"
 
     override fun onInit(status: Int) {
-        if (Build.MANUFACTURER.toLowerCase(Locale.ENGLISH) != "huawei") {
+        if (checkManufacturer && Build.MANUFACTURER.toLowerCase(Locale.ENGLISH) == "huawei") {
+            isEnabled = false
+        } else {
             isEnabled = status == TextToSpeech.SUCCESS
             if (isEnabled) {
-                if (textToSpeech.isLanguageAvailable(Locale.ENGLISH) == TextToSpeech.LANG_AVAILABLE) {
-                    textToSpeech.language = Locale.ENGLISH
-                } else {
+                try {
+                    if (textToSpeech.isLanguageAvailable(Locale.ENGLISH) == TextToSpeech.LANG_AVAILABLE) {
+                        textToSpeech.language = Locale.ENGLISH
+                    } else {
+                        isEnabled = false
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                     isEnabled = false
                 }
             }
@@ -63,13 +71,4 @@ class TextToSpeechHelper(context: Context) : TextToSpeech.OnInitListener {
             textToSpeech.shutdown()
         }
     }
-
-//    companion object {
-//        @Volatile private var instance: TextToSpeechHelper? = null
-//        private val LOCK = Any()
-//
-//        operator fun invoke(context: Context)= instance ?: synchronized(LOCK){
-//            instance ?: TextToSpeechHelper(context).also { instance = it}
-//        }
-//    }
 }

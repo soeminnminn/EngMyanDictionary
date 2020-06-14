@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorBackground">@color/colorBackgroundDark</color>
+    <color name="colorForeground">@color/bright_foreground_holo_dark</color>
+</resources>

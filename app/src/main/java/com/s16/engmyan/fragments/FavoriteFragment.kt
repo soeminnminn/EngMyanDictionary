@@ -1,14 +1,9 @@
 package com.s16.engmyan.fragments
 
-import android.app.Activity
-import android.content.Context
 import android.graphics.Point
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
@@ -20,20 +15,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.s16.engmyan.Constants
 import com.s16.engmyan.R
-import com.s16.engmyan.activity.DetailsActivity
 import com.s16.engmyan.adapters.FavoriteListAdapter
 import com.s16.engmyan.data.DbManager
 import com.s16.engmyan.data.FavoriteItem
 import com.s16.engmyan.data.FavoriteModel
+import com.s16.engmyan.utils.UIManager
 import com.s16.utils.gone
-import com.s16.utils.startActivity
 import com.s16.utils.visible
 import com.s16.view.Adapter
 import kotlinx.android.synthetic.main.fragment_favorite.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import java.lang.Exception
 
 class FavoriteFragment : DialogFragment(),
     FavoriteListAdapter.OnItemClickListener, FavoriteListAdapter.OnItemSelectListener {
@@ -49,8 +41,6 @@ class FavoriteFragment : DialogFragment(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setStyle(STYLE_NO_TITLE, R.style.AppTheme_Dialog_NoTitle)
     }
 
     override fun onCreateView(
@@ -60,6 +50,7 @@ class FavoriteFragment : DialogFragment(),
     ): View? {
         val view = inflater.inflate(R.layout.fragment_favorite, container, false)
 
+        dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog?.window?.let {
             if (isTwoPane) {
                 it.setGravity(Gravity.TOP or GravityCompat.START)
@@ -174,13 +165,20 @@ class FavoriteFragment : DialogFragment(),
     }
 
     private fun removeSelected() {
-        val provider = DbManager(requireContext()).provider()
         val selectedItems = adapter.getSelectedItems().map {
             it.refId
         }
 
         job = backgroundScope.launch {
-            provider.deleteFavoriteAll(selectedItems)
+            try {
+                val provider = DbManager(requireContext()).provider()
+                provider.deleteFavoriteAll(selectedItems)
+
+                val topFav = provider.queryTopFavorites()
+                UIManager.createShortcuts(requireContext(), topFav)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 

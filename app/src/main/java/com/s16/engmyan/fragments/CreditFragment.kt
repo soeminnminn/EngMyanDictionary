@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import androidx.fragment.app.DialogFragment
 import com.s16.engmyan.Constants
 import com.s16.engmyan.R
@@ -17,14 +18,13 @@ class CreditFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setStyle(STYLE_NO_TITLE, R.style.AppTheme_Dialog_NoTitle)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE);
         return inflater.inflate(R.layout.fragment_credit, container, false)
     }
 

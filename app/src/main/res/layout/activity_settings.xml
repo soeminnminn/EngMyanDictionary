@@ -5,6 +5,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/window_background"
         tools:context=".activity.SettingsActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -23,9 +24,10 @@
                 android:layout_marginStart="@dimen/dimen_4dp"
                 android:layout_marginRight="@dimen/dimen_4dp"
                 android:layout_marginEnd="@dimen/dimen_4dp"
-                app:layout_collapseMode="pin"
+                android:background="?attr/colorPrimary"
                 android:theme="@style/AppTheme.AppBarOverlay"
-                app:popupTheme="@style/AppTheme.PopupOverlay"/>
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:layout_collapseMode="pin"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 

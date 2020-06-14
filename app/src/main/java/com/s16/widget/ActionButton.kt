@@ -6,13 +6,13 @@ import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
-import android.widget.ImageButton
 import android.widget.Toast
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
+import com.google.android.material.button.MaterialButton
 
 
-class ActionButton: ImageButton, View.OnLongClickListener {
+class ActionButton: MaterialButton, View.OnLongClickListener {
 
     constructor(context: Context) : super(context) {
         initialize(context)

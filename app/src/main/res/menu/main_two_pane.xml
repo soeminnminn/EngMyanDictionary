@@ -6,20 +6,20 @@
     <item
         android:id="@+id/action_favorite"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_favorite"
+        android:icon="@drawable/ic_favorite_off"
         android:title="@string/action_favorite"/>
     
     <item
         android:id="@+id/action_sound"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_volume_up_white"
+        android:icon="@drawable/ic_volume_up"
         android:title="@string/action_sound"
         app:showAsAction="withText|ifRoom" />
     
     <item
         android:id="@+id/action_picture"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_photo_white"
+        android:icon="@drawable/ic_photo"
         android:title="@string/action_picture"
         app:showAsAction="withText|ifRoom"/>
     
@@ -27,7 +27,7 @@
     <item 
         android:id="@+id/action_manage_favorites"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_favorite_border_white"
+        android:icon="@drawable/ic_favorite"
         android:title="@string/action_manage_favorites"
         app:showAsAction="never"/>
     
@@ -35,7 +35,7 @@
     <item 
         android:id="@+id/action_recent"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_alarm_white"
+        android:icon="@drawable/ic_alarm"
         android:title="@string/action_recent"
         app:showAsAction="never"/>
     
@@ -43,7 +43,7 @@
     <item 
         android:id="@+id/action_settings"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_settings_white"
+        android:icon="@drawable/ic_settings"
         android:title="@string/action_settings"
         app:showAsAction="never" />
     
@@ -51,7 +51,7 @@
     <item 
         android:id="@+id/action_exit"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_exit_to_app_white"
+        android:icon="@drawable/ic_exit_to_app"
         android:title="@string/action_exit"
         app:showAsAction="never" />
 

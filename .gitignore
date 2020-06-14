@@ -12,3 +12,4 @@
 /captures
 .externalNativeBuild
 /signing/*.key
+release/

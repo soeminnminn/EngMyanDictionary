@@ -1,15 +1,9 @@
 package com.s16.engmyan.fragments
 
-import android.app.Activity
-import android.app.Dialog
-import android.content.Context
 import android.graphics.Point
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
@@ -21,12 +15,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.s16.engmyan.Constants
 import com.s16.engmyan.R
-import com.s16.engmyan.activity.DetailsActivity
 import com.s16.engmyan.adapters.RecentListAdapter
 import com.s16.engmyan.data.DbManager
 import com.s16.engmyan.data.HistoryItem
 import com.s16.engmyan.data.RecentModel
-import com.s16.utils.startActivity
 import com.s16.view.Adapter
 import com.s16.view.RecyclerViewArrayAdapter
 import kotlinx.android.synthetic.main.fragment_recent.*
@@ -34,6 +26,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class RecentFragment : DialogFragment(), RecyclerViewArrayAdapter.OnItemClickListener {
 
@@ -47,7 +40,6 @@ class RecentFragment : DialogFragment(), RecyclerViewArrayAdapter.OnItemClickLis
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NO_TITLE, R.style.AppTheme_Dialog_NoTitle)
     }
 
     override fun onCreateView(
@@ -57,6 +49,7 @@ class RecentFragment : DialogFragment(), RecyclerViewArrayAdapter.OnItemClickLis
     ): View? {
         val view = inflater.inflate(R.layout.fragment_recent, container, false)
 
+        dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog?.window?.let {
             if (isTwoPane) {
                 it.setGravity(Gravity.TOP or GravityCompat.START)
@@ -154,10 +147,13 @@ class RecentFragment : DialogFragment(), RecyclerViewArrayAdapter.OnItemClickLis
     }
 
     private fun removeAllHistory() {
-        val provider = DbManager(requireContext()).provider()
-
         job = backgroundScope.launch {
-            provider.deleteAllHistory()
+            try {
+                val provider = DbManager(requireContext()).provider()
+                provider.deleteAllHistory()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 

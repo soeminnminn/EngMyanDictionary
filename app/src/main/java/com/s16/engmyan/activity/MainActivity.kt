@@ -1,5 +1,6 @@
 package com.s16.engmyan.activity
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -21,6 +22,7 @@ import com.s16.engmyan.fragments.RecentFragment
 import com.s16.engmyan.utils.MenuItemToggle
 import com.s16.engmyan.utils.SearchUiHelper
 import com.s16.engmyan.utils.TextToSpeechHelper
+import com.s16.engmyan.utils.UIManager
 import com.s16.utils.defaultSharedPreferences
 import com.s16.utils.startActivity
 import com.s16.view.Adapter
@@ -28,6 +30,7 @@ import com.s16.view.RecyclerViewArrayAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.coroutines.*
+import java.lang.Exception
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity(),
@@ -57,6 +60,9 @@ class MainActivity : AppCompatActivity(),
     private val menuPicture = MenuItemToggle()
     private var menuSound : MenuItem? = null
     private lateinit var textToSpeech: TextToSpeechHelper
+
+    private val context: Context
+        get() = this
 
     private val isTwoPane: Boolean
         get() = resources.getInteger(R.integer.screen_width) >= 900
@@ -88,8 +94,8 @@ class MainActivity : AppCompatActivity(),
             }
         })
 
-        searchList.layoutManager = LinearLayoutManager(this)
-        searchList.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
+        searchList.layoutManager = LinearLayoutManager(context)
+        searchList.addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
         searchList.adapter = adapter
 
         model = ViewModelProvider(this).get(DictionaryModel::class.java)
@@ -196,14 +202,19 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onSearchSubmit(searchText: CharSequence?) {
-        val provider = DbManager(this).provider()
-
         searchText?.let { word ->
             submitJob = uiScope.launch {
                 val ids = withContext(Dispatchers.IO) {
                     val searchWord = "$word".replace("'", "''")
                         .replace("%", "").replace("_", "").trim()
-                    provider.queryExacted(searchWord)
+
+                    try {
+                        val provider = DbManager(context).provider()
+                        provider.queryExacted(searchWord)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        listOf<Long>()
+                    }
                 }
                 if (ids.isNotEmpty() && ids.size == 1) {
                     onItemClick(null, null, 0, ids.first())
@@ -227,9 +238,13 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun saveHistory(item: DefinitionItem) {
-        val provider = DbManager(this).provider()
         historyJob = backgroundScope.launch {
-            provider.createHistory(item.word ?: "", item.id)
+            try {
+                val provider = DbManager(context).provider()
+                provider.createHistory(item.word ?: "", item.id)
+            } catch (e: Exception){
+                e.printStackTrace()
+            }
         }
     }
 
@@ -248,22 +263,35 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun performFavorite(isFavorite: Boolean) {
-        val provider = DbManager(this).provider()
         val item = FavoriteItem(word = "$title", refId = recordId, timestamp = System.currentTimeMillis())
 
         favoriteJob = uiScope.launch {
+            val provider = DbManager(context).provider()
+
             val result = withContext(Dispatchers.IO) {
-                if (isFavorite) {
-                    provider.deleteFavoriteByRef(recordId)
-                    0
-                } else {
-                    provider.insertFavorite(item)
+                try {
+                    if (isFavorite) {
+                        provider.deleteFavoriteByRef(recordId)
+                        0L
+                    } else {
+                        provider.insertFavorite(item)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    -1L
                 }
+            }
+
+            try {
+                val topFav = provider.queryTopFavorites()
+                UIManager.createShortcuts(context, topFav)
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
 
             if (result == 0L) {
                 Snackbar.make(mainRoot, getText(R.string.remove_favorites_message), Snackbar.LENGTH_LONG).show()
-            } else {
+            } else if (result > 0L) {
                 Snackbar.make(mainRoot, getText(R.string.add_favorites_message), Snackbar.LENGTH_LONG).show()
             }
         }

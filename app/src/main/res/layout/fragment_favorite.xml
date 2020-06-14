@@ -19,7 +19,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_toLeftOf="@+id/actionsContainer"
                 android:layout_toStartOf="@+id/actionsContainer"
                 android:paddingLeft="?attr/dialogPreferredPadding"
                 android:paddingRight="?attr/dialogPreferredPadding"
@@ -42,7 +41,6 @@
                 android:id="@+id/actionsContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true" >
 
             <LinearLayout
@@ -50,24 +48,24 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginRight="@dimen/dimen_4dp"
-                    android:layout_marginEnd="@dimen/dimen_4dp" >
+                    android:layout_marginEnd="@dimen/dimen_4dp"
+                    android:paddingTop="@dimen/dimen_4dp" >
 
                 <com.s16.widget.ActionButton
                         android:id="@+id/actionEdit"
-                        style="@style/AppWidget.ActionbarButton"
+                        style="@style/AppWidget.ActionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:contentDescription="@string/action_edit"
-                        android:src="@drawable/ic_edit_gray" />
+                        app:icon="@drawable/ic_edit" />
 
                 <com.s16.widget.ActionButton
                         android:id="@+id/actionClose"
-                        style="@style/AppWidget.ActionbarButton"
+                        style="@style/AppWidget.ActionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:contentDescription="@string/action_close"
-                        android:src="@drawable/ic_close_gray" />
+                        app:icon="@drawable/ic_close" />
 
             </LinearLayout>
 
@@ -76,25 +74,25 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginRight="@dimen/dimen_4dp"
                     android:layout_marginEnd="@dimen/dimen_4dp"
+                    android:paddingTop="@dimen/dimen_4dp"
                     android:visibility="gone" >
 
                 <com.s16.widget.ActionButton
                         android:id="@+id/actionDelete"
-                        style="@style/AppWidget.ActionbarButton"
+                        style="@style/AppWidget.ActionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:contentDescription="@string/action_delete"
-                        android:src="@drawable/ic_delete_gray" />
+                        app:icon="@drawable/ic_delete" />
 
                 <com.s16.widget.ActionButton
                         android:id="@+id/actionDone"
-                        style="@style/AppWidget.ActionbarButton"
+                        style="@style/AppWidget.ActionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:contentDescription="@string/action_done"
-                        android:src="@drawable/ic_done_gray" />
+                        app:icon="@drawable/ic_done" />
 
             </LinearLayout>
 

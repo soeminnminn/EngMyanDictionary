@@ -4,7 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/white"
+        android:background="@drawable/window_background"
         android:paddingBottom="@dimen/dimen_64dp"
         android:clipToPadding="false"
         tools:showIn="@layout/fragment_details">

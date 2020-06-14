@@ -1,5 +1,6 @@
 package com.s16.engmyan.activity
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -18,8 +19,10 @@ import com.s16.engmyan.fragments.DetailsFragment
 import com.s16.engmyan.utils.DefinitionBuilder
 import com.s16.engmyan.utils.MenuItemToggle
 import com.s16.engmyan.utils.TextToSpeechHelper
+import com.s16.engmyan.utils.UIManager
 import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.coroutines.*
+import java.lang.Exception
 
 class DetailsActivity : BackStackActivity(),
     DefinitionBuilder.OnWordLinkClickListener {
@@ -45,6 +48,9 @@ class DetailsActivity : BackStackActivity(),
     private var favoriteJob: Job? = null
     private var historyJob: Job? = null
     private var linkClickJob: Job? = null
+
+    private val context: Context
+        get() = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -145,17 +151,21 @@ class DetailsActivity : BackStackActivity(),
     }
 
     override fun onWordLinkClick(word: String) {
-        val provider = DbManager(this).provider()
-
         linkClickJob = uiScope.launch {
             val id = withContext(Dispatchers.IO) {
                 val searchWord = word.replace("'", "''")
                     .replace("%", "").replace("_", "").trim()
-                provider.queryId(searchWord)
+
+                try {
+                    val provider = DbManager(context).provider()
+                    provider.queryId(searchWord)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    -1L
+                }
             }
 
-
-            if (::model.isInitialized) {
+            if (::model.isInitialized && id > 0L) {
                 recordId = id
                 addNewFragment(R.id.detailsContainer, DetailsFragment.newInstance(recordId), "details_$recordId")
                 model.fetch(recordId)
@@ -164,22 +174,35 @@ class DetailsActivity : BackStackActivity(),
     }
 
     private fun performFavorite(isFavorite: Boolean) {
-        val provider = DbManager(this).provider()
         val item = FavoriteItem(word = "$title", refId = recordId, timestamp = System.currentTimeMillis())
 
         favoriteJob = uiScope.launch {
+            val provider = DbManager(context).provider()
+
             val result = withContext(Dispatchers.IO) {
-                if (isFavorite) {
-                    provider.deleteFavoriteByRef(recordId)
-                    0
-                } else {
-                    provider.insertFavorite(item)
+                try {
+                    if (isFavorite) {
+                        provider.deleteFavoriteByRef(recordId)
+                        0L
+                    } else {
+                        provider.insertFavorite(item)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    -1L
                 }
+            }
+
+            try {
+                val topFav = provider.queryTopFavorites()
+                UIManager.createShortcuts(context, topFav)
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
 
             if (result == 0L) {
                 Snackbar.make(detailsRoot, getText(R.string.remove_favorites_message), Snackbar.LENGTH_LONG).show()
-            } else {
+            } else if (result > 0L) {
                 Snackbar.make(detailsRoot, getText(R.string.add_favorites_message), Snackbar.LENGTH_LONG).show()
             }
         }
@@ -194,9 +217,13 @@ class DetailsActivity : BackStackActivity(),
     }
 
     private fun saveHistory(item: DefinitionItem) {
-        val provider = DbManager(this).provider()
         historyJob = backgroundScope.launch {
-            provider.createHistory(item.word ?: "", item.id)
+            try {
+                val provider = DbManager(context).provider()
+                provider.createHistory(item.word ?: "", item.id)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }

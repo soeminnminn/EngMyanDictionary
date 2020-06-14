@@ -31,6 +31,8 @@
     <string name="title_credit">ဖန်တီးသူ</string>
     <string name="title_synonym">Synonym</string>
 
+    <string name="title_shortcut">\'%s\' ၏ အဓိပ္ပာယ်</string>
+
     <string name="favorites_title">စိတ်ကြိုက်များ</string>
     <string name="favorites_edit_title">စိတ်ကြိုက်များ ပြင်ရန်</string>
     <string name="favorites_delete_message">စိတ်ကြိုက်များမှ ဖျက်ပါမည်လား။</string>
@@ -40,6 +42,13 @@
     <string name="clear_recent_title">ယခင်အသုံးများ ရှင်းပါမည်လား။</string>
 
     <string name="prefs_category_general">ယေဘုယျ</string>
+
+    <string name="prefs_theme">အဆင်အပြင်</string>
+
+    <string name="prefs_theme_light">အလင်း</string>
+    <string name="prefs_theme_dark">အမှောင်</string>
+    <string name="prefs_theme_battery">ဓါတ်ခဲအားကို လိုက်၍</string>
+    <string name="prefs_theme_system">စက်မှသတ်မှတ်ချက် အတိုင်း</string>
 
     <string name="prefs_font_size">Font size</string>
     <string name="prefs_font_size_summary">Change definition font size</string>

@@ -8,6 +8,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 
 
 @SuppressLint("ClickableViewAccessibility")
@@ -103,6 +104,10 @@ class ClearableEditText : AppCompatEditText, View.OnTouchListener, View.OnFocusC
     }
 
     private fun initIcon() {
+        compoundDrawablesRelative.forEach {
+            if (it != null) DrawableCompat.setTint(it, currentTextColor)
+        }
+
         this.xD = null
         if (this.loc != null) {
             this.xD = compoundDrawablesRelative[loc!!.idx]
@@ -111,6 +116,7 @@ class ClearableEditText : AppCompatEditText, View.OnTouchListener, View.OnFocusC
             this.xD = ContextCompat.getDrawable(context, android.R.drawable.presence_offline)
         }
         this.xD?.let {
+            DrawableCompat.setTint(it, currentTextColor)
             it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
             val min = paddingTop + it.intrinsicHeight + paddingBottom
             if (suggestedMinimumHeight < min) {

@@ -32,7 +32,15 @@
         <activity
                 android:name=".activity.DetailsActivity"
                 android:launchMode="singleTop"
-                android:theme="@style/AppTheme.NoActionBar" />
+                android:exported="true"
+                android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <action android:name="android.intent.action.VIEW" />
+                <data android:scheme="com.s16.engmyan" />
+            </intent-filter>
+        </activity>
 
         <activity
                 android:name=".activity.SettingsActivity"

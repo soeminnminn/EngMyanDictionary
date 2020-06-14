@@ -4,6 +4,12 @@
     <color name="colorPrimaryDark">#FF4F5175</color>
     <color name="colorAccent">#FF8286C2</color>
 
+    <color name="colorBackgroundDark">#ff303030</color>
+    <color name="colorBackgroundLight">#ffffffff</color>
+
+    <color name="colorBackground">@color/colorBackgroundLight</color>
+    <color name="colorForeground">@color/bright_foreground_holo_light</color>
+
     <color name="imageview_background">#a060638f</color>
     <color name="covered_color">#60000000</color>
     <color name="title_synonym">#ff8080C0</color>

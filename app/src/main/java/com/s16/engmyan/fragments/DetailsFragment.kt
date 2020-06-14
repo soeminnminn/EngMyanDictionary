@@ -19,6 +19,7 @@ import com.s16.utils.*
 import kotlinx.android.synthetic.main.content_definition.*
 import kotlinx.android.synthetic.main.fragment_details.*
 import kotlinx.coroutines.*
+import java.lang.Exception
 
 
 class DetailsFragment : Fragment() {
@@ -62,7 +63,6 @@ class DetailsFragment : Fragment() {
             Constants.PREFS_FONT_SIZE, Constants.PREFS_FORCE_ZAWGYI,
             Constants.PREFS_WORD_CLICKABLE, Constants.PREFS_SHOW_SYNONYM)
         optionsModel.observe(viewLifecycleOwner, Observer {
-            // it[Constants.PREFS_WORD_CLICKABLE].
             dataBind()
         })
 
@@ -102,7 +102,7 @@ class DetailsFragment : Fragment() {
         model.data.observe(
             viewLifecycleOwner, Observer<DefinitionItem> { item ->
                 definitionBuilder.setDefinition("${item.definition}")
-                    .setKeywords(item.keywords)
+                definitionBuilder.setKeywords(item.keywords)
 
                 job = uiScope.launch {
                     if (forceZawgyi) {
@@ -114,13 +114,22 @@ class DetailsFragment : Fragment() {
                                 val convertedItem = ConvertedItem(refId = item.id,
                                     mode = "zawgyi", value = converted,
                                     timestamp = System.currentTimeMillis())
-                                DbManager(requireContext()).provider().insertConverted(convertedItem)
+
+                                try {
+                                    val provider = DbManager(requireContext()).provider()
+                                    provider.insertConverted(convertedItem)
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
                             }
                         }
 
                         definitionBuilder.setDefinition(converted)
                     }
-                    textViewDetails.setText(definitionBuilder.build(), TextView.BufferType.NORMAL)
+
+                    if (textViewDetails != null) {
+                        textViewDetails.setText(definitionBuilder.build(), TextView.BufferType.NORMAL)
+                    }
                 }
 
                 if (isShowSynonym && (item.synonym ?: "").isNotEmpty()) {
